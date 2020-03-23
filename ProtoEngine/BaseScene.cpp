@@ -75,7 +75,9 @@ void BaseScene::RootInitialize()
 		return;
 
 	//User-Scene Initialize
-	Initialize();
+	InitializeCommands();
+	InitializeControls();
+	InitializeScene();
 
 	//Root-Scene Initialize
 	for (auto pChild : m_pChildren)

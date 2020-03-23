@@ -24,5 +24,6 @@
     <ClInclude Include="StartScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Commands.h" />
   </ItemGroup>
 </Project>

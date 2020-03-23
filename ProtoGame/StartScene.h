@@ -8,10 +8,16 @@ public:
 	~StartScene() override = default;
 	
 protected:
-	void Initialize() override;
+	void InitializeCommands() override;
+	void InitializeControls() override;
+	void InitializeScene() override;
 	void Update() override;
 	void Draw() override;
 	void SceneActivated() override;
 	void SceneDeactivated() override;
+
+private:
+	std::string m_JumpDataExample{ "Boing!" };
+	AudioServices m_AudioServices{};
 };
 

@@ -69,6 +69,15 @@
     <ClCompile Include="TextComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="CommandManager.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -136,6 +145,18 @@
     </ClInclude>
     <ClInclude Include="TextComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandManager.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCommand.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

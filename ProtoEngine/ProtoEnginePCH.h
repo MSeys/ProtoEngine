@@ -9,6 +9,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#define COMMAND_DEFAULT "DFLT_C"  // NOLINT(cppcoreguidelines-macro-usage)
+#define COMMAND_EXIT "EXIT_C"  // NOLINT(cppcoreguidelines-macro-usage)
+
 // Define Singletons
 #include "Renderer.h"
 #define ProtoRenderer Proto::Renderer::GetInstance()  // NOLINT(cppcoreguidelines-macro-usage)
@@ -25,6 +28,13 @@
 #include "TimeManager.h"
 #define ProtoTime Proto::TimeManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
 
+#include "CommandManager.h"
+#define ProtoCommands Proto::CommandManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+
+#include "Audio.h"
+#define ProtoAudio ServiceLocator
+
 #include "Utils.h"
 #include "Components.h"
 #include "Structs.h"
+#include "Buttons.h"

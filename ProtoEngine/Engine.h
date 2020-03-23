@@ -27,6 +27,7 @@ namespace Proto
 
 		BaseGame* m_pGame;
 		WindowSettings m_WindowSettings;
+		bool m_Exit{ false };
 		
 		void Initialize();
 		void Cleanup();

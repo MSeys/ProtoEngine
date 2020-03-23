@@ -26,18 +26,20 @@ Proto::Engine::~Engine()
 
 void Proto::Engine::Run()
 {
-	bool exit{ false };
-
 	ProtoTime.SetStartTime(std::chrono::steady_clock::now());
-	while(!exit)
+	while(!m_Exit)
 	{
 		ProtoTime.SetCurrTime(std::chrono::steady_clock::now());
 		ProtoTime.UpdateTime();
 		ProtoTime.SetStartTime(ProtoTime.GetCurrTime());
+
+		ProtoInput.UpdateStates();
+		ProtoInput.ProcessStates();
 		
-		exit = !ProtoInput.ProcessInput(); // temporary
 		ProtoScenes.Update();
 		ProtoScenes.Draw();
+
+		ProtoCommands.ResetInputData();
 	}
 }
 
@@ -60,6 +62,11 @@ void Proto::Engine::Initialize()
 
 	ProtoRenderer.Init(m_Window);
 	ProtoResources.Init("../Data/");
+	ProtoAudio::Init();
+
+	ProtoInput.AddKey(SDLK_ESCAPE);
+	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
+	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
 }
 
 void Proto::Engine::Cleanup()
