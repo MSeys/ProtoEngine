@@ -1,6 +1,7 @@
+// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream> // std::cout
 #include <sstream> // stringstream
 #include <memory> // smart pointers
@@ -9,27 +10,26 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#define COMMAND_DEFAULT "DFLT_C"  // NOLINT(cppcoreguidelines-macro-usage)
-#define COMMAND_EXIT "EXIT_C"  // NOLINT(cppcoreguidelines-macro-usage)
+#define STRINGIFY(x) #x
 
 // Define Singletons
 #include "Renderer.h"
-#define ProtoRenderer Proto::Renderer::GetInstance()  // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoRenderer Proto::Renderer::GetInstance() 
 
 #include "InputManager.h"
-#define ProtoInput Proto::InputManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoInput Proto::InputManager::GetInstance()
 
 #include "ResourceManager.h"
-#define ProtoResources Proto::ResourceManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoResources Proto::ResourceManager::GetInstance()
 
 #include "SceneManager.h"
-#define ProtoScenes Proto::SceneManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoScenes Proto::SceneManager::GetInstance()
 
 #include "TimeManager.h"
-#define ProtoTime Proto::TimeManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoTime Proto::TimeManager::GetInstance()
 
 #include "CommandManager.h"
-#define ProtoCommands Proto::CommandManager::GetInstance() // NOLINT(cppcoreguidelines-macro-usage)
+#define ProtoCommands Proto::CommandManager::GetInstance()
 
 #include "Audio.h"
 #define ProtoAudio ServiceLocator

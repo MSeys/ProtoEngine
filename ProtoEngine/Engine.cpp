@@ -45,7 +45,19 @@ void Proto::Engine::Run()
 
 void Proto::Engine::Initialize()
 {
-	if(SDL_Init(SDL_INIT_VIDEO) != 0)
+	InitializeSDL();
+	InitializeEngineParts();
+
+	
+
+	ProtoInput.AddKey(SDLK_ESCAPE);
+	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
+	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
+}
+
+void Proto::Engine::InitializeSDL()
+{
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 
 	m_Window = SDL_CreateWindow(
@@ -57,24 +69,51 @@ void Proto::Engine::Initialize()
 		SDL_WINDOW_OPENGL
 	);
 
-	if(!m_Window)
+	if (!m_Window)
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
+}
 
+void Proto::Engine::InitializeEngineParts() const
+{
+	// ProtoRenderer
 	ProtoRenderer.Init(m_Window);
-	ProtoResources.Init("../Data/");
-	ProtoAudio::Init();
 
-	ProtoInput.AddKey(SDLK_ESCAPE);
-	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
-	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
+	// ProtoInput
+	ProtoInput.Init();
+
+	// ProtoCommands
+	ProtoCommands.Init();
+	
+	// ProtoResource
+	ProtoResources.Init("../Data/");
+
+	// ProtoAudio
+	ProtoAudio::Init();
 }
 
 void Proto::Engine::Cleanup()
 {
-	ProtoRenderer.Destroy();
-	SafeDelete(m_pGame);
-	
+	CleanupEngineParts();
+	CleanupSDL();
+}
+
+void Proto::Engine::CleanupSDL()
+{
 	SDL_DestroyWindow(m_Window);
 	m_Window = nullptr;
 	SDL_Quit();
+}
+
+void Proto::Engine::CleanupEngineParts()
+{
+	// ProtoRenderer
+	ProtoRenderer.Destroy();
+
+	// ProtoInput
+	ProtoInput.Destroy();
+
+	// ProtoCommands
+	ProtoCommands.Destroy();
+	
+	SafeDelete(m_pGame);
 }

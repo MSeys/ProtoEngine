@@ -7,6 +7,8 @@
 #include "windows.h"
 #include <Xinput.h>
 
+#include "CommandManager.h"
+
 #pragma region Button and Keys
 enum class ButtonState
 {

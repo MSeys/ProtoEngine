@@ -5,7 +5,6 @@
 #include "Commands.h"
 #include "GameObject.h"
 
-
 StartScene::StartScene(const std::wstring& sceneName)
 	: BaseScene(sceneName)
 {

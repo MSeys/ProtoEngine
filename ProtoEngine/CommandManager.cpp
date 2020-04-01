@@ -3,16 +3,15 @@
 
 #include <iostream>
 
-
-Proto::CommandManager::CommandManager()
+void Proto::CommandManager::Init()
 {
-	m_Commands[COMMAND_DEFAULT] = new DefaultCommand(); // Add Default Command | Useful for Debugging Purposes
-	m_Commands[COMMAND_EXIT] = new ExitCommand();
+	m_Commands[COMMAND_DEFAULT] = new DefaultCommand(); // Add default command | Useful for Debugging
+	m_Commands[COMMAND_EXIT] = new ExitCommand(); // Add Exit command | Basic bool exit handling | Used in Force Exit for SDL_QUIT Event
 }
 
-Proto::CommandManager::~CommandManager()
+void Proto::CommandManager::Destroy()
 {
-	for(std::pair<std::string, Command*> pair : m_Commands)
+	for (std::pair<std::string, Command*> pair : m_Commands)
 		SafeDelete(pair.second);
 }
 
@@ -39,6 +38,11 @@ Command* Proto::CommandManager::GetCommand(const std::string& commandID) const
 
 	std::cout << "CommandManager::GetCommand failed > Command not found. (NullPointerException)" << std::endl; // TODO: Replace by Logger
 	return nullptr;
+}
+
+void Proto::CommandManager::ForceExit()
+{
+	m_Commands.at(COMMAND_EXIT)->Execute();
 }
 
 void Proto::CommandManager::ResetInputData()

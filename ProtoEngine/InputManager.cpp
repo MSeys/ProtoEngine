@@ -4,7 +4,7 @@
 
 #include "Buttons.h"
 
-Proto::InputManager::InputManager()
+void Proto::InputManager::Init()
 {
 	for (int i{ XINPUT_CONTROLLER_MIN_INDEX }; i <= XINPUT_CONTROLLER_MAX_INDEX; i++)
 	{
@@ -20,16 +20,16 @@ Proto::InputManager::InputManager()
 	m_pMouse = new Mouse();
 }
 
-Proto::InputManager::~InputManager()
+void Proto::InputManager::Destroy()
 {
-	for(auto& upperPair : m_ControllerButtons)
-		for(auto& innerPair : upperPair.second)
+	for (auto& upperPair : m_ControllerButtons)
+		for (auto& innerPair : upperPair.second)
 			SafeDelete(innerPair.second);
 
 	for (auto& pair : m_Keys)
 		SafeDelete(pair.second);
 
-	for(auto& pJoystick : m_pLeftJoysticks)
+	for (auto& pJoystick : m_pLeftJoysticks)
 		SafeDelete(pJoystick);
 
 	for (auto& pJoystick : m_pRightJoysticks)
@@ -49,65 +49,8 @@ Proto::InputManager::~InputManager()
 
 void Proto::InputManager::UpdateStates()
 {
-	for (int i{ XINPUT_CONTROLLER_MIN_INDEX }; i <= XINPUT_CONTROLLER_MAX_INDEX; i++)
-	{
-		m_OldStates[i] = m_CurrentStates[i];
-		ZeroMemory(&m_CurrentStates[i], sizeof(XINPUT_STATE));
-		XInputGetState(0, &m_CurrentStates[i]);
-	}
-
-	for (auto& pair : m_Keys)
-	{
-		Key* pKey{ pair.second };
-		pKey->UpdateOutPoll();
-	}
-
-	for(auto& pMouseButton : m_pMouseButtons)
-	{
-		pMouseButton->UpdateOutPoll();
-	}
-
-	GetMouse()->UpdateOutPoll();
-	
-	SDL_Event e;
-	while (SDL_PollEvent(&e)) {
-		if(e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
-		{
-			if(GetKey(e.key.keysym.sym, false))
-			{
-				GetKey(e.key.keysym.sym)->UpdateInPoll(e);
-			}
-		}
-
-		if(e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
-		{
-			GetMouseButton(e.button.button)->UpdateInPoll(e);
-		}
-
-		if(e.type == SDL_MOUSEMOTION)
-		{
-			GetMouse()->UpdateInPoll(e);
-		}
-	}
-
-	for (auto& upperPair : m_ControllerButtons)
-	{
-		const int index{ upperPair.first };
-		for (auto& innerPair : upperPair.second)
-		{
-			ControllerButton* pControllerButton{ innerPair.second };
-			pControllerButton->Update(m_OldStates[index], m_CurrentStates[index]);
-		}
-	}
-
-	for (int i{ XINPUT_CONTROLLER_MIN_INDEX }; i <= XINPUT_CONTROLLER_MAX_INDEX; i++)
-	{
-		m_pLeftJoysticks[i]->Update(m_OldStates[i], m_CurrentStates[i]);
-		m_pRightJoysticks[i]->Update(m_OldStates[i], m_CurrentStates[i]);
-
-		m_pLeftTriggers[i]->Update(m_OldStates[i], m_CurrentStates[i]);
-		m_pRightTriggers[i]->Update(m_OldStates[i], m_CurrentStates[i]);
-	}
+	UpdateController();
+	UpdateKeyboardAndMouse();
 }
 
 void Proto::InputManager::ProcessStates()
@@ -247,4 +190,77 @@ MouseButton* Proto::InputManager::GetMouseButton(int sdlKey)
 Mouse* Proto::InputManager::GetMouse() const
 {
 	return m_pMouse;
+}
+
+void Proto::InputManager::UpdateKeyboardAndMouse()
+{
+	for (auto& pair : m_Keys)
+	{
+		Key* pKey{ pair.second };
+		pKey->UpdateOutPoll();
+	}
+
+	for (auto& pMouseButton : m_pMouseButtons)
+	{
+		pMouseButton->UpdateOutPoll();
+	}
+
+	GetMouse()->UpdateOutPoll();
+
+	SDL_Event e;
+	while (SDL_PollEvent(&e))
+	{
+		if(e.type == SDL_QUIT)
+		{
+			ProtoCommands.ForceExit();
+			break;
+		}
+
+		if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+		{
+			if (GetKey(e.key.keysym.sym, false))
+			{
+				GetKey(e.key.keysym.sym)->UpdateInPoll(e);
+			}
+		}
+
+		if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
+		{
+			GetMouseButton(e.button.button)->UpdateInPoll(e);
+		}
+
+		if (e.type == SDL_MOUSEMOTION)
+		{
+			GetMouse()->UpdateInPoll(e);
+		}
+	}
+}
+
+void Proto::InputManager::UpdateController()
+{
+	for (int i{ XINPUT_CONTROLLER_MIN_INDEX }; i <= XINPUT_CONTROLLER_MAX_INDEX; i++)
+	{
+		m_OldStates[i] = m_CurrentStates[i];
+		ZeroMemory(&m_CurrentStates[i], sizeof(XINPUT_STATE));
+		XInputGetState(0, &m_CurrentStates[i]);
+	}
+	
+	for (auto& upperPair : m_ControllerButtons)
+	{
+		const int index{ upperPair.first };
+		for (auto& innerPair : upperPair.second)
+		{
+			ControllerButton* pControllerButton{ innerPair.second };
+			pControllerButton->Update(m_OldStates[index], m_CurrentStates[index]);
+		}
+	}
+
+	for (int i{ XINPUT_CONTROLLER_MIN_INDEX }; i <= XINPUT_CONTROLLER_MAX_INDEX; i++)
+	{
+		m_pLeftJoysticks[i]->Update(m_OldStates[i], m_CurrentStates[i]);
+		m_pRightJoysticks[i]->Update(m_OldStates[i], m_CurrentStates[i]);
+
+		m_pLeftTriggers[i]->Update(m_OldStates[i], m_CurrentStates[i]);
+		m_pRightTriggers[i]->Update(m_OldStates[i], m_CurrentStates[i]);
+	}
 }

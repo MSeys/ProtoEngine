@@ -30,6 +30,12 @@ namespace Proto
 		bool m_Exit{ false };
 		
 		void Initialize();
+		void InitializeSDL();
+		void InitializeEngineParts() const;
+		
 		void Cleanup();
+		void CleanupSDL();
+		void CleanupEngineParts();
+		
 	};
 }

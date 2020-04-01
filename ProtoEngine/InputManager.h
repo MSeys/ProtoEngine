@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include "Buttons.h"
-#include "CommandManager.h"
 #include "windows.h"
 #include "Xinput.h"
 
@@ -12,8 +11,8 @@
 
 class Command;
 
-#define XINPUT_CONTROLLER_MIN_INDEX 0  // NOLINT(cppcoreguidelines-macro-usage)
-#define XINPUT_CONTROLLER_MAX_INDEX 3  // NOLINT(cppcoreguidelines-macro-usage)
+constexpr int XINPUT_CONTROLLER_MIN_INDEX = 0;
+constexpr int XINPUT_CONTROLLER_MAX_INDEX = 3;
 
 namespace Proto
 {
@@ -21,8 +20,8 @@ namespace Proto
 	{
 
 	public:
-		InputManager();
-		~InputManager();
+		void Init();
+		void Destroy();
 
 		void UpdateStates();
 		void ProcessStates();
@@ -53,5 +52,8 @@ namespace Proto
 
 		std::array<MouseButton*, 2> m_pMouseButtons{};
 		Mouse* m_pMouse{};
+
+		void UpdateKeyboardAndMouse();
+		void UpdateController();
 	};
 }
