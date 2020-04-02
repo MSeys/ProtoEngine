@@ -48,9 +48,6 @@
     <ClCompile Include="TransformComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="BaseGame.cpp">
-      <Filter>Scenegraph</Filter>
-    </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
@@ -77,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsManager.cpp">
+      <Filter>Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,9 +134,6 @@
     <ClInclude Include="RenderComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="Structs.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -157,6 +154,12 @@
     </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsManager.h">
+      <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

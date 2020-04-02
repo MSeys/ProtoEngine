@@ -14,9 +14,6 @@ Proto::Engine::Engine(BaseGame* pGame, WindowSettings windowSettings)
 	: m_pGame(pGame), m_WindowSettings(std::move(windowSettings))
 {
 	Initialize();
-	
-	m_pGame->Initialize();
-	ProtoTime.SetMaxFPS(m_pGame->GetMaxFPS());
 }
 
 Proto::Engine::~Engine()
@@ -24,7 +21,7 @@ Proto::Engine::~Engine()
 	Cleanup();
 }
 
-void Proto::Engine::Run()
+void Proto::Engine::Run() const
 {
 	ProtoTime.SetStartTime(std::chrono::steady_clock::now());
 	while(!m_Exit)
@@ -48,11 +45,8 @@ void Proto::Engine::Initialize()
 	InitializeSDL();
 	InitializeEngineParts();
 
-	
-
-	ProtoInput.AddKey(SDLK_ESCAPE);
-	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
-	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
+	// Game
+	m_pGame->Initialize();
 }
 
 void Proto::Engine::InitializeSDL()
@@ -61,11 +55,11 @@ void Proto::Engine::InitializeSDL()
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 
 	m_Window = SDL_CreateWindow(
-		m_WindowSettings.title.c_str(),
+		m_WindowSettings.Title.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		m_WindowSettings.windowWidth,
-		m_WindowSettings.windowHeight,
+		m_WindowSettings.WindowWidth,
+		m_WindowSettings.WindowHeight,
 		SDL_WINDOW_OPENGL
 	);
 
@@ -73,16 +67,22 @@ void Proto::Engine::InitializeSDL()
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 }
 
-void Proto::Engine::InitializeEngineParts() const
+void Proto::Engine::InitializeEngineParts()
 {
+	// ProtoSettings
+	ProtoSettings.Init(m_WindowSettings);
+	
 	// ProtoRenderer
 	ProtoRenderer.Init(m_Window);
 
 	// ProtoInput
 	ProtoInput.Init();
-
+	ProtoInput.AddKey(SDLK_ESCAPE);
+	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
+	
 	// ProtoCommands
 	ProtoCommands.Init();
+	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
 	
 	// ProtoResource
 	ProtoResources.Init("../Data/");
@@ -93,6 +93,9 @@ void Proto::Engine::InitializeEngineParts() const
 
 void Proto::Engine::Cleanup()
 {
+	// Game
+	SafeDelete(m_pGame);
+	
 	CleanupEngineParts();
 	CleanupSDL();
 }
@@ -114,6 +117,4 @@ void Proto::Engine::CleanupEngineParts()
 
 	// ProtoCommands
 	ProtoCommands.Destroy();
-	
-	SafeDelete(m_pGame);
 }

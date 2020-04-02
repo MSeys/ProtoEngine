@@ -13,6 +13,9 @@
 #define STRINGIFY(x) #x
 
 // Define Singletons
+#include "SettingsManager.h"
+#define ProtoSettings Proto::SettingsManager::GetInstance()
+
 #include "Renderer.h"
 #define ProtoRenderer Proto::Renderer::GetInstance() 
 
@@ -25,11 +28,11 @@
 #include "SceneManager.h"
 #define ProtoScenes Proto::SceneManager::GetInstance()
 
-#include "TimeManager.h"
-#define ProtoTime Proto::TimeManager::GetInstance()
-
 #include "CommandManager.h"
 #define ProtoCommands Proto::CommandManager::GetInstance()
+
+#include "TimeManager.h"
+#define ProtoTime Proto::TimeManager::GetInstance()
 
 #include "Audio.h"
 #define ProtoAudio ServiceLocator

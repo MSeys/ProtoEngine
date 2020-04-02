@@ -13,7 +13,7 @@ void FPSComponent::Update()
 	if (m_Timer > 0.2f)
 	{
 		TextComponent::Update();
-		SetText(std::to_string(int(1 / ProtoTime.DeltaTime)) + " FPS");
+		SetText(std::to_string(ProtoTime.FPS) + " FPS");
 		m_Timer = 0.f;
 	}
 }
