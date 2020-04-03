@@ -21,6 +21,11 @@ void StartScene::InitializeCommands()
 
 	ProtoAudio::RegisterAudioService(&m_AudioServices.LogAudio);
 	ProtoCommands.GetCommand("SwitchAudioService")->SetExecuteData(&m_AudioServices);
+
+	/* Extra Commands */
+	ProtoCommands.AddCommand(new JoystickCommand(), "Joystick");
+	ProtoCommands.AddCommand(new MouseCommand(), "Mouse");
+	ProtoCommands.AddCommand(new TriggerCommand(), "Trigger");
 }
 
 void StartScene::InitializeControls()
@@ -39,6 +44,11 @@ void StartScene::InitializeControls()
 
 	ProtoInput.AddKey(SDLK_t);
 	ProtoInput.GetKey(SDLK_t).SetCommand(ButtonState::Pressed, "SwitchAudioService");
+
+	/* Extra Inputs */
+	ProtoInput.GetControllerJoystick(0, StickState::Left).SetCommand(JoystickState::Moving, "Joystick");
+	ProtoInput.GetControllerTrigger(0, TriggerPosState::Left).SetCommand(TriggerState::Held, "Trigger");
+	ProtoInput.GetMouse().SetCommand(JoystickState::Moving, "Mouse");
 }
 
 void StartScene::InitializeScene()
