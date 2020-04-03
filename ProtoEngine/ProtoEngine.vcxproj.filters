@@ -19,6 +19,12 @@
     <Filter Include="Scenegraph">
       <UniqueIdentifier>{121cbf75-873e-461f-af2e-26e5d19f4fde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers\Input">
+      <UniqueIdentifier>{b288a8e7-f0b4-493e-b1c0-b54051e6508e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Input\Handlers">
+      <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -35,9 +41,6 @@
     </ClCompile>
     <ClCompile Include="Texture2D.cpp">
       <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Helpers</Filter>
@@ -66,9 +69,6 @@
     <ClCompile Include="TextComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="CommandManager.cpp">
-      <Filter>Helpers</Filter>
-    </ClCompile>
     <ClCompile Include="Buttons.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -77,6 +77,18 @@
     </ClCompile>
     <ClCompile Include="SettingsManager.cpp">
       <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandManager.cpp">
+      <Filter>Helpers\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Helpers\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="ControllerHandler.cpp">
+      <Filter>Helpers\Input\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="KBMHandler.cpp">
+      <Filter>Helpers\Input\Handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Helpers</Filter>
@@ -143,9 +152,6 @@
     <ClInclude Include="TextComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="CommandManager.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="BaseCommand.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -160,6 +166,18 @@
     </ClInclude>
     <ClInclude Include="SettingsManager.h">
       <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Helpers\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandManager.h">
+      <Filter>Helpers\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ControllerHandler.h">
+      <Filter>Helpers\Input\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="KBMHandler.h">
+      <Filter>Helpers\Input\Handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

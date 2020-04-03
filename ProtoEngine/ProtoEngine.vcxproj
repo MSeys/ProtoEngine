@@ -188,11 +188,13 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClCompile Include="BaseComponent.cpp" />
     <ClCompile Include="Buttons.cpp" />
     <ClCompile Include="CommandManager.cpp" />
+    <ClCompile Include="ControllerHandler.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPSComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="KBMHandler.cpp" />
     <ClCompile Include="ProtoEnginePCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -217,10 +219,12 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="CommandManager.h" />
     <ClInclude Include="BaseCommand.h" />
     <ClInclude Include="Components.h" />
+    <ClInclude Include="ControllerHandler.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPSComponent.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="KBMHandler.h" />
     <ClInclude Include="ProtoEnginePCH.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="Renderer.h" />

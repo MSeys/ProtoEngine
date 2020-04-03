@@ -30,8 +30,8 @@ void Proto::Engine::Run() const
 		ProtoTime.UpdateTime();
 		ProtoTime.SetStartTime(ProtoTime.GetCurrTime());
 
-		ProtoInput.UpdateStates();
-		ProtoInput.ProcessStates();
+		ProtoInput.Update();
+		ProtoInput.Process();
 		
 		ProtoScenes.Update();
 		ProtoScenes.Draw();
@@ -78,7 +78,7 @@ void Proto::Engine::InitializeEngineParts()
 	// ProtoInput
 	ProtoInput.Init();
 	ProtoInput.AddKey(SDLK_ESCAPE);
-	ProtoInput.GetKey(SDLK_ESCAPE)->SetCommand(ButtonState::Pressed, COMMAND_EXIT);
+	ProtoInput.GetKey(SDLK_ESCAPE).SetCommand(ButtonState::Pressed, COMMAND_EXIT);
 	
 	// ProtoCommands
 	ProtoCommands.Init();
