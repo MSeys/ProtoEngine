@@ -75,14 +75,14 @@ void Proto::Engine::InitializeEngineParts()
 	// ProtoRenderer
 	ProtoRenderer.Init(m_Window);
 
-	// ProtoInput
-	ProtoInput.Init();
-	ProtoInput.AddKey(SDLK_ESCAPE);
-	ProtoInput.GetKey(SDLK_ESCAPE).SetCommand(ButtonState::Pressed, COMMAND_EXIT);
-	
 	// ProtoCommands
 	ProtoCommands.Init();
-	ProtoCommands.GetCommand(COMMAND_EXIT)->SetExecuteData(&m_Exit);
+	ProtoCommands.GetCommand(COMMAND_EXIT).SetExecuteData(&m_Exit);
+	
+	// ProtoInput
+	ProtoInput.Init();
+	ProtoInput.AddKey(SDLK_ESCAPE, STRINGIFY(SDLK_ESCAPE));
+	ProtoInput.GetKey(SDLK_ESCAPE).SetCommand(ButtonState::Pressed, COMMAND_EXIT);
 	
 	// ProtoResource
 	ProtoResources.Init("../Data/");

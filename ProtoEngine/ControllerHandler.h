@@ -1,4 +1,6 @@
 #pragma once
+#include "Triggers.h"
+#include "Joysticks.h"
 #include "Buttons.h"
 
 constexpr int XINPUT_CONTROLLER_MIN_INDEX = 0;
@@ -15,7 +17,7 @@ namespace Proto
 		void Update();
 		void Process();
 
-		bool AddInput(int index, int XInput);
+		bool AddInput(int index, int XInput, const std::string& stringifiedXInput);
 		ControllerButton& GetInput(int index, int XInput);
 		ControllerJoystick& GetInput(int index, const StickState& stickState) const;
 		ControllerTrigger& GetInput(int index, const TriggerPosState& triggerPosState) const;

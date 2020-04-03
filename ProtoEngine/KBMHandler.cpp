@@ -7,7 +7,7 @@ void KBMHandler::Init()
 	m_pMouseButtons[1] = new MouseButton();
 	m_pMouse = new Mouse();
 
-	m_pDefaultKey = new Key();
+	m_pDefaultKey = new Key("UNDEFINED");
 }
 
 void KBMHandler::Destroy()
@@ -77,7 +77,7 @@ void KBMHandler::Process()
 	GetInput().Process();
 }
 
-bool KBMHandler::AddInput(int SDLKey)
+bool KBMHandler::AddInput(int SDLKey, const std::string& stringifiedSDLKey)
 {
 	if (m_Keys.find(SDLKey) != m_Keys.end())
 	{
@@ -85,7 +85,7 @@ bool KBMHandler::AddInput(int SDLKey)
 		return false;
 	}
 
-	m_Keys[SDLKey] = new Key();
+	m_Keys[SDLKey] = new Key(stringifiedSDLKey);
 	return true;
 }
 
@@ -101,7 +101,7 @@ Key& KBMHandler::GetInput(int SDLKey, bool doesCreate)
 		UNREFERENCED_PARAMETER(exception);
 		if (doesCreate)
 		{
-			AddInput(SDLKey);
+			AddInput(SDLKey, "UNDEFINED");
 			std::cout << "KBMHandler::GetInput(SDLKey, ...) failed > Key was not found, but has been created. Use AddKey first on the desired key." << std::endl; // TODO: Replace by Logger
 
 			return GetInput(SDLKey);

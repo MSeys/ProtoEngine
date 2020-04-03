@@ -93,7 +93,7 @@ void Proto::ControllerHandler::Process()
 	}
 }
 
-bool Proto::ControllerHandler::AddInput(int index, int XInput)
+bool Proto::ControllerHandler::AddInput(int index, int XInput, const std::string& stringifiedXInput)
 {
 	if (index > XINPUT_CONTROLLER_MAX_INDEX || index < XINPUT_CONTROLLER_MIN_INDEX)
 	{
@@ -107,7 +107,7 @@ bool Proto::ControllerHandler::AddInput(int index, int XInput)
 		return false;
 	}
 
-	m_ControllerButtons[index][XInput] = new ControllerButton{ XInput };
+	m_ControllerButtons[index][XInput] = new ControllerButton{ XInput, stringifiedXInput };
 	return true;
 }
 
@@ -122,8 +122,8 @@ ControllerButton& Proto::ControllerHandler::GetInput(int index, int XInput)
 	{
 		UNREFERENCED_PARAMETER(exception);
 
-		AddInput(index, XInput);
-		std::cout << "ControllerHandler::GetInput(index, XInput) failed > Controller Button not found, but AddInput was called for safety. " << std::endl; // TODO: Replace by Logger
+		AddInput(index, XInput, "UNDEFINED");
+		std::cout << "ControllerHandler::GetInput(index, XInput) failed > Controller Button not found, but AddInput was called for safety." << std::endl; // TODO: Replace by Logger
 
 		return GetInput(index, XInput);
 	}

@@ -1,7 +1,6 @@
 #include "ProtoEnginePCH.h"
 #include "StartScene.h"
 
-
 #include "Commands.h"
 #include "GameObject.h"
 
@@ -13,14 +12,14 @@ StartScene::StartScene(const std::wstring& sceneName)
 void StartScene::InitializeCommands()
 {
 	ProtoCommands.AddCommand(new JumpCommand(), "Jump");
-	ProtoCommands.GetCommand("Jump")->SetExecuteData(&m_JumpDataExample); // Sets data that can be used in Execute
+	ProtoCommands.GetCommand("Jump").SetExecuteData(&m_JumpDataExample); // Sets data that can be used in Execute
 	ProtoCommands.AddCommand(new FireCommand(), "Fire");
 	ProtoCommands.AddCommand(new DuckCommand(), "Duck");
 	ProtoCommands.AddCommand(new FartCommand(), "Fart");
 	ProtoCommands.AddCommand(new SwitchAudioServiceCommand(), "SwitchAudioService");
 
 	ProtoAudio::RegisterAudioService(&m_AudioServices.LogAudio);
-	ProtoCommands.GetCommand("SwitchAudioService")->SetExecuteData(&m_AudioServices);
+	ProtoCommands.GetCommand("SwitchAudioService").SetExecuteData(&m_AudioServices);
 
 	/* Extra Commands */
 	ProtoCommands.AddCommand(new JoystickCommand(), "Joystick");
@@ -30,19 +29,19 @@ void StartScene::InitializeCommands()
 
 void StartScene::InitializeControls()
 {
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_A);
+	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_A, STRINGIFY(XINPUT_GAMEPAD_A));
 	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_A).SetCommand(ButtonState::Pressed, "Jump");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_B);
+	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_B, STRINGIFY(XINPUT_GAMEPAD_B));
 	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_B).SetCommand(ButtonState::Pressed, "Fire");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_Y);
+	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_Y, STRINGIFY(XINPUT_GAMEPAD_Y));
 	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_Y).SetCommand(ButtonState::Pressed, "Duck");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_X);
+	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_X, STRINGIFY(XINPUT_GAMEPAD_X));
 	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_X).SetCommand(ButtonState::Pressed, "Fart");
 
-	ProtoInput.AddKey(SDLK_t);
+	ProtoInput.AddKey(SDLK_t, STRINGIFY(SDLK_t));
 	ProtoInput.GetKey(SDLK_t).SetCommand(ButtonState::Pressed, "SwitchAudioService");
 
 	/* Extra Inputs */

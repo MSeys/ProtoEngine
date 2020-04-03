@@ -25,6 +25,9 @@
     <Filter Include="Helpers\Input\Handlers">
       <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Inputs">
+      <UniqueIdentifier>{cebdcfb6-9c45-4009-a4f7-1a60d7be67dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -69,9 +72,6 @@
     <ClCompile Include="TextComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Buttons.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -89,6 +89,15 @@
     </ClCompile>
     <ClCompile Include="KBMHandler.cpp">
       <Filter>Helpers\Input\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons.cpp">
+      <Filter>Core\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="Joysticks.cpp">
+      <Filter>Core\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="Triggers.cpp">
+      <Filter>Core\Inputs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +164,6 @@
     <ClInclude Include="BaseCommand.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Buttons.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -178,6 +184,15 @@
     </ClInclude>
     <ClInclude Include="KBMHandler.h">
       <Filter>Helpers\Input\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons.h">
+      <Filter>Core\Inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="Joysticks.h">
+      <Filter>Core\Inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="Triggers.h">
+      <Filter>Core\Inputs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

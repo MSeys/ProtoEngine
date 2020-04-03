@@ -4,6 +4,18 @@
 #include "Audio.h"
 #include "Buttons.h"
 
+enum class CommandOrigin
+{
+	C_BUTTON, C_JOYSTICK, C_TRIGGER, KBM_KEY, KBM_MOUSE, KBM_MOUSE_KEY, NONE
+};
+
+struct InputData
+{
+	CommandOrigin Origin{ CommandOrigin::NONE };
+	std::string StringifiedCode = "NONE";
+	void* Data = nullptr;
+};
+
 #pragma region Base Command
 class Command
 {
@@ -12,17 +24,17 @@ public:
 	virtual void Execute() = 0;
 	virtual void SetExecuteData(void* data)
 	{
-		Data = data;
+		ExecuteData = data;
 	}
 
-	virtual void SetInputData(void* inputData)
+	virtual void SetInputData(const CommandOrigin& origin, const std::string& code, void* data)
 	{
-		InputData = inputData;
+		InputData = { origin, code, data };
 	}
 
 protected:
-	void* Data = nullptr;
-	void* InputData = nullptr;
+	void* ExecuteData = nullptr;
+	InputData InputData;
 };
 #pragma endregion Base Command
 
@@ -39,6 +51,6 @@ class ExitCommand : public Command
 {
 	void Execute() override
 	{
-		*static_cast<bool*>(Data) = true;
+		*static_cast<bool*>(ExecuteData) = true;
 	}
 };

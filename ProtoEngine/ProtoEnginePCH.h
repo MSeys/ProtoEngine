@@ -11,6 +11,7 @@
 #include <windows.h>
 
 #define STRINGIFY(x) #x
+#define CompStringify(x, y) x == STRINGIFY(y)
 
 // Define Singletons
 #include "SettingsManager.h"
@@ -40,4 +41,7 @@
 #include "Utils.h"
 #include "Components.h"
 #include "Structs.h"
+
 #include "Buttons.h"
+#include "Joysticks.h"
+#include "Triggers.h"

@@ -3,13 +3,19 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "Buttons.h"
-#include "ControllerHandler.h"
-#include "KBMHandler.h"
 #include "windows.h"
 #include "Xinput.h"
 
+#include "Buttons.h"
+
+#include "Joysticks.h"
+
+#include "ControllerHandler.h"
+#include "KBMHandler.h"
+
+
 #include "Singleton.h"
+#include "Triggers.h"
 
 class Command;
 
@@ -25,14 +31,14 @@ namespace Proto
 		void Update();
 		void Process();
 
-		bool AddControllerButton(int index, int XInput);
-		bool AddKey(int sdlKey);
+		bool AddControllerButton(int index, int XInput, const std::string& stringifiedXInput = "UNDEFINED");
+		bool AddKey(int SDLKey, const std::string& stringifiedSDLKey = "UNDEFINED");
 
 		ControllerButton& GetControllerButton(int index, int XInput);
 		ControllerJoystick& GetControllerJoystick(int index, const StickState& stickState) const noexcept;
 		ControllerTrigger& GetControllerTrigger(int index, const TriggerPosState& triggerPosState) const noexcept;
 
-		Key& GetKey(int sdlKey, bool doesCreate = true);
+		Key& GetKey(int SDLKey, bool doesCreate = true);
 		MouseButton& GetMouseButton(const StickState& mouseState) const;
 		Mouse& GetMouse() const;
 

@@ -9,7 +9,6 @@
 
 #include "CommandManager.h"
 
-#pragma region Button and Keys
 enum class ButtonState
 {
 	Pressed, Held, Released, None
@@ -23,6 +22,7 @@ public:
 	bool UnlinkCommand(ButtonState state);
 	
 	void Process();
+	virtual void SetInputData(Command& command) = 0;
 	
 protected:
 	ButtonState m_CurrState{ ButtonState::None };
@@ -35,130 +35,33 @@ class ControllerButton final : public Button
 {
 
 public:
-	ControllerButton(int XInput);
+	ControllerButton(int XInput, std::string stringifiedXInput);
 	void Update(const XINPUT_STATE& oldState, const XINPUT_STATE& currState);
+	void SetInputData(Command& command) override;
+	
 private:
 	int m_XInput;
+	std::string m_StringifiedXInput;
 };
 
 class Key : public Button
 {
 public:
+	Key(std::string stringifiedSDLKey);
+
 	virtual void UpdateInPoll(const SDL_Event& currState);
 	void UpdateOutPoll();
+	void SetInputData(Command& command) override;
+
+private:
+	std::string m_StringifiedSDLKey;
 };
 
 class MouseButton final : public Key
 {
 public:
+	MouseButton();
+
 	void UpdateInPoll(const SDL_Event& currState) override;
+	void SetInputData(Command& command) override;
 };
-#pragma endregion Button and Keys
-
-#pragma region Joystick and Mouse
-
-enum class StickState
-{
-	Left, Right
-};
-
-enum class JoystickState
-{
-	Moving, Released, None
-};
-
-struct PositionData
-{
-	float x;
-	float y;
-
-	bool IsZero() const
-	{
-		return x == 0 && y == 0;
-	}
-};
-
-struct MouseData
-{
-	PositionData Position{ 0, 0 };
-	bool LeftMouseDown{ false };
-	bool RightMouseDown{ false };
-};
-
-class Joystick
-{
-public:
-	virtual ~Joystick() = default;
-	bool SetCommand(JoystickState state, const std::string& commandID, bool forceSet = false);
-	bool UnlinkCommand(JoystickState state);
-
-	virtual void Process() = 0;
-
-protected:
-	JoystickState m_CurrState{ JoystickState::None };
-	std::array<std::string, 2> m_Commands{ COMMAND_DEFAULT, COMMAND_DEFAULT };
-};
-
-class ControllerJoystick : public Joystick
-{
-public:
-	ControllerJoystick(const StickState& stickState);
-	void Update(const XINPUT_STATE& oldState, const XINPUT_STATE& currState);
-	void Process() override;
-
-private:
-	StickState m_StickState;
-	PositionData m_Data;
-};
-
-class Mouse : public Joystick
-{
-public:
-	void UpdateInPoll(const SDL_Event& currState);
-	void UpdateOutPoll();
-	void Process() override;
-	
-private:
-	MouseData m_Data;
-};
-#pragma endregion Joystick and Mouse
-
-#pragma region Trigger
-struct TriggerData
-{
-	float value = 0.f;
-	bool IsZero() const
-	{
-		return value == 0;
-	}
-};
-
-enum class TriggerState
-{
-	Pressed, Held, Released, None 
-};
-
-enum class TriggerPosState
-{
-	Left, Right
-};
-
-class ControllerTrigger
-{
-public:
-	ControllerTrigger(TriggerPosState triggerPosState);
-
-	bool SetCommand(TriggerState state, const std::string& commandID, bool forceSet = false);
-	bool UnlinkCommand(TriggerState state);
-	
-	void Update(const XINPUT_STATE& oldState, const XINPUT_STATE& currState);
-	void Process();
-
-private:
-	TriggerPosState m_TriggerPosState{};
-	TriggerState m_CurrState{ TriggerState::None };
-	TriggerData m_Data;
-
-	std::array<std::string, 3> m_Commands{ COMMAND_DEFAULT, COMMAND_DEFAULT, COMMAND_DEFAULT };
-};
-#pragma endregion Trigger

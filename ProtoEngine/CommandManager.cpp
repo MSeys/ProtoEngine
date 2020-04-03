@@ -29,15 +29,20 @@ bool Proto::CommandManager::AddCommand(Command* command, const std::string& comm
 	 return true;
 }
 
-Command* Proto::CommandManager::GetCommand(const std::string& commandID) const
+Command& Proto::CommandManager::GetCommand(const std::string& commandID) const
 {
-	if (m_Commands.find(commandID) != m_Commands.end())
+	try
 	{
-		return m_Commands.at(commandID);
+		return *m_Commands.at(commandID);
 	}
 
-	std::cout << "CommandManager::GetCommand failed > Command not found. (NullPointerException)" << std::endl; // TODO: Replace by Logger
-	return nullptr;
+	catch(const std::out_of_range& exception)
+	{
+		UNREFERENCED_PARAMETER(exception);
+		
+		std::cout << "CommandManager::GetCommand failed > Command not found. Default Command ran." << std::endl; // TODO: Replace by Logger
+		return *m_Commands.at(COMMAND_DEFAULT);
+	}
 }
 
 void Proto::CommandManager::ForceExit()
@@ -49,6 +54,6 @@ void Proto::CommandManager::ResetInputData()
 {
 	for (std::pair<std::string, Command*> pair : m_Commands)
 	{
-		pair.second->SetInputData(nullptr);
+		pair.second->SetInputData(CommandOrigin::NONE, "NONE", nullptr);
 	}
 }

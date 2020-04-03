@@ -16,12 +16,11 @@ namespace Proto
 		void Destroy();
 		
 		bool AddCommand(Command* command, const std::string& commandID);
-		Command* GetCommand(const std::string& commandID) const;
+		Command& GetCommand(const std::string& commandID) const;
 
 		void ForceExit();
 		void ResetInputData();
 		
-
 	private:
 		std::unordered_map<std::string, Command*> m_Commands;
 	};

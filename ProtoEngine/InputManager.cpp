@@ -41,14 +41,14 @@ void Proto::InputManager::Process()
 	m_KBMHandler.Process();
 }
 
-bool Proto::InputManager::AddControllerButton(int index, int XInput)
+bool Proto::InputManager::AddControllerButton(int index, int XInput, const std::string& stringifiedXInput)
 {
-	return m_ControllerHandler.AddInput(index, XInput);
+	return m_ControllerHandler.AddInput(index, XInput, stringifiedXInput);
 }
 
-bool Proto::InputManager::AddKey(int sdlKey)
+bool Proto::InputManager::AddKey(int SDLKey, const std::string& stringifiedSDLKey)
 {
-	return m_KBMHandler.AddInput(sdlKey);
+	return m_KBMHandler.AddInput(SDLKey, stringifiedSDLKey);
 }
 
 ControllerButton& Proto::InputManager::GetControllerButton(int index, int XInput)
@@ -66,9 +66,9 @@ ControllerTrigger& Proto::InputManager::GetControllerTrigger(int index, const Tr
 	return m_ControllerHandler.GetInput(index, triggerPosState);
 }
 
-Key& Proto::InputManager::GetKey(int sdlKey, bool doesCreate)
+Key& Proto::InputManager::GetKey(int SDLKey, bool doesCreate)
 {
-	return m_KBMHandler.GetInput(sdlKey, doesCreate);
+	return m_KBMHandler.GetInput(SDLKey, doesCreate);
 }
 
 MouseButton& Proto::InputManager::GetMouseButton(const StickState& mouseState) const

@@ -9,7 +9,7 @@ public:
 	void UpdateInPoll(const SDL_Event& e);
 	void Process();
 
-	bool AddInput(int SDLKey);
+	bool AddInput(int SDLKey, const std::string& stringifiedSDLKey);
 
 	Key& GetInput(int SDLKey, bool doesCreate = true);
 	MouseButton& GetInput(const StickState& mouseState) const noexcept;
