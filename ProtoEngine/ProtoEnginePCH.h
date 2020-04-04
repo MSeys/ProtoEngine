@@ -38,6 +38,12 @@
 #include "Audio.h"
 #define ProtoAudio ServiceLocator
 
+#include "Messenger.h"
+#define ProtoMessenger Proto::Messenger::GetInstance()
+
+#include "AchievementManager.h"
+#define ProtoAchievements(x) Proto::AchievementManager<x>::GetInstance()
+
 #include "Utils.h"
 #include "Components.h"
 #include "Structs.h"

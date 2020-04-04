@@ -25,9 +25,6 @@
     <Filter Include="Core\Engine">
       <UniqueIdentifier>{9be13218-5e4c-4adb-ae17-1fc909236a78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Handlers">
-      <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Input Handling">
       <UniqueIdentifier>{cebdcfb6-9c45-4009-a4f7-1a60d7be67dc}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,15 @@
     </Filter>
     <Filter Include="Core\Input Handling\Input">
       <UniqueIdentifier>{acdaf1d7-ff4e-405e-993d-9005ca86efb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Observer">
+      <UniqueIdentifier>{188af16a-a31c-4af4-8e18-1daf64d4789f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Achievement">
+      <UniqueIdentifier>{b7e6a1ab-9d1b-4dcd-971f-6672165e24fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input Handling\Handlers">
+      <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,10 +79,10 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ControllerHandler.cpp">
-      <Filter>Core\Handlers</Filter>
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClCompile>
     <ClCompile Include="KBMHandler.cpp">
-      <Filter>Core\Handlers</Filter>
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Graphics</Filter>
@@ -99,14 +105,14 @@
     <ClCompile Include="Buttons.cpp">
       <Filter>Core\Input Handling\Input</Filter>
     </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Core\Input Handling\Input</Filter>
-    </ClCompile>
     <ClCompile Include="Joysticks.cpp">
       <Filter>Core\Input Handling\Input</Filter>
     </ClCompile>
     <ClCompile Include="Triggers.cpp">
       <Filter>Core\Input Handling\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,10 +162,10 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ControllerHandler.h">
-      <Filter>Core\Handlers</Filter>
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="KBMHandler.h">
-      <Filter>Core\Handlers</Filter>
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Graphics</Filter>
@@ -197,11 +203,23 @@
     <ClInclude Include="Buttons.h">
       <Filter>Core\Input Handling\Input</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Core\Input Handling\Input</Filter>
-    </ClInclude>
     <ClInclude Include="Joysticks.h">
       <Filter>Core\Input Handling\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Messenger.h">
+      <Filter>Core\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Core\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseAchievement.h">
+      <Filter>Core\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="AchievementManager.h">
+      <Filter>Core\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Core\Input Handling\Handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,6 +7,9 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{093fc29b-c466-4f3a-9b7b-166e3eef9615}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Observers">
+      <UniqueIdentifier>{8a87252d-5ed5-4928-bad5-83b6bc6b817d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -15,6 +18,9 @@
     </ClCompile>
     <ClCompile Include="StartScene.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="AchievementObserver.cpp">
+      <Filter>Observers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -25,5 +31,11 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Commands.h" />
+    <ClInclude Include="AchievementObserver.h">
+      <Filter>Observers</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.h">
+      <Filter>Observers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

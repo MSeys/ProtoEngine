@@ -1,7 +1,10 @@
 #include "ProtoEnginePCH.h"
 #include "StartScene.h"
 
+
+#include "AchievementObserver.h"
 #include "Commands.h"
+#include "Events.h"
 #include "GameObject.h"
 
 StartScene::StartScene(const std::wstring& sceneName)
@@ -75,6 +78,10 @@ void StartScene::InitializeScene()
 	pGameObject->AddComponent(pFPSComponent);
 
 	AddChild(pGameObject);
+	
+	ProtoMessenger.AddObserver(new AchievementObserver({}), "Achievement");
+	ProtoAchievements(bool).AddAchievement(new ConditionAchievement("Ah, you're finally awake!", "You started up the game for the first time.", true));
+	ProtoMessenger.Notify(nullptr, E_GAME_STARTED);
 }
 
 void StartScene::Update()
