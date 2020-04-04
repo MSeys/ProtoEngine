@@ -19,34 +19,31 @@
     <Filter Include="Scenegraph">
       <UniqueIdentifier>{121cbf75-873e-461f-af2e-26e5d19f4fde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Helpers\Input">
-      <UniqueIdentifier>{b288a8e7-f0b4-493e-b1c0-b54051e6508e}</UniqueIdentifier>
+    <Filter Include="Content">
+      <UniqueIdentifier>{dbd5e14f-f4b1-4a88-b470-e68ef13e45ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Helpers\Input\Handlers">
+    <Filter Include="Core\Engine">
+      <UniqueIdentifier>{9be13218-5e4c-4adb-ae17-1fc909236a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Handlers">
       <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Inputs">
+    <Filter Include="Core\Input Handling">
       <UniqueIdentifier>{cebdcfb6-9c45-4009-a4f7-1a60d7be67dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input Handling\Command">
+      <UniqueIdentifier>{a28cea9b-2324-42c1-8e91-da37073d1a3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input Handling\Input">
+      <UniqueIdentifier>{acdaf1d7-ff4e-405e-993d-9005ca86efb8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ProtoEnginePCH.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Helpers</Filter>
-    </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Texture2D.cpp">
       <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="BaseComponent.cpp">
       <Filter>Components</Filter>
@@ -75,42 +72,45 @@
     <ClCompile Include="Audio.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="SettingsManager.cpp">
-      <Filter>Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandManager.cpp">
-      <Filter>Helpers\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Helpers\Input</Filter>
-    </ClCompile>
     <ClCompile Include="ControllerHandler.cpp">
-      <Filter>Helpers\Input\Handlers</Filter>
+      <Filter>Core\Handlers</Filter>
     </ClCompile>
     <ClCompile Include="KBMHandler.cpp">
-      <Filter>Helpers\Input\Handlers</Filter>
+      <Filter>Core\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Core\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtoEnginePCH.cpp">
+      <Filter>Core\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandManager.cpp">
+      <Filter>Core\Input Handling\Command</Filter>
     </ClCompile>
     <ClCompile Include="Buttons.cpp">
-      <Filter>Core\Inputs</Filter>
+      <Filter>Core\Input Handling\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Core\Input Handling\Input</Filter>
     </ClCompile>
     <ClCompile Include="Joysticks.cpp">
-      <Filter>Core\Inputs</Filter>
+      <Filter>Core\Input Handling\Input</Filter>
     </ClCompile>
     <ClCompile Include="Triggers.cpp">
-      <Filter>Core\Inputs</Filter>
+      <Filter>Core\Input Handling\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ProtoEnginePCH.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Singleton.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
@@ -121,9 +121,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="BaseComponent.h">
       <Filter>Components</Filter>
@@ -146,14 +143,8 @@
     <ClInclude Include="BaseScene.h">
       <Filter>Scenegraph</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="RenderComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Structs.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FPSComponent.h">
       <Filter>Components</Filter>
@@ -161,38 +152,56 @@
     <ClInclude Include="TextComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="BaseCommand.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="SettingsManager.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Helpers\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandManager.h">
-      <Filter>Helpers\Input</Filter>
-    </ClInclude>
     <ClInclude Include="ControllerHandler.h">
-      <Filter>Helpers\Input\Handlers</Filter>
+      <Filter>Core\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="KBMHandler.h">
-      <Filter>Helpers\Input\Handlers</Filter>
+      <Filter>Core\Handlers</Filter>
     </ClInclude>
-    <ClInclude Include="Buttons.h">
-      <Filter>Core\Inputs</Filter>
+    <ClInclude Include="Renderer.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Joysticks.h">
-      <Filter>Core\Inputs</Filter>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtoEnginePCH.h">
+      <Filter>Core\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandManager.h">
+      <Filter>Core\Input Handling\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCommand.h">
+      <Filter>Core\Input Handling\Command</Filter>
     </ClInclude>
     <ClInclude Include="Triggers.h">
-      <Filter>Core\Inputs</Filter>
+      <Filter>Core\Input Handling\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons.h">
+      <Filter>Core\Input Handling\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Core\Input Handling\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Joysticks.h">
+      <Filter>Core\Input Handling\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

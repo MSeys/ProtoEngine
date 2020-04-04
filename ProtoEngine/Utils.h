@@ -18,3 +18,9 @@ inline float MicroSecondsToSeconds(float microSeconds)
 {
 	return microSeconds / 1'000'000;
 }
+
+template<typename T>
+T& VoidCast(void* pData)
+{
+	return *static_cast<T*>(pData);
+}
