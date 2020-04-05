@@ -81,7 +81,7 @@ bool KBMHandler::AddInput(int SDLKey, const std::string& stringifiedSDLKey)
 {
 	if (m_Keys.find(SDLKey) != m_Keys.end())
 	{
-		std::cout << "KBMHandler::AddInput(SDLKey) failed > Key was already added." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::AddInput failed > Key was already added.");
 		return false;
 	}
 
@@ -102,12 +102,12 @@ Key& KBMHandler::GetInput(int SDLKey, bool doesCreate)
 		if (doesCreate)
 		{
 			AddInput(SDLKey, "UNDEFINED");
-			std::cout << "KBMHandler::GetInput(SDLKey, ...) failed > Key was not found, but has been created. Use AddKey first on the desired key." << std::endl; // TODO: Replace by Logger
+			ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::GetInput failed > Key was not found, but has been created. Use AddKey first on the desired key.");
 
 			return GetInput(SDLKey);
 		}
 
-		std::cout << "KBMHandler::GetInput(SDLKey, ...) failed > Key was not found, default key has been returned." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::GetInput failed > Key was not found, default key has been returned.");
 		return *m_pDefaultKey;
 	}
 }

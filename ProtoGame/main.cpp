@@ -17,7 +17,7 @@
 int main(int, char* [])
 {
 #ifdef Simple
-	const Proto::Engine engine{ new SimpleGame(), WindowSettings{ "SimpleGame", 640, 480, FPSState::PROTO_CAPPED, FPSRate::PROTO_FPS_VERY_HIGH } };
+	const Proto::Engine engine{ new SimpleGame(), WindowSettings{ "SimpleGame", 640, 680, FPSState::PROTO_CAPPED, FPSRate::PROTO_FPS_VERY_HIGH } };
 #endif
 	
 	engine.Run();

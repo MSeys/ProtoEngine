@@ -34,7 +34,17 @@ void Proto::Engine::Run() const
 		ProtoInput.Process();
 		
 		ProtoScenes.Update();
+
+		ImGui::NewFrame();
+		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+		
 		ProtoScenes.Draw();
+		ProtoLogger.Draw();
+
+		ImGui::Render();
+		ImGuiSDL::Render(ImGui::GetDrawData());
+
+		SDL_RenderPresent(ProtoRenderer.GetSDLRenderer());
 
 		ProtoCommands.ResetInputData();
 	}

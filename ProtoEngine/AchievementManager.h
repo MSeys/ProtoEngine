@@ -11,7 +11,10 @@ namespace Proto
 	class AchievementManager : public Singleton<AchievementManager<T>>
 	{
 	public:
-		AchievementManager() = default;
+		AchievementManager()
+		{
+		}
+		
 		~AchievementManager()
 		{
 			for (auto& pair : m_pAchievements)
@@ -33,23 +36,25 @@ namespace Proto
 				return true;
 			}
 
-			// TODO: To Logger
-			std::cout << "AchievementManager::AddAchievement > Achievement " << pAchievement->GetTitle() << " already added." << std::endl;
+			ProtoLogger.AddLog(LogLevel::Warning, "AchievementManager::AddAchievement > Achievement " + pAchievement->GetTitle() + " already added.");
 
 			return false;
 		}
 
 		Achievement<T>* GetAchievement(const std::string& title)
 		{
-			if (m_pAchievements.find(title) != m_pAchievements.end())
+			try
 			{
-				return m_pAchievements[title];
+				return m_pAchievements.at(title);
 			}
-
-			// TODO: To Logger
-			std::cout << "AchievementManager::GetAchievement > Achievement " << title << " not found. (NullPointerException)" << std::endl;
-
-			return nullptr;
+			catch(const std::out_of_range& exception)
+			{
+				UNREFERENCED_PARAMETER(exception);
+				
+				// TODO: Avoid NullPointerException
+				ProtoLogger.AddLog(LogLevel::Error, "AchievementManager::GetAchievement > Achievement " + title + " not found. NullPointerException");
+				return nullptr;
+			}
 		}
 
 	private:

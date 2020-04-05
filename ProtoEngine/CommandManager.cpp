@@ -19,7 +19,7 @@ bool Proto::CommandManager::AddCommand(Command* command, const std::string& comm
 {
 	 if(m_Commands.find(commandID) != m_Commands.end())
 	 {
-		std::cout << "CommandManager::AddCommand failed > CommandID is already used." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "CommandManager::AddCommand failed > CommandID is already used.");
 		SafeDelete(command);
 	 	
 		return false;
@@ -39,8 +39,8 @@ Command& Proto::CommandManager::GetCommand(const std::string& commandID) const
 	catch(const std::out_of_range& exception)
 	{
 		UNREFERENCED_PARAMETER(exception);
-		
-		std::cout << "CommandManager::GetCommand failed > Command not found. Default Command ran." << std::endl; // TODO: Replace by Logger
+
+		ProtoLogger.AddLog(LogLevel::Warning, "CommandManager::GetCommand failed > Command not found. Default Command ran.");
 		return *m_Commands.at(COMMAND_DEFAULT);
 	}
 }

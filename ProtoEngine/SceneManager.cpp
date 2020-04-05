@@ -60,12 +60,8 @@ void Proto::SceneManager::Update()
 
 void Proto::SceneManager::Draw() const
 {
-	SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
-	
 	if (m_ActiveScene != nullptr)
 		m_ActiveScene->RootDraw();
-
-	SDL_RenderPresent(ProtoRenderer.GetSDLRenderer());
 }
 
 void Proto::SceneManager::AddGameScene(BaseScene* pScene)

@@ -10,6 +10,9 @@ void Proto::Renderer::Init(SDL_Window * window)
 	else
 		m_Renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	ImGui::CreateContext();
+	ImGuiSDL::Initialize(m_Renderer, ProtoSettings.GetWindowSettings().WindowWidth, ProtoSettings.GetWindowSettings().WindowHeight);
+	
 	if (!m_Renderer) 
 	{
 		throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") + SDL_GetError());
@@ -20,8 +23,11 @@ void Proto::Renderer::Destroy()
 {
 	if (m_Renderer != nullptr)
 	{
+		ImGuiSDL::Deinitialize();
 		SDL_DestroyRenderer(m_Renderer);
 		m_Renderer = nullptr;
+
+		ImGui::DestroyContext();
 	}
 }
 

@@ -82,6 +82,7 @@ void StartScene::InitializeScene()
 	ProtoMessenger.AddObserver(new AchievementObserver({}), "Achievement");
 	ProtoAchievements(bool).AddAchievement(new ConditionAchievement("Ah, you're finally awake!", "You started up the game for the first time.", true));
 	ProtoMessenger.Notify(nullptr, E_GAME_STARTED);
+	ProtoLogger.AddLog(LogLevel::Info, "Testing Logging.");
 }
 
 void StartScene::Update()

@@ -14,6 +14,9 @@
 #define CompStringify(x, y) bool(x == #y)
 
 // Define Singletons
+#include "Logger.h"
+#define ProtoLogger Proto::Logger::GetInstance()
+
 #include "SettingsManager.h"
 #define ProtoSettings Proto::SettingsManager::GetInstance()
 
@@ -51,3 +54,6 @@
 #include "Buttons.h"
 #include "Joysticks.h"
 #include "Triggers.h"
+
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_sdl.h"

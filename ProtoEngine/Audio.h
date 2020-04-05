@@ -4,6 +4,8 @@
 #include <mmsystem.h>
 #include <string>
 
+#include "Logger.h"
+
 class Audio
 {
 public:
@@ -24,8 +26,7 @@ public:
 class LogAudio : public Audio
 {
 public:
-	void PlayAudio(const std::wstring& soundID) override
-	{ std::wcout << L"LogAudio::PlayAudio < Data\\" << soundID << std::endl; }
+	void PlayAudio(const std::wstring& soundID) override { std::wcout << L"LogAudio::PlayAudio < Data\\" << soundID << std::endl; }
 	void StopAudio(const std::wstring& soundID) override { std::wcout << L"LogAudio::StopAudio < Data\\" << soundID << std::endl; }
 	void StopAllSounds() override { std::cout << "LogAudio::StopAllSounds" << std::endl; }
 };

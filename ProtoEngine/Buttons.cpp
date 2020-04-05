@@ -16,12 +16,12 @@ bool Button::SetCommand(ButtonState state, const std::string& commandID, bool fo
 	if (forceSet)
 	{
 		m_Commands[int(state)] = commandID;
-		std::cout << "ControllerButton::SetCommand forced > A previous command has been replaced by force." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "ControllerButton::SetCommand forced > A previous command has been replaced by force.");
 		return true;
 	}
 
-	std::cout << "ControllerButton::SetCommand failed > There is already a command for this state." << std::endl; // TODO: Replace by Logger
-	return true;
+	ProtoLogger.AddLog(LogLevel::Warning, "ControllerButton::SetCommand failed > There is already a command for this state.");
+	return false;
 }
 
 bool Button::UnlinkCommand(ButtonState state)
@@ -32,7 +32,7 @@ bool Button::UnlinkCommand(ButtonState state)
 		return true;
 	}
 
-	std::cout << "ControllerButton::UnlinkCommand failed > There was no command available for this state." << std::endl; // TODO: Replace by Logger
+	ProtoLogger.AddLog(LogLevel::Warning, "ControllerButton::UnlinkCommand failed > There was no command available for this state.");
 	return false;
 }
 

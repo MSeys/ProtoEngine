@@ -13,12 +13,12 @@ bool Joystick::SetCommand(JoystickState state, const std::string& commandID, boo
 	if (forceSet)
 	{
 		m_Commands[int(state)] = commandID;
-		std::cout << "Joystick::SetCommand forced > A previous command has been replaced by force." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "Joystick::SetCommand forced > A previous command has been replaced by force.");
 		return true;
 	}
 
-	std::cout << "Joystick::SetCommand failed > There is already a command for this state." << std::endl; // TODO: Replace by Logger
-	return true;
+	ProtoLogger.AddLog(LogLevel::Warning, "Joystick::SetCommand failed > There is already a command for this state.");
+	return false;
 }
 
 bool Joystick::UnlinkCommand(JoystickState state)
@@ -29,7 +29,7 @@ bool Joystick::UnlinkCommand(JoystickState state)
 		return true;
 	}
 
-	std::cout << "Joystick::UnlinkCommand failed > There was no command available for this state." << std::endl; // TODO: Replace by Logger
+	ProtoLogger.AddLog(LogLevel::Warning, "Joystick::UnlinkCommand failed > There was no command available for this state.");
 	return false;
 }
 

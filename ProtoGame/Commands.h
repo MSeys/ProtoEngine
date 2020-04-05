@@ -8,7 +8,7 @@ public:
 	void Execute() override
 	{
 		auto& dataStr{ VoidCast<std::string>(EData) };
-		std::cout << "JumpCommand::Execute > " << std::boolalpha << CompStringify(IData.StringCode, XINPUT_GAMEPAD_A) << IData.StringCode << " > " << dataStr << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Debug, "JumpCommand::Execute > " + IData.StringCode + " > " + dataStr);
 		ServiceLocator::GetAudio().PlayAudio(L"jump.wav");
 		dataStr = "Boing V2.0";
 	}
@@ -19,7 +19,7 @@ class FireCommand : public Command
 public:
 	void Execute() override
 	{
-		std::cout << "FireCommand::Execute > I set FIIIIIIIRE to the raaaain!" << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Debug, "FireCommand::Execute > I set FIIIIIIIRE to the raaaain!");
 		ServiceLocator::GetAudio().PlayAudio(L"fire.wav");
 	}
 };
@@ -29,7 +29,7 @@ class DuckCommand : public Command
 public:
 	void Execute() override
 	{
-		std::cout << "DuckCommand::Execute > HOOOOOONK! Quack! Quack!" << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Debug, "DuckCommand::Execute > HOOOOOONK! Quack! Quack!");
 		ServiceLocator::GetAudio().PlayAudio(L"quack.wav");
 	}
 };
@@ -39,34 +39,34 @@ class FartCommand : public Command
 public:
 	void Execute() override
 	{
-		std::cout << "FartCommand::Execute > Prrrrrttt! WHO FARTED?" << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Debug, "FartCommand::Execute > Prrrrrttt! WHO FARTED?");
 		ServiceLocator::GetAudio().PlayAudio(L"fart.wav");
 	}
 };
 
-class JoystickCommand : public Command
+class JoystickCommand : public Command // Old Separate Command
 {
 	void Execute() override
 	{
-		const auto pData = static_cast<PositionData*>(IData.Data);
-		std::cout << "JoystickCommand::Execute > [" << pData->x << ", " << pData->y << "]" << std::endl; // TODO: Replace by Logger
+		const auto& data{ VoidCast<PositionData>(IData.Data) };
+		ProtoLogger.AddLog(LogLevel::Debug, "JoystickCommand::Execute > [" + std::to_string(data.x) + ", " + std::to_string(data.y) + "]");
 	}
 };
 
-class MouseCommand : public Command
+class MouseCommand : public Command // Old Separate Command
 {
 	void Execute() override
 	{
-		const auto pData = static_cast<MouseData*>(IData.Data);
+		const auto& data{ VoidCast<MouseData>(IData.Data) };
 
-		if (pData->LeftMouseDown)
-			std::cout << "MouseCommand::Execute > Left Down | [" << pData->Position.x << ", " << pData->Position.y << "]" << std::endl; // TODO: Replace by Logger
+		if (data.LeftMouseDown)
+			ProtoLogger.AddLog(LogLevel::Debug, "MouseCommand::Execute > Left Down | [" + std::to_string(data.Position.x) + ", " + std::to_string(data.Position.y) + "]");
 
-		else if (pData->RightMouseDown)
-			std::cout << "MouseCommand::Execute > Right Down | [" << pData->Position.x << ", " << pData->Position.y << "]" << std::endl; // TODO: Replace by Logger
+		else if (data.RightMouseDown)
+			ProtoLogger.AddLog(LogLevel::Debug, "MouseCommand::Execute > Right Down | [" + std::to_string(data.Position.x) + ", " + std::to_string(data.Position.y) + "]");
 
 		else
-			std::cout << "MouseCommand::Execute > [" << pData->Position.x << ", " << pData->Position.y << "]" << std::endl; // TODO: Replace by Logger
+			ProtoLogger.AddLog(LogLevel::Debug, "MouseCommand::Execute > [" + std::to_string(data.Position.x) + ", " + std::to_string(data.Position.y) + "]");
 	}
 };
 
@@ -95,7 +95,7 @@ class MotionCommand : public Command
 				extra = "Right Down |";
 		}
 
-		std::cout << "MotionCommand::Execute > " << extra << " [" << position.x << ", " << position.y << "]" << std::endl; // TODO: Replace by Logger	
+		ProtoLogger.AddLog(LogLevel::Debug, "MotionCommand::Execute > " + extra + " [" + std::to_string(position.x) + ", " + std::to_string(position.y) + "]");
 	}
 };
 
@@ -103,8 +103,8 @@ class TriggerCommand : public Command
 {
 	void Execute() override
 	{
-		const auto pData = static_cast<TriggerData*>(IData.Data);
-		std::cout << "TriggerCommand::Execute > [" << pData->value << "]" << std::endl; // TODO: Replace by Logger
+		const auto& data{ VoidCast<TriggerData>(IData.Data) };
+		ProtoLogger.AddLog(LogLevel::Debug, "TriggerCommand::Execute > [" + std::to_string(data.value) + "]");
 	}
 };
 

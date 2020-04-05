@@ -35,8 +35,7 @@ namespace Proto
 
 			SafeDelete(pObserver);
 
-			// TODO: To Logger
-			std::cout << "Messenger::AddObserver < Failed. There is already an observer on this key." << std::endl;
+			ProtoLogger.AddLog(LogLevel::Warning, "Messenger::AddObserver < Failed. There is already an observer on this key.");
 			return false;
 		}
 
@@ -48,8 +47,7 @@ namespace Proto
 				return true;
 			}
 
-			// TODO: To Logger
-			std::cout << "Messenger::RemoveObserver < Failed. No Observer on this key." << std::endl;
+			ProtoLogger.AddLog(LogLevel::Warning, "Messenger::RemoveObserver < Failed. No Observer on this key.");
 			return false;
 		}
 

@@ -54,8 +54,7 @@ public:
 		
 		if(progress >= m_Req)
 		{
-			// TODO: To Logger
-			std::cout << m_Title << " - " << m_Prefix << " " << m_Req << " " << m_Suffix << std::endl;
+			ProtoLogger.AddLog(LogLevel::Achievement, m_Title + " - " + m_Prefix + " " + std::to_string(m_Req) + " " + m_Suffix);
 			
 			m_Unlocked = true;
 			return AchievementState::ACHIEVED;
@@ -80,8 +79,7 @@ public:
 
 		if (progress == m_Req)
 		{
-			// TODO: To Logger
-			std::cout << m_Title << " - " << m_Prefix << " " << m_Suffix << std::endl;
+			ProtoLogger.AddLog(LogLevel::Achievement, m_Title + " - " + m_Prefix + " " + m_Suffix);
 
 			m_Unlocked = true;
 			return AchievementState::ACHIEVED;

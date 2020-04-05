@@ -18,11 +18,11 @@ bool ControllerTrigger::SetCommand(TriggerState state, const std::string& comman
 	if (forceSet)
 	{
 		m_Commands[int(state)] = commandID;
-		std::cout << "Trigger::SetCommand forced > A previous command has been replaced by force." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "Trigger::SetCommand forced > A previous command has been replaced by force.");
 		return true;
 	}
 
-	std::cout << "Trigger::SetCommand failed > There is already a command for this state." << std::endl; // TODO: Replace by Logger
+	ProtoLogger.AddLog(LogLevel::Warning, "Trigger::SetCommand failed > There is already a command for this state.");
 	return true;
 }
 
@@ -34,7 +34,7 @@ bool ControllerTrigger::UnlinkCommand(TriggerState state)
 		return true;
 	}
 
-	std::cout << "Trigger::UnlinkCommand failed > There was no command available for this state." << std::endl; // TODO: Replace by Logger
+	ProtoLogger.AddLog(LogLevel::Warning, "Trigger::UnlinkCommand failed > There was no command available for this state.");
 	return false;
 }
 

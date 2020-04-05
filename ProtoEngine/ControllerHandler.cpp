@@ -97,13 +97,13 @@ bool Proto::ControllerHandler::AddInput(int index, int XInput, const std::string
 {
 	if (index > XINPUT_CONTROLLER_MAX_INDEX || index < XINPUT_CONTROLLER_MIN_INDEX)
 	{
-		std::cout << "ControllerHandler::AddInput(index, XInput) failed > XInput only allows 4 controllers maximum. (index 0 - 3)." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "ControllerHandler::AddInput failed > XInput only allows 4 controllers maximum. (index 0 - 3).");
 		return false;
 	}
 
 	if (m_ControllerButtons[index].find(XInput) != m_ControllerButtons[index].end()) // if map does not exist yet with index, it'll make inner map
 	{
-		std::cout << "ControllerHandler::AddInput(index, XInput) failed > Controller Button was already added." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "ControllerHandler::AddInput failed > Controller Button was already added.");
 		return false;
 	}
 
@@ -123,7 +123,7 @@ ControllerButton& Proto::ControllerHandler::GetInput(int index, int XInput)
 		UNREFERENCED_PARAMETER(exception);
 
 		AddInput(index, XInput, "UNDEFINED");
-		std::cout << "ControllerHandler::GetInput(index, XInput) failed > Controller Button not found, but AddInput was called for safety." << std::endl; // TODO: Replace by Logger
+		ProtoLogger.AddLog(LogLevel::Warning, "ControllerHandler::GetInput failed > Controller Button not found, but AddInput was called for safety.");
 
 		return GetInput(index, XInput);
 	}

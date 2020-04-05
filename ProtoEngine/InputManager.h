@@ -17,6 +17,7 @@
 #include "Singleton.h"
 #include "Triggers.h"
 
+struct ImGuiIO;
 class Command;
 
 namespace Proto
@@ -45,5 +46,7 @@ namespace Proto
 	private:
 		ControllerHandler m_ControllerHandler;
 		KBMHandler m_KBMHandler;
+
+		void InitImGuiIO();
 	};
 }
