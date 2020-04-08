@@ -22,7 +22,10 @@ namespace Proto
 		BaseScene* GetActiveScene() const { return m_ActiveScene; }
 
 		void Update();
+		void FixedUpdate();
 		void Draw() const;
+
+		void DrawHierarchy() const;
 		
 	private:
 		friend class Singleton<SceneManager>;

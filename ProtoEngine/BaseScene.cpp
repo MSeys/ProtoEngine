@@ -69,6 +69,14 @@ void BaseScene::RemoveChild(GameObject* obj, bool deleteObject)
 #pragma endregion Add / Remove Child
 
 #pragma region Root Functions
+void BaseScene::DrawHierarchy()
+{
+	for (auto pChild : m_pChildren)
+	{
+		pChild->DrawHierarchy();
+	}
+}
+
 void BaseScene::RootInitialize()
 {
 	if (m_IsInitialized)
@@ -97,6 +105,18 @@ void BaseScene::RootUpdate()
 	for (auto pChild : m_pChildren)
 	{
 		pChild->RootUpdate();
+	}
+}
+
+void BaseScene::RootFixedUpdate()
+{
+	//User-Scene Update
+	FixedUpdate();
+
+	//Root-Scene Update
+	for (auto pChild : m_pChildren)
+	{
+		pChild->RootFixedUpdate();
 	}
 }
 

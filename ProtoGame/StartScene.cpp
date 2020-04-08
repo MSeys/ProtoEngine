@@ -60,7 +60,9 @@ void StartScene::InitializeControls()
 
 void StartScene::InitializeScene()
 {
-	GameObject* pGameObject{ new GameObject() };
+	GameObject* pGameObject{ new GameObject("Component Owner") };
+	GameObject* pGameObjectChild{ new GameObject("Random Empty") };
+	
 	Proto::Texture2D* pBackground = ProtoResources.LoadTexture("background.jpg");
 	Proto::Texture2D* pLogo = ProtoResources.LoadTexture("logo.png");
 	Proto::Font* pTextFont = ProtoResources.LoadFont("Lingua.otf", 36);
@@ -78,6 +80,7 @@ void StartScene::InitializeScene()
 	pGameObject->AddComponent(pFPSComponent);
 
 	AddChild(pGameObject);
+	pGameObject->AddChild(pGameObjectChild);
 	
 	ProtoMessenger.AddObserver(new AchievementObserver({}), "Achievement");
 	ProtoAchievements(bool).AddAchievement(new ConditionAchievement("Ah, you're finally awake!", "You started up the game for the first time.", true));
@@ -91,6 +94,7 @@ void StartScene::Update()
 
 void StartScene::Draw()
 {
+	ImGui::ShowDemoWindow();
 }
 
 void StartScene::SceneActivated()
@@ -98,5 +102,9 @@ void StartScene::SceneActivated()
 }
 
 void StartScene::SceneDeactivated()
+{
+}
+
+void StartScene::FixedUpdate()
 {
 }

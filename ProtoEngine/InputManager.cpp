@@ -41,6 +41,7 @@ void Proto::InputManager::Update()
 
 		if (e.type == SDL_WINDOWEVENT)
 		{
+			// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L38
 			if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 			{
 				io.DisplaySize.x = static_cast<float>(e.window.data1);
@@ -50,17 +51,20 @@ void Proto::InputManager::Update()
 
 		else if (e.type == SDL_MOUSEWHEEL)
 		{
+			// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L46
 			wheel = e.wheel.y;
 		}
 
 		else if(e.type == SDL_TEXTINPUT)
 		{
+			// Based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_sdl.cpp#L107
 			io.AddInputCharactersUTF8(e.text.text);
 		}
 
 		else if(e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
 		{
-			int key = e.key.keysym.scancode;
+			// Based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_sdl.cpp#L92
+			const int key = e.key.keysym.scancode;
 			IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
 			io.KeysDown[key] = (e.type == SDL_KEYDOWN);
 			io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
@@ -77,6 +81,7 @@ void Proto::InputManager::Update()
 	int mouseX, mouseY;
 	const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
+	// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L55
 	// Setup low-level inputs (e.g. on Win32, GetKeyboardState(), or write to those fields from your Windows message loop handlers, etc.)
 	io.DeltaTime = 1.0f / 60.0f;
 	io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
@@ -133,6 +138,7 @@ Mouse& Proto::InputManager::GetMouse() const
 
 void Proto::InputManager::InitImGuiIO()
 {
+	// Based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_sdl.cpp#L140	
 	ImGuiIO& io = ImGui::GetIO();
 	
 	io.KeyMap[ImGuiKey_Tab] = SDL_SCANCODE_TAB;

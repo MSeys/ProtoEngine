@@ -32,7 +32,8 @@ namespace Proto
 
 			DeltaTime += MicroSecondsToSeconds(float(sleepTime_microSeconds));
 		}
-		
+
+		const float FixedDeltaTime{ 0.02f };
 		float DeltaTime{};
 		int FPS{};
 

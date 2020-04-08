@@ -1,4 +1,10 @@
 #pragma once
+
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#include "glm/glm.hpp"
+#pragma warning(pop)
+
 #include "Singleton.h"
 #include <string>
 
@@ -16,11 +22,22 @@ enum class FPSState
 	PROTO_UNCAPPED, PROTO_CAPPED, PROTO_VSYNC
 };
 
+enum class RenderMode
+{
+	GAME, EDITOR
+};
+
+struct RenderSettings
+{
+	RenderMode RenderMode{ RenderMode::EDITOR };
+	glm::vec2 WindowSizeOffset{ 0, 0 };
+	glm::vec2 GameRenderOffset{ 0, 0 };
+};
+
 struct WindowSettings
 {
 	std::string Title{ "ProtoEngine" };
-	int WindowWidth{ 640 };
-	int WindowHeight{ 480 };
+	glm::vec2 WindowSize{ 640, 480 };
 	FPSState FPSState{ FPSState::PROTO_UNCAPPED };
 	FPSRate FPSRate{ FPSRate::PROTO_FPS_NORMAL };
 };
@@ -30,11 +47,30 @@ namespace Proto
 	class SettingsManager : public Singleton<SettingsManager>
 	{
 	public:
-		void Init(const WindowSettings& windowSettings) { m_WindowSettings = windowSettings; }
-		
+		void Init(const RenderSettings& renderSettings, const WindowSettings& windowSettings)
+		{
+			m_RenderSettings = renderSettings;
+			m_WindowSettings = windowSettings;
+		}
+
+		RenderSettings GetRenderSettings() const { return m_RenderSettings; }
 		WindowSettings GetWindowSettings() const { return m_WindowSettings; }
+
+		glm::vec2 GetWindowSize() const
+		{
+			glm::vec2 finalWindowSize{ m_WindowSettings.WindowSize };
+
+			if(m_RenderSettings.RenderMode == RenderMode::EDITOR)
+			{
+				finalWindowSize.x += GetRenderSettings().WindowSizeOffset.x;
+				finalWindowSize.y += GetRenderSettings().WindowSizeOffset.y;
+			}
+
+			return finalWindowSize;
+		}
 		
 	private:
+		RenderSettings m_RenderSettings{};
 		WindowSettings m_WindowSettings{};
 	};
 }

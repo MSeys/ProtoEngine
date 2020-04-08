@@ -18,14 +18,25 @@ public:
 	TransformComponent& operator=(const TransformComponent& other) = delete;
 	TransformComponent& operator=(TransformComponent&& other) noexcept = delete;
 	
-	const glm::vec3& GetPosition() const { return m_Position; }
+	glm::vec3 GetPosition() const
+	{
+		if(GetGameObject()->GetParent())
+		{
+			return GetGameObject()->GetParent()->GetTransform()->GetPosition() + m_Position;
+		}
+		
+		return m_Position;
+	}
 	void SetPosition(float x, float y, float z);
 	
 protected:
 	void Initialize() override;
 	void Update() override;
+	void FixedUpdate() override;
 	void Draw() override;
-	
+
+	void DrawInspectorTitle() override;
+	void DrawInspector() override;
 private:
 	glm::vec3 m_Position;
 };

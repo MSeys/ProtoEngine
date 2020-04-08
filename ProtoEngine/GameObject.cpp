@@ -1,14 +1,17 @@
 #include "ProtoEnginePCH.h"
 #include "GameObject.h"
 
+#include <utility>
+
 #include "BaseScene.h"
 #include "BaseComponent.h"
 #include "TransformComponent.h"
 #include "Utils.h"
 
-GameObject::GameObject() :
+GameObject::GameObject(std::string name) :
 	m_pChildren(std::vector<GameObject*>()),
 	m_pComponents(std::vector<BaseComponent*>()),
+	m_Name(std::move(name)),
 	m_IsInitialized(false),
 	m_IsActive(true),
 	m_pParentScene(nullptr),
@@ -85,6 +88,8 @@ void GameObject::RemoveChild(GameObject* obj)
 
 	m_pChildren.erase(it);
 	obj->m_pParentObject = nullptr;
+
+	SafeDelete(obj);
 }
 #pragma endregion Add / Remove Child
 
@@ -132,10 +137,78 @@ void GameObject::RemoveComponent(BaseComponent* pComp)
 
 	m_pComponents.erase(it);
 	pComp->m_pGameObject = nullptr;
+
+	SafeDelete(pComp);
 }
 #pragma endregion Add / Remove Component
 
 #pragma region Root Functions
+void GameObject::DrawHierarchy()
+{
+	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+	if (ProtoEditor.GetCurrentSelected() == this)
+		nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+	if(m_pChildren.empty())
+		nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	
+	const bool nodeOpen = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
+
+	if (ImGui::IsItemClicked())
+		ProtoEditor.SetCurrentSelected(this);
+	
+	if(nodeOpen)
+	{
+		if(!m_pChildren.empty())
+		{
+			for(GameObject* pChild : m_pChildren)
+			{
+				pChild->DrawHierarchy();
+			}
+		}
+
+		if (!m_pChildren.empty())
+			ImGui::TreePop();
+	}
+}
+
+void GameObject::DrawInspector()
+{
+	BaseComponent* delComp{};
+	
+	m_Name.resize(25);
+
+	ImGui::Checkbox("##Active", &m_IsActive);
+	ImGui::SameLine();
+	ImGui::InputText("Name", &m_Name[0], 25);
+	
+	for (BaseComponent* pComp : m_pComponents)
+	{
+		std::stringstream compAddress;
+		compAddress << pComp;
+		
+		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::SameLine();
+
+		pComp->DrawInspectorTitle();
+
+		if (!dynamic_cast<TransformComponent*>(pComp))
+		{
+			ImGui::SameLine(360);
+
+			const std::string labelText{ "X##" + compAddress.str() };
+			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
+				delComp = pComp;
+		}
+		
+		pComp->DrawInspector();
+	}
+
+	if (delComp)
+		RemoveComponent(delComp);
+}
+
 void GameObject::RootInitialize()
 {
 	if (m_IsInitialized)
@@ -160,6 +233,9 @@ void GameObject::RootInitialize()
 
 void GameObject::RootUpdate()
 {
+	if (!m_IsActive)
+		return;
+	
 	Update();
 
 	//Component Update
@@ -175,8 +251,31 @@ void GameObject::RootUpdate()
 	}
 }
 
+void GameObject::RootFixedUpdate()
+{
+	if (!m_IsActive)
+		return;
+
+	FixedUpdate();
+
+	//Component Update
+	for (BaseComponent* pComp : m_pComponents)
+	{
+		pComp->FixedUpdate();
+	}
+
+	//Root-Object Update
+	for (GameObject* pChild : m_pChildren)
+	{
+		pChild->RootFixedUpdate();
+	}
+}
+
 void GameObject::RootDraw()
 {
+	if (!m_IsActive)
+		return;
+	
 	//User-Object Draw
 	Draw();
 

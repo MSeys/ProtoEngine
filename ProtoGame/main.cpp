@@ -16,9 +16,29 @@
 
 int main(int, char* [])
 {
-#ifdef Simple
-	const Proto::Engine engine{ new SimpleGame(), WindowSettings{ "SimpleGame", 640, 680, FPSState::PROTO_CAPPED, FPSRate::PROTO_FPS_VERY_HIGH } };
+	BaseGame* pGame{};
+	RenderSettings renderSettings{};
+	WindowSettings windowSettings{};
+
+#ifdef _DEBUG
+	renderSettings.RenderMode = RenderMode::EDITOR;
+#else
+	renderSettings.RenderMode = RenderMode::GAME;
 #endif
+	
+#ifdef Simple
+	pGame = new SimpleGame();
+
+	windowSettings.Title = "SimpleGame";
+	windowSettings.WindowSize = { 640, 480 };
+	windowSettings.FPSState = FPSState::PROTO_CAPPED;
+	windowSettings.FPSRate = FPSRate::PROTO_FPS_VERY_HIGH;
+	
+	renderSettings.WindowSizeOffset = { 1920 - windowSettings.WindowSize.x, 1080 - windowSettings.WindowSize.y };
+	renderSettings.GameRenderOffset = { 1920 / 3 , 50 };
+#endif
+	
+	const Proto::Engine engine{ pGame, renderSettings, windowSettings };
 	
 	engine.Run();
 	return 0;

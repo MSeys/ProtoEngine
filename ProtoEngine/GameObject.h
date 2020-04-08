@@ -7,7 +7,7 @@ class BaseScene;
 class GameObject
 {
 public:
-	GameObject();
+	GameObject(std::string name = "GameObject");
 	virtual ~GameObject();
 
 	GameObject(const GameObject& other) = delete;
@@ -24,6 +24,7 @@ public:
 	TransformComponent* GetTransform() const { return m_pTransform; }
 	BaseScene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
+	std::string& GetName() { return m_Name; }
 
 #pragma region
 	template <class T>
@@ -106,23 +107,30 @@ public:
 		return children;
 	}
 #pragma endregion Template Methods
+
+	void DrawInspector();
 	
 protected:
 	virtual void Initialize() {}
 	virtual void Draw() {}
 	virtual void PostDraw() {}
 	virtual void Update() {}
+	virtual void FixedUpdate() {}
+
+	void DrawHierarchy();
 	
 private:
 	friend class BaseScene;
 	
 	void RootInitialize();
 	void RootUpdate();
+	void RootFixedUpdate();
 	void RootDraw();
 
 	std::vector<GameObject*> m_pChildren;
 	std::vector<BaseComponent*> m_pComponents;
 
+	std::string m_Name;
 	bool m_IsInitialized, m_IsActive;
 	BaseScene* m_pParentScene;
 	GameObject* m_pParentObject;

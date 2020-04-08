@@ -10,7 +10,8 @@ namespace Proto
 	class Engine
 	{
 	public:
-		Engine(BaseGame* pGame, WindowSettings windowSettings = { "ProtoEngine", 640, 480, FPSState::PROTO_VSYNC, FPSRate::PROTO_FPS_NORMAL });
+		Engine(BaseGame* pGame, const RenderSettings& renderSettings = { RenderMode::GAME, { 0, 0 }, { 0, 0 }},
+								const WindowSettings& windowSettings = { "ProtoEngine", {640, 480 }, FPSState::PROTO_VSYNC, FPSRate::PROTO_FPS_NORMAL });
 		~Engine();
 		
 		Engine(const Engine& other) = delete;
@@ -24,16 +25,15 @@ namespace Proto
 		SDL_Window* m_Window{};
 
 		BaseGame* m_pGame;
-		WindowSettings m_WindowSettings;
 		bool m_Exit{ false };
 		
 		void Initialize();
 		void InitializeSDL();
 		void InitializeEngineParts();
+		void InitializeImGuiStyle();
 		
 		void Cleanup();
 		void CleanupSDL();
 		void CleanupEngineParts();
-		
 	};
 }

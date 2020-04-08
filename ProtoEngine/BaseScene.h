@@ -24,7 +24,10 @@ protected:
 	virtual void InitializeControls() = 0;
 	virtual void InitializeScene() = 0;
 	virtual void Update() = 0;
+	virtual void FixedUpdate() = 0;
 	virtual void Draw() = 0;
+
+	void DrawHierarchy();
 
 	virtual void SceneActivated() {}
 	virtual void SceneDeactivated() {}
@@ -34,6 +37,7 @@ private:
 
 	void RootInitialize();
 	void RootUpdate();
+	void RootFixedUpdate();
 	void RootDraw();
 	void RootSceneActivated();
 	void RootSceneDeactivated();

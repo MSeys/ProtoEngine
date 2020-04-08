@@ -23,7 +23,11 @@ public:
 protected:
 	virtual void Initialize() = 0;
 	virtual void Update() = 0;
+	virtual void FixedUpdate() = 0;
 	virtual void Draw() = 0;
+
+	virtual void DrawInspectorTitle() = 0;
+	virtual void DrawInspector() = 0;
 
 	GameObject* m_pGameObject{};
 	bool m_IsInitialized{};

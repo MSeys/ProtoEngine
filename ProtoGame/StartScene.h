@@ -16,8 +16,8 @@ protected:
 	void SceneActivated() override;
 	void SceneDeactivated() override;
 
+	void FixedUpdate() override;
 private:
 	std::string m_JumpDataExample{ "Boing!" };
 	AudioServices m_AudioServices{};
 };
-

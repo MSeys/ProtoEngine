@@ -8,6 +8,8 @@
 #include "Texture2D.h"
 #include "Font.h"
 
+#include <fstream>
+
 void Proto::ResourceManager::Init(const std::string& dataPath)
 {
 	m_DataPath = dataPath;
@@ -39,10 +41,40 @@ Proto::Texture2D* Proto::ResourceManager::LoadTexture(const std::string& file) c
 		throw std::runtime_error(std::string("Failed to load texture: ") + SDL_GetError());
 	}
 	
-	return new Texture2D(texture);
+	return new Texture2D(texture, fullPath, file);
 }
 
 Proto::Font* Proto::ResourceManager::LoadFont(const std::string& file, unsigned int size) const
 {
-	return new Font(m_DataPath + file, size);
+	return new Font(m_DataPath + file, file, size);
+}
+
+bool Proto::ResourceManager::FileExists(const std::string& file, const ResourceType& type) const
+{
+	if(type == ResourceType::FONT)
+	{
+		const std::array<std::string, 2> formats{ "ttf", "otf" };
+		auto it = std::find_if(formats.cbegin(), formats.cend(), [&](const std::string& s) {return file.find(s) != std::string::npos; });
+
+		if (it == formats.end())
+			return false;
+
+		const std::ifstream f(m_DataPath + file);
+		return f.good();
+	}
+
+	if (type == ResourceType::IMAGE)
+	{
+		const std::array<std::string, 4> formats{ "jpeg", "png", "jpg", "PNG" };
+		auto it = std::find_if(formats.cbegin(), formats.cend(), [&](const std::string& s) {return file.find(s) != std::string::npos; });
+
+		if (it == formats.end())
+			return false;
+
+		const std::ifstream f(m_DataPath + file);
+		return f.good();
+	}
+
+	const std::ifstream f(m_DataPath + file);
+	return f.good();
 }

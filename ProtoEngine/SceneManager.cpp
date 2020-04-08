@@ -58,10 +58,24 @@ void Proto::SceneManager::Update()
 	}
 }
 
+void Proto::SceneManager::FixedUpdate()
+{
+	if (m_ActiveScene != nullptr)
+	{
+		m_ActiveScene->RootFixedUpdate();
+	}
+}
+
 void Proto::SceneManager::Draw() const
 {
 	if (m_ActiveScene != nullptr)
 		m_ActiveScene->RootDraw();
+}
+
+void Proto::SceneManager::DrawHierarchy() const
+{
+	if (m_ActiveScene != nullptr)
+		m_ActiveScene->DrawHierarchy();
 }
 
 void Proto::SceneManager::AddGameScene(BaseScene* pScene)

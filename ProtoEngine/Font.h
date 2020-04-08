@@ -11,7 +11,7 @@ namespace Proto
 	{
 	public:
 		_TTF_Font* GetFont() const;
-		explicit Font(const std::string& fullPath, unsigned int size);
+		explicit Font(const std::string& fullPath, std::string relativePath, unsigned int size);
 		~Font();
 
 		Font(const Font &) = delete;
@@ -19,9 +19,14 @@ namespace Proto
 		Font & operator= (const Font &) = delete;
 		Font & operator= (const Font &&) = delete;
 
-		std::string GetPath() const;
+		std::string GetFullPath() const;
+		std::string GetRelativePath() const;
+		unsigned int GetSize() const;
+		
 	private:
 		std::string m_FullPath;
+		std::string m_RelativePath;
 		_TTF_Font* m_Font;
+		unsigned int m_Size;
 	};
 }

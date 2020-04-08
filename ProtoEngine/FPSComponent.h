@@ -8,8 +8,10 @@ public:
 	
 protected:
 	void Update() override;
+	void FixedUpdate() override;
+	
+	void DrawInspectorTitle() override;
 
 private:
 	float m_Timer{ 0.21f };
 };
-

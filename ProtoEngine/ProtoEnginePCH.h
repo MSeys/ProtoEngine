@@ -14,11 +14,11 @@
 #define CompStringify(x, y) bool(x == #y)
 
 // Define Singletons
-#include "Logger.h"
-#define ProtoLogger Proto::Logger::GetInstance()
-
 #include "SettingsManager.h"
 #define ProtoSettings Proto::SettingsManager::GetInstance()
+
+#include "Logger.h"
+#define ProtoLogger Proto::Logger::GetInstance()
 
 #include "Renderer.h"
 #define ProtoRenderer Proto::Renderer::GetInstance() 
@@ -47,6 +47,12 @@
 #include "AchievementManager.h"
 #define ProtoAchievements(x) Proto::AchievementManager<x>::GetInstance()
 
+
+
+#include "Editor.h"
+#define ProtoEditor Proto::Editor::GetInstance()
+
+
 #include "Utils.h"
 #include "Components.h"
 #include "Structs.h"
@@ -54,6 +60,11 @@
 #include "Buttons.h"
 #include "Joysticks.h"
 #include "Triggers.h"
+
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#include "glm/glm.hpp"
+#pragma warning(pop)
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"

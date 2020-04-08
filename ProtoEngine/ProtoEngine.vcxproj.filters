@@ -46,6 +46,12 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{132cfe5c-95be-4c94-ad36-bc5e34cee2d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGui\Core">
+      <UniqueIdentifier>{a2c59047-e95a-45ad-bd44-29c687ccf2f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui\Editor">
+      <UniqueIdentifier>{4b4c60c6-0060-43e4-91e2-8af09269ef58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp">
@@ -118,19 +124,19 @@
       <Filter>Core\Input Handling\Handlers</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_sdl.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -239,29 +245,32 @@
     <ClInclude Include="InputManager.h">
       <Filter>Core\Input Handling\Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>ImGui\Core</Filter>
+    </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_sdl.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
+      <Filter>ImGui\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Editor.h">
+      <Filter>ImGui\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
-      <Filter>Core</Filter>
+      <Filter>ImGui\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
