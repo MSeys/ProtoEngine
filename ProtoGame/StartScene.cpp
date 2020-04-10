@@ -56,6 +56,17 @@ void StartScene::InitializeControls()
 	ProtoInput.GetMouse().SetCommand(JoystickState::Moving, "Motion");
 
 	ProtoInput.GetControllerTrigger(0, TriggerPosState::Left).SetCommand(TriggerState::Held, "Trigger");
+
+
+	/* Key Held Test */
+	ProtoInput.AddKey(SDLK_a, STRINGIFY(SDLK_a));
+	ProtoInput.GetKey(SDLK_a).SetCommand(ButtonState::Pressed, "Jump");
+	ProtoInput.GetKey(SDLK_a).SetCommand(ButtonState::Held, "Fire");
+	ProtoInput.GetKey(SDLK_a).SetCommand(ButtonState::Released, "Fart");
+	
+	ProtoInput.GetMouseButton(StickState::Left).SetCommand(ButtonState::Pressed, "Jump");
+	ProtoInput.GetMouseButton(StickState::Left).SetCommand(ButtonState::Held, "Fire");
+	ProtoInput.GetMouseButton(StickState::Left).SetCommand(ButtonState::Released, "Duck");
 }
 
 void StartScene::InitializeScene()

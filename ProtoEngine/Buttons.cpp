@@ -108,7 +108,21 @@ void Key::UpdateInPoll(const SDL_Event& currState)
 
 void Key::UpdateOutPoll()
 {
-	m_CurrState = ButtonState::None;
+	switch(m_CurrState)
+	{
+	case ButtonState::Pressed:
+	case ButtonState::Held:
+		m_CurrState = ButtonState::Held;
+		break;
+	case ButtonState::Released:
+	case ButtonState::None:
+		m_CurrState = ButtonState::None;
+		break;
+	default:
+		break;
+	}
+
+	//m_CurrState = ButtonState::None;
 }
 
 void Key::SetInputData(Command& command)

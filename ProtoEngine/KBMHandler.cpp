@@ -41,7 +41,9 @@ void KBMHandler::UpdateOutPoll()
 
 void KBMHandler::UpdateInPoll(const SDL_Event& e)
 {
-	if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+	// Necessary to check for NO Key repeat or it'll be sending the KEYDOWN event over and over after a delay
+	// https://stackoverflow.com/questions/22156815/how-to-disable-key-repeat-in-sdl2
+	if ((e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) && e.key.repeat == 0)
 	{
 		GetInput(e.key.keysym.sym, false).UpdateInPoll(e);
 	}
