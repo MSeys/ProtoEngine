@@ -68,6 +68,24 @@ void BaseScene::RemoveChild(GameObject* obj, bool deleteObject)
 }
 #pragma endregion Add / Remove Child
 
+void BaseScene::SwapUpChild(GameObject* obj)
+{
+	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
+	if (it != m_pChildren.begin())
+	{
+		std::swap(*it, *(it - 1));
+	}
+}
+
+void BaseScene::SwapDownChild(GameObject* obj)
+{
+	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
+	if (it != m_pChildren.end() - 1)
+	{
+		std::swap(*it, *(it + 1));
+	}
+}
+
 #pragma region Root Functions
 void BaseScene::DrawHierarchy()
 {

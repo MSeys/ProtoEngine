@@ -62,12 +62,30 @@ namespace Proto
 
 		}
 		
-		void Draw() const
+		void Draw()
 		{
+			SDL_Rect fullWindow{
+					0,
+					0,
+					int(ProtoSettings.GetWindowSize().x),
+					int(ProtoSettings.GetWindowSize().y) };
+			
+			SDL_Rect gameWindow{
+					int(ProtoSettings.GetRenderSettings().GameRenderOffset.x),
+					int(ProtoSettings.GetRenderSettings().GameRenderOffset.y),
+					int(ProtoSettings.GetWindowSettings().WindowSize.x),
+					int(ProtoSettings.GetWindowSettings().WindowSize.y) };
+
+			SDL_SetRenderDrawColor(ProtoRenderer.GetSDLRenderer(), 25, 25, 25, 80);
+			SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &fullWindow);
+			SDL_SetRenderDrawColor(ProtoRenderer.GetSDLRenderer(), 0, 0, 0, 255);
+			SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &gameWindow);
+			
 			DrawMenu();
 			ProtoLogger.Draw();
 			DrawHierarchy();
 			DrawInspector();
+
 		}
 
 		void SetCurrentSelected(GameObject* pGameObject) { m_pCurrentSelected = pGameObject; }
@@ -120,7 +138,7 @@ namespace Proto
 
 		GameObject* m_pCurrentSelected{};
 
-		void DrawInspector() const
+		void DrawInspector()
 		{
 			if (!m_pCurrentSelected)
 				return;
@@ -129,7 +147,12 @@ namespace Proto
 
 			ImGui::Begin(title.c_str());
 
-			m_pCurrentSelected->DrawInspector();
+			if (!m_pCurrentSelected->DrawInspector())
+			{
+				m_pCurrentSelected = nullptr;
+				ImGui::End();
+				return;
+			}
 
 			ImGui::Separator();
 
@@ -151,10 +174,10 @@ namespace Proto
 			ImGui::Text("Component");
 			ImGui::Separator();
 
-			if (ImGui::Selectable("Render Component"))
-				m_pCurrentSelected->AddComponent(new RenderComponent(nullptr, {}));
+			if (ImGui::Selectable("Image"))
+				m_pCurrentSelected->AddComponent(new ImageComponent(nullptr, {}));
 
-			if (ImGui::Selectable("Text Component"))
+			if (ImGui::Selectable("Text"))
 				m_pCurrentSelected->AddComponent(new TextComponent("", nullptr, {}));
 
 			if (ImGui::Selectable("FPS Component"))

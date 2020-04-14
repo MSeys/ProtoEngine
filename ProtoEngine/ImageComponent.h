@@ -2,14 +2,14 @@
 #include "BaseComponent.h"
 #include "Structs.h"
 
-class RenderComponent : public BaseComponent
+class ImageComponent : public BaseComponent
 {
 public:
-	RenderComponent(Proto::Texture2D* pTexture, const Proto::TextureData& texData);
-	~RenderComponent();
+	ImageComponent(Proto::Texture2D* pTexture, const TextureData& texData);
+	~ImageComponent();
 
 	void SetTexture(const std::string& path);
-	void SetTextureData(const Proto::TextureData& texData);
+	void SetTextureData(const TextureData& texData);
 	
 protected:
 	void Initialize() override;
@@ -23,5 +23,8 @@ protected:
 
 	std::string m_TexRelPath;
 	Proto::Texture2D* m_pTexture;
-	Proto::TextureData m_TexData;
+	TextureData m_TexData;
+
+	HAlignment m_HorAlignment{ HAlignment::LEFT };
+	VAlignment m_VerAlignment{ VAlignment::BOTTOM };
 };

@@ -1,9 +1,6 @@
 ﻿#pragma once
 #include <iostream>
 
-#include "Audio.h"
-#include "Buttons.h"
-
 enum class CommandOrigin
 {
 	C_BUTTON, C_JOYSTICK, C_TRIGGER, KBM_KEY, KBM_MOUSE, KBM_MOUSE_KEY, NONE

@@ -142,45 +142,227 @@ void GameObject::RemoveComponent(BaseComponent* pComp)
 }
 #pragma endregion Add / Remove Component
 
+void GameObject::SwapUpChild(GameObject* obj)
+{
+	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
+	if(it != m_pChildren.begin())
+	{
+		std::swap(*it, *(it - 1));		
+	}
+}
+
+void GameObject::SwapDownChild(GameObject* obj)
+{
+	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
+	if (it != m_pChildren.end() - 1)
+	{
+		std::swap(*it, *(it + 1));
+	}
+}
+
+void GameObject::SwapUpComponent(BaseComponent* pComp)
+{
+	const auto it{ std::find(m_pComponents.begin(), m_pComponents.end(), pComp) };
+	if (it != m_pComponents.begin() + 1)
+	{
+		std::swap(*it, *(it - 1));
+	}
+}
+
+void GameObject::SwapDownComponent(BaseComponent* pComp)
+{
+	const auto it{ std::find(m_pComponents.begin(), m_pComponents.end(), pComp) };
+	if (it != m_pComponents.end() - 1)
+	{
+		std::swap(*it, *(it + 1));
+	}
+}
+
 #pragma region Root Functions
 void GameObject::DrawHierarchy()
 {
+	std::stringstream thisAddress;
+	thisAddress << this;
+
+	std::string labelText;
+
 	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 	if (ProtoEditor.GetCurrentSelected() == this)
 		nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
+	// Leaf
 	if(m_pChildren.empty())
-		nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-	
-	const bool nodeOpen = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
-
-	if (ImGui::IsItemClicked())
-		ProtoEditor.SetCurrentSelected(this);
-	
-	if(nodeOpen)
 	{
-		if(!m_pChildren.empty())
+		nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
+
+		if (ImGui::IsItemClicked())
+			ProtoEditor.SetCurrentSelected(this);
+
+		labelText = "NodeMenu##" + thisAddress.str();
+		ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
+
+		if (ImGui::BeginPopup(labelText.c_str()))
 		{
-			for(GameObject* pChild : m_pChildren)
+			ImGui::Text("Actions");
+			ImGui::Separator();
+
+			if (ImGui::Selectable("Add GameObject"))
+				AddChild(new GameObject(m_Name));
+
+			if(ImGui::Selectable("Swap Up"))
 			{
-				pChild->DrawHierarchy();
+				if (m_pParentObject)
+					m_pParentObject->SwapUpChild(this);
+
+				else
+					m_pParentScene->SwapUpChild(this);
 			}
+
+			if(ImGui::Selectable("Swap Down"))
+			{
+				if (m_pParentObject)
+					m_pParentObject->SwapDownChild(this);
+
+				else
+					m_pParentScene->SwapDownChild(this);
+			}
+
+			if(ImGui::Selectable("Delete"))
+			{
+				if (m_pParentObject)
+					m_pParentObject->RemoveChild(this);
+
+				else
+					m_pParentScene->RemoveChild(this);
+
+				if (ProtoEditor.GetCurrentSelected() == this)
+					ProtoEditor.SetCurrentSelected(nullptr);
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	// Tree
+	else
+	{
+		const bool nodeOpen = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
+
+		if (ImGui::IsItemClicked())
+			ProtoEditor.SetCurrentSelected(this);
+
+		labelText = "NodeMenu##" + thisAddress.str();
+
+		ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
+
+		if (ImGui::BeginPopup(labelText.c_str()))
+		{
+			ImGui::Text("Actions");
+			ImGui::Separator();
+
+			if (ImGui::Selectable("Add GameObject"))
+				AddChild(new GameObject(m_Name));
+
+			if (ImGui::Selectable("Swap Up"))
+			{
+				if (m_pParentObject)
+					m_pParentObject->SwapUpChild(this);
+
+				else
+					m_pParentScene->SwapUpChild(this);
+			}
+
+			if (ImGui::Selectable("Swap Down"))
+			{
+				if (m_pParentObject)
+					m_pParentObject->SwapDownChild(this);
+
+				else
+					m_pParentScene->SwapDownChild(this);
+			}
+
+			if (ImGui::Selectable("Delete"))
+			{
+				if (m_pParentObject)
+					m_pParentObject->RemoveChild(this);
+
+				else
+					m_pParentScene->RemoveChild(this);
+
+				if (ProtoEditor.GetCurrentSelected() == this)
+					ProtoEditor.SetCurrentSelected(nullptr);
+			}
+
+			ImGui::EndPopup();
 		}
 
-		if (!m_pChildren.empty())
-			ImGui::TreePop();
+		if (nodeOpen)
+		{
+			if (!m_pChildren.empty())
+			{
+				for (GameObject* pChild : m_pChildren)
+				{
+					pChild->DrawHierarchy();
+				}
+
+				ImGui::TreePop();
+			}
+		}
 	}
 }
 
-void GameObject::DrawInspector()
+bool GameObject::DrawInspector()
 {
+	std::stringstream thisAddress;
+	thisAddress << this;
+
+	std::string labelText;
 	BaseComponent* delComp{};
 	
-	m_Name.resize(25);
+	m_Name.resize(50);
 
-	ImGui::Checkbox("##Active", &m_IsActive);
+	labelText = "##Active" + thisAddress.str();
+	ImGui::Checkbox(labelText.c_str(), &m_IsActive);
 	ImGui::SameLine();
-	ImGui::InputText("Name", &m_Name[0], 25);
+
+	labelText = "##Name" + thisAddress.str();
+	ImGui::InputText(labelText.c_str(), &m_Name[0], 50);
+
+	ImGui::SameLine(310);
+
+	if (ImGui::Button("^"))
+	{
+		if (m_pParentObject)
+			m_pParentObject->SwapUpChild(this);
+
+		else
+			m_pParentScene->SwapUpChild(this);
+	}
+
+	ImGui::SameLine(335);
+	
+	if (ImGui::Button("v"))
+	{
+		if (m_pParentObject)
+			m_pParentObject->SwapDownChild(this);
+
+		else
+			m_pParentScene->SwapDownChild(this);
+	}
+	
+	ImGui::SameLine(360);
+	
+	if(ImGui::Button("X"))
+	{
+		if (m_pParentObject)
+			m_pParentObject->RemoveChild(this);
+
+		else
+			m_pParentScene->RemoveChild(this);
+
+		return false;
+	}
 	
 	for (BaseComponent* pComp : m_pComponents)
 	{
@@ -195,9 +377,21 @@ void GameObject::DrawInspector()
 
 		if (!dynamic_cast<TransformComponent*>(pComp))
 		{
+			ImGui::SameLine(310);
+
+			labelText = "^##" + compAddress.str();
+			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
+				SwapUpComponent(pComp);
+			
+			ImGui::SameLine(335);
+			
+			labelText = "v##" + compAddress.str();
+			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
+				SwapDownComponent(pComp);
+			
 			ImGui::SameLine(360);
 
-			const std::string labelText{ "X##" + compAddress.str() };
+			labelText = "X##" + compAddress.str();
 			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
 				delComp = pComp;
 		}
@@ -207,6 +401,8 @@ void GameObject::DrawInspector()
 
 	if (delComp)
 		RemoveComponent(delComp);
+
+	return true;
 }
 
 void GameObject::RootInitialize()

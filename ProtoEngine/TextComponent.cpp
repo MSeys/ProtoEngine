@@ -8,7 +8,11 @@
 #include "Texture2D.h"
 #include "Utils.h"
 
-TextComponent::TextComponent(std::string text, Proto::Font* pFont, const Proto::TextureData& texData)
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+
+TextComponent::TextComponent(std::string text, Proto::Font* pFont, const TextureData& texData)
 	: m_pTexture(nullptr), m_TexData(texData), m_Text(std::move(text)), m_pFont(pFont)
 {
 	if(pFont)
@@ -21,7 +25,6 @@ TextComponent::TextComponent(std::string text, Proto::Font* pFont, const Proto::
 TextComponent::~TextComponent()
 {
 	SafeDelete(m_pTexture);
-	SafeDelete(m_pFont);
 }
 
 void TextComponent::SetText(const std::string& text)
@@ -33,8 +36,7 @@ void TextComponent::SetText(const std::string& text)
 void TextComponent::SetFontSize(unsigned size)
 {
 	const std::string relPath{ m_pFont->GetRelativePath() };
-	SafeDelete(m_pFont);
-	m_pFont = ProtoResources.LoadFont(relPath, size);
+	m_pFont = ProtoContent.GetFont(relPath, size);
 	
 	UpdateText();
 }
@@ -51,8 +53,7 @@ void TextComponent::SetFont(const std::string& path)
 	if(m_pFont)
 		size = m_pFont->GetSize();
 	
-	SafeDelete(m_pFont);
-	m_pFont = ProtoResources.LoadFont(path, size);
+	m_pFont = ProtoContent.GetFont(path, size);
 	m_FontRelPath = path;
 
 	UpdateText();
@@ -72,7 +73,7 @@ void TextComponent::FixedUpdate()
 
 void TextComponent::DrawInspectorTitle()
 {
-	ImGui::Text("Text Component");
+	ImGui::Text("Text");
 }
 
 void TextComponent::DrawInspector()
@@ -80,58 +81,44 @@ void TextComponent::DrawInspector()
 	std::stringstream thisAddress;
 	thisAddress << this;
 
-	std::string labelText{};
-
-	/* Position */ {
-		ImGui::Text("Position");
-
-		/* Position X */ {
-			ImGui::SameLine(100);
-			ImGui::Text("X");
-			ImGui::SameLine(115);
-
-			ImGui::PushItemWidth(70);
-			labelText = "##TEXT_COMP_POS_X" + thisAddress.str();
-			ImGui::InputFloat(labelText.c_str(), &m_TexData.x, 0, 0, "%.1f");
-			ImGui::PopItemWidth();
-		}
-
-		/* Position Y */ {
-			ImGui::SameLine(200);
-			ImGui::Text("Y");
-			ImGui::SameLine(215);
-
-			ImGui::PushItemWidth(70);
-			labelText = "##TEXT_COMP_POS_Y" + thisAddress.str();
-			ImGui::InputFloat(labelText.c_str(), &m_TexData.y, 0, 0, "%.1f");
-			ImGui::PopItemWidth();
-		}
-	}
+	std::string labelText;
 
 	/* Font Path */ {
 		ImGui::Text("Font");
 		ImGui::SameLine(100);
 
+		ImGui::PushItemWidth(175);
 		labelText = "##TEXT_COMP_FILE_PATH" + thisAddress.str();
-
-		m_FontRelPath.resize(150);
-
-		ImGui::InputText(labelText.c_str(), &m_FontRelPath[0], 150);
-		if (ProtoResources.FileExists(m_FontRelPath, ResourceType::FONT))
+		ImGui::InputText(labelText.c_str(), &m_FontRelPath[0], 300, ImGuiInputTextFlags_ReadOnly);
+		ImGui::PopItemWidth();
+		
+		ImGui::SameLine(285);
+		labelText = "...##TEXT_COMP_FILE_PATH_BUTTON" + thisAddress.str();
+		if (ImGui::Button(labelText.c_str()))
 		{
-			if (m_pFont)
+			const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
+			const auto selection = pfd::open_file("Select a Font", fullPath, { "Font Files", "*.ttf *.otf" }).result();
+			if (!selection.empty())
 			{
-				if (m_FontRelPath != m_pFont->GetRelativePath())
-					SetFont(m_FontRelPath);
-			}
+				const std::string relPath{ selection[0].substr(fullPath.size()) };
+				
+				if (m_pFont)
+				{
+					if (relPath != m_pFont->GetRelativePath())
+						SetFont(relPath);
+				}
 
-			else
-				SetFont(m_FontRelPath);
+				else
+					SetFont(relPath);
+			}
 		}
 	}
 
 	if (!m_pFont)
 		return;
+
+	ImGuiProto::Position(m_TexData, thisAddress.str());
+	ImGuiProto::Size(m_TexData, thisAddress.str());
 	
 	/* Font Size */ {
 		ImGui::Text("Font Size");
@@ -140,14 +127,14 @@ void TextComponent::DrawInspector()
 		int newSize{ int(m_pFont->GetSize()) };
 
 		labelText = "##TEXT_COMP_FONT_SIZE" + thisAddress.str();
-		ImGui::InputInt(labelText.c_str(), &newSize);
+		ImGui::DragInt(labelText.c_str(), &newSize, 1, 10, 100);
 
 		if (newSize != int(m_pFont->GetSize()))
 			SetFontSize(newSize);
 	}
 
 	/* Text */ {
-		m_Text.resize(100);
+		m_Text.resize(200);
 
 		ImGui::Text("Text");
 		ImGui::SameLine(100);
@@ -155,7 +142,7 @@ void TextComponent::DrawInspector()
 		std::string newText{ m_Text };
 		newText.resize(m_Text.size());
 		labelText = "##TEXT_COMP_TEXT" + thisAddress.str();
-		ImGui::InputText(labelText.c_str(), &newText[0], 100);
+		ImGui::InputText(labelText.c_str(), &newText[0], 200);
 
 		if (newText != m_Text)
 		{
@@ -163,15 +150,13 @@ void TextComponent::DrawInspector()
 		}
 	}
 
+	ImGui::PushID(this);
+	ImGuiProto::Alignment(m_HorAlignment, m_VerAlignment);
+	ImGui::PopID();
+	
 	/* Text Color */ {
-		ImGui::Text("Text Color");
-		ImGui::SameLine(100);
-
-		labelText = "##TEXT_COMP_TEXT_COLOR" + thisAddress.str();
-
-		float colors[4] = { float(m_TexData.color.r) / 255.f, float(m_TexData.color.g) / 255.f, float(m_TexData.color.b) / 255.f, float(m_TexData.color.a) / 255.f };
-		ImGui::ColorEdit4(labelText.c_str(), &colors[0]);
-		const SDL_Color newColor{ Uint8(colors[0] * 255), Uint8(colors[1] * 255), Uint8(colors[2] * 255), Uint8(colors[3] * 255) };
+		SDL_Color newColor{};
+		ImGuiProto::Color("Text Color", m_TexData, newColor, thisAddress.str());
 
 		if (newColor.r != m_TexData.color.r || newColor.g != m_TexData.color.g || newColor.b != m_TexData.color.b || newColor.a != m_TexData.color.a)
 			SetColor(newColor);
@@ -182,12 +167,39 @@ void TextComponent::Draw()
 {
 	if (!m_pTexture)
 		return;
-	
-	if (m_TexData.width == -1 || m_TexData.height == -1)
-		ProtoRenderer.RenderTexture(*m_pTexture, m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x, m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y, { 255, 255, 255, m_TexData.color.a });
+	float x{ m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x }, y{ m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y };
 
-	else
-		ProtoRenderer.RenderTexture(*m_pTexture, m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x, m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y, m_TexData.width, m_TexData.height, { 255, 255, 255, m_TexData.color.a });
+	switch (m_HorAlignment)
+	{
+	case HAlignment::LEFT:
+		break;
+	case HAlignment::CENTER:
+		x -= m_TexData.width / 2.f;
+		break;
+	case HAlignment::RIGHT:
+		x -= m_TexData.width;
+		break;
+	default:
+		break;
+	}
+
+	switch (m_VerAlignment)
+	{
+	case VAlignment::TOP:
+		y -= m_TexData.height;
+		break;
+	case VAlignment::CENTER:
+		y -= m_TexData.height / 2.f;
+		break;
+	case VAlignment::BOTTOM:
+		break;
+	default:
+		break;
+	}
+
+	ProtoRenderer.RenderTexture(*m_pTexture, x, y,
+		m_pGameObject->GetTransform()->GetScale().x * m_TexData.width,
+		m_pGameObject->GetTransform()->GetScale().y * m_TexData.height, { 255, 255, 255, m_TexData.color.a });
 }
 
 void TextComponent::UpdateText()
@@ -213,4 +225,9 @@ void TextComponent::UpdateText()
 	SDL_FreeSurface(surf);
 
 	m_pTexture = new Proto::Texture2D(texture, m_pFont->GetFullPath(), m_pFont->GetRelativePath());
+
+	int width, height;
+	SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
+	m_TexData.width = float(width);
+	m_TexData.height = float(height);
 }

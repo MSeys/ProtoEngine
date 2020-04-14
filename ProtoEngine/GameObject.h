@@ -21,6 +21,12 @@ public:
 	void AddComponent(BaseComponent* pComp);
 	void RemoveComponent(BaseComponent* pComp);
 
+	void SwapUpChild(GameObject* obj);
+	void SwapDownChild(GameObject* obj);
+
+	void SwapUpComponent(BaseComponent* pComp);
+	void SwapDownComponent(BaseComponent* pComp);
+	
 	TransformComponent* GetTransform() const { return m_pTransform; }
 	BaseScene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
@@ -108,7 +114,7 @@ public:
 	}
 #pragma endregion Template Methods
 
-	void DrawInspector();
+	bool DrawInspector();
 	
 protected:
 	virtual void Initialize() {}

@@ -51,12 +51,12 @@ void Proto::Engine::Run() const
 		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
 		if (ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
+		{
 			ProtoEditor.DrawDocks();
-
-		ProtoScenes.Draw();
-
-		if(ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
 			ProtoEditor.Draw();
+		}
+		
+		ProtoScenes.Draw();
 
 		ImGui::Render();
 		ImGuiSDL::Render(ImGui::GetDrawData());
@@ -114,7 +114,7 @@ void Proto::Engine::InitializeEngineParts()
 	ProtoInput.GetKey(SDLK_ESCAPE).SetCommand(ButtonState::Pressed, COMMAND_EXIT);
 	
 	// ProtoResource
-	ProtoResources.Init("../Data/");
+	ProtoContent.Init("../Data/");
 
 	// ProtoAudio
 	ProtoAudio::Init();
@@ -206,6 +206,9 @@ void Proto::Engine::CleanupSDL()
 
 void Proto::Engine::CleanupEngineParts()
 {
+	// ProtoContent
+	ProtoContent.Destroy();
+	
 	// ProtoRenderer
 	ProtoRenderer.Destroy();
 

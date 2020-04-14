@@ -18,7 +18,7 @@ public:
 	TransformComponent& operator=(const TransformComponent& other) = delete;
 	TransformComponent& operator=(TransformComponent&& other) noexcept = delete;
 	
-	glm::vec3 GetPosition() const
+	glm::vec2 GetPosition() const
 	{
 		if(GetGameObject()->GetParent())
 		{
@@ -27,7 +27,19 @@ public:
 		
 		return m_Position;
 	}
-	void SetPosition(float x, float y, float z);
+
+	glm::vec2 GetScale() const
+	{
+		if (GetGameObject()->GetParent())
+		{
+			return GetGameObject()->GetParent()->GetTransform()->GetScale() + m_Scale;
+		}
+
+		return m_Scale;
+	}
+	
+	void SetPosition(float x, float y);
+	void SetScale(float x, float y);
 	
 protected:
 	void Initialize() override;
@@ -38,5 +50,6 @@ protected:
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
 private:
-	glm::vec3 m_Position;
+	glm::vec2 m_Position;
+	glm::vec2 m_Scale;
 };

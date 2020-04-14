@@ -188,6 +188,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClCompile Include="BaseComponent.cpp" />
     <ClCompile Include="Buttons.cpp" />
     <ClCompile Include="CommandManager.cpp" />
+    <ClCompile Include="ContentManager.cpp" />
     <ClCompile Include="ControllerHandler.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -223,6 +224,12 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ImGui_Proto.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Joysticks.cpp" />
     <ClCompile Include="KBMHandler.cpp" />
@@ -232,9 +239,8 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="RenderComponent.cpp" />
+    <ClCompile Include="ImageComponent.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SettingsManager.cpp" />
@@ -253,6 +259,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="CommandManager.h" />
     <ClInclude Include="BaseCommand.h" />
     <ClInclude Include="Components.h" />
+    <ClInclude Include="ContentManager.h" />
     <ClInclude Include="ControllerHandler.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Engine.h" />
@@ -265,16 +272,17 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="ImGui_Proto.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Joysticks.h" />
     <ClInclude Include="KBMHandler.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Messenger.h" />
     <ClInclude Include="Observer.h" />
+    <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="ProtoEnginePCH.h" />
-    <ClInclude Include="RenderComponent.h" />
+    <ClInclude Include="ImageComponent.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="GameObject.h" />

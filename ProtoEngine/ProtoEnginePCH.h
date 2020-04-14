@@ -26,8 +26,8 @@
 #include "InputManager.h"
 #define ProtoInput Proto::InputManager::GetInstance()
 
-#include "ResourceManager.h"
-#define ProtoResources Proto::ResourceManager::GetInstance()
+#include "ContentManager.h"
+#define ProtoContent Proto::ContentManager::GetInstance()
 
 #include "SceneManager.h"
 #define ProtoScenes Proto::SceneManager::GetInstance()
@@ -68,3 +68,6 @@
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
+#include "ImGui_Proto.h"
+
+#include "portable-file-dialogs.h"

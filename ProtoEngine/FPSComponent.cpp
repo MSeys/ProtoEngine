@@ -4,7 +4,7 @@
 
 #include "Font.h"
 
-FPSComponent::FPSComponent(Proto::Font* pFont, const Proto::TextureData& texData)
+FPSComponent::FPSComponent(Proto::Font* pFont, const TextureData& texData)
 	: TextComponent("FPS", pFont, texData)
 {
 }

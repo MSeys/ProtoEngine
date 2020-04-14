@@ -19,6 +19,9 @@ public:
 	void AddChild(GameObject* obj);
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
+	void SwapUpChild(GameObject* obj);
+	void SwapDownChild(GameObject* obj);
+
 protected:
 	virtual void InitializeCommands() = 0;
 	virtual void InitializeControls() = 0;

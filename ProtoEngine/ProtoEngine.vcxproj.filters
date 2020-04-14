@@ -75,9 +75,6 @@
     <ClCompile Include="BaseScene.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
-    <ClCompile Include="RenderComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="FPSComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -95,9 +92,6 @@
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Content</Filter>
     </ClCompile>
     <ClCompile Include="SettingsManager.cpp">
       <Filter>Core</Filter>
@@ -138,6 +132,15 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui\Core</Filter>
     </ClCompile>
+    <ClCompile Include="ImageComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ContentManager.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui_Proto.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -173,9 +176,6 @@
     <ClInclude Include="BaseScene.h">
       <Filter>Scenegraph</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="FPSComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -193,9 +193,6 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="Structs.h">
       <Filter>Helpers</Filter>
@@ -271,6 +268,18 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>ImGui\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="portable-file-dialogs.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ContentManager.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui_Proto.h">
+      <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

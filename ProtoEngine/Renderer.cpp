@@ -64,6 +64,8 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const float x, con
 	
 	dst.w = static_cast<int>(width);
 	dst.h = static_cast<int>(height);
+	SDL_SetTextureBlendMode(texture.GetSDLTexture(), SDL_BLENDMODE_BLEND);
 	SDL_SetTextureColorMod(texture.GetSDLTexture(), color.r, color.g, color.b);
+	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), color.a);
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }

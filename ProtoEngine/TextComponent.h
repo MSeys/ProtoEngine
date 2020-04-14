@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "RenderComponent.h"
+#include "ImageComponent.h"
 
 namespace Proto {
 	class Font;
@@ -10,7 +10,7 @@ namespace Proto {
 class TextComponent : public BaseComponent
 {
 public:
-	TextComponent(std::string text, Proto::Font* pFont, const Proto::TextureData& texData = { 0, 0 });
+	TextComponent(std::string text, Proto::Font* pFont, const TextureData& texData = { 0, 0 });
 	~TextComponent() override;
 
 	void SetText(const std::string& text);
@@ -32,8 +32,11 @@ protected:
 	
 	std::string m_FontRelPath;
 	Proto::Texture2D* m_pTexture;
-	Proto::TextureData m_TexData;
+	TextureData m_TexData;
 	std::string m_Text;
 	Proto::Font* m_pFont;
+
+	HAlignment m_HorAlignment{ HAlignment::LEFT };
+	VAlignment m_VerAlignment{ VAlignment::BOTTOM };
 };
 

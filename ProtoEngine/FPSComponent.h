@@ -4,7 +4,7 @@
 class FPSComponent : public TextComponent
 {
 public:
-	FPSComponent(Proto::Font* pFont, const Proto::TextureData& texData);
+	FPSComponent(Proto::Font* pFont, const TextureData& texData);
 	
 protected:
 	void Update() override;
