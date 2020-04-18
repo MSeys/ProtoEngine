@@ -3,11 +3,11 @@
 
 #include <SDL.h>
 
-#include "BaseScene.h"
+#include "Scene.h"
 #include "Utils.h"
 
 Proto::SceneManager::SceneManager()
-	: m_pScenes(std::vector<BaseScene*>())
+	: m_pScenes(std::vector<Scene*>())
 	, m_IsInitialized(false)
 	, m_ActiveScene(nullptr)
 	, m_NewActiveScene(nullptr)
@@ -17,7 +17,7 @@ Proto::SceneManager::SceneManager()
 
 Proto::SceneManager::~SceneManager()
 {
-	for (BaseScene* scene : m_pScenes)
+	for (Scene* scene : m_pScenes)
 	{
 		SafeDelete(scene);
 	}
@@ -28,9 +28,10 @@ void Proto::SceneManager::Initialize()
 	if (m_IsInitialized)
 		return;
 
-	for (BaseScene* scene : m_pScenes)
+	for (Scene* scene : m_pScenes)
 	{
-		scene->RootInitialize();
+		scene->Start();
+		scene->Awake();
 	}
 
 	m_IsInitialized = true;
@@ -40,21 +41,14 @@ void Proto::SceneManager::Update()
 {	
 	if (m_NewActiveScene != nullptr)
 	{
-		//Deactivate the current active scene
-		if (m_ActiveScene != nullptr)
-			m_ActiveScene->RootSceneDeactivated();
-
 		//Set New Scene
 		m_ActiveScene = m_NewActiveScene;
 		m_NewActiveScene = nullptr;
-
-		//Active the new scene and reset SceneTimer
-		m_ActiveScene->RootSceneActivated();
 	}
 
 	if (m_ActiveScene != nullptr)
 	{
-		m_ActiveScene->RootUpdate();
+		m_ActiveScene->Update();
 	}
 }
 
@@ -62,14 +56,14 @@ void Proto::SceneManager::FixedUpdate()
 {
 	if (m_ActiveScene != nullptr)
 	{
-		m_ActiveScene->RootFixedUpdate();
+		m_ActiveScene->FixedUpdate();
 	}
 }
 
 void Proto::SceneManager::Draw() const
 {
 	if (m_ActiveScene != nullptr)
-		m_ActiveScene->RootDraw();
+		m_ActiveScene->Draw();
 }
 
 void Proto::SceneManager::DrawHierarchy() const
@@ -78,7 +72,7 @@ void Proto::SceneManager::DrawHierarchy() const
 		m_ActiveScene->DrawHierarchy();
 }
 
-void Proto::SceneManager::AddGameScene(BaseScene* pScene)
+void Proto::SceneManager::AddGameScene(Scene* pScene)
 {
 	const auto it = find(m_pScenes.begin(), m_pScenes.end(), pScene);
 
@@ -87,14 +81,14 @@ void Proto::SceneManager::AddGameScene(BaseScene* pScene)
 		m_pScenes.push_back(pScene);
 
 		if (m_IsInitialized)
-			pScene->RootInitialize();
+			pScene->Start();
 
 		if (m_ActiveScene == nullptr && m_NewActiveScene == nullptr)
 			m_NewActiveScene = pScene;
 	}
 }
 
-void Proto::SceneManager::RemoveGameScene(BaseScene* pScene)
+void Proto::SceneManager::RemoveGameScene(Scene* pScene)
 {
 	const auto it = find(m_pScenes.begin(), m_pScenes.end(), pScene);
 
@@ -106,7 +100,7 @@ void Proto::SceneManager::RemoveGameScene(BaseScene* pScene)
 
 void Proto::SceneManager::SetActiveGameScene(const std::wstring& sceneName)
 {
-	const auto it = find_if(m_pScenes.begin(), m_pScenes.end(), [sceneName](BaseScene* scene)
+	const auto it = find_if(m_pScenes.begin(), m_pScenes.end(), [sceneName](Scene* scene)
 		{
 			return wcscmp(scene->m_SceneName.c_str(), sceneName.c_str()) == 0;
 		});

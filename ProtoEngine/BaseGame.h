@@ -5,5 +5,17 @@ class BaseGame
 {
 public:
 	virtual ~BaseGame() = default;
-	virtual void Initialize() = 0;
+	
+	void RootInitialize();
+	
+	virtual void InitializeCommands() = 0;
+	virtual void InitializeControls() = 0;
+	virtual void InitializeScene() = 0;
 };
+
+inline void BaseGame::RootInitialize()
+{
+	InitializeCommands();
+	InitializeControls();
+	InitializeScene();
+}

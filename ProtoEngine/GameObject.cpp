@@ -3,20 +3,21 @@
 
 #include <utility>
 
-#include "BaseScene.h"
+#include "Scene.h"
 #include "BaseComponent.h"
+#include "ProtoScene_Parser.h"
 #include "TransformComponent.h"
 #include "Utils.h"
 
-GameObject::GameObject(std::string name) :
-	m_pChildren(std::vector<GameObject*>()),
-	m_pComponents(std::vector<BaseComponent*>()),
-	m_Name(std::move(name)),
-	m_IsInitialized(false),
-	m_IsActive(true),
-	m_pParentScene(nullptr),
-	m_pParentObject(nullptr),
-	m_pTransform(nullptr)
+GameObject::GameObject(std::string name, bool isActive)
+	: m_pChildren(std::vector<GameObject*>())
+	, m_pComponents(std::vector<BaseComponent*>())
+	, m_Name(std::move(name))
+	, m_IsInitialized(false)
+	, m_IsActive(isActive)
+	, m_pParentScene(nullptr)
+	, m_pParentObject(nullptr)
+	, m_pTransform(nullptr)
 {
 	m_pTransform = new TransformComponent();
 	AddComponent(m_pTransform);
@@ -36,6 +37,46 @@ GameObject::~GameObject()
 }
 
 #pragma region Add / Remove Child
+void GameObject::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+{
+	using namespace rapidxml;
+	
+	xml_node<>* thisGO = doc.allocate_node(node_element, "GameObject");
+	thisGO->append_attribute(doc.allocate_attribute("Name", doc.allocate_string(m_Name.c_str())));
+	thisGO->append_attribute(doc.allocate_attribute("Active", m_IsActive ? "true" : "false"));
+
+	xml_node<>* thisComponents = doc.allocate_node(node_element, "Components");
+	
+	for(BaseComponent* pComp : m_pComponents)
+		pComp->Save(doc, thisComponents);
+	
+	thisGO->append_node(thisComponents);
+
+	for (GameObject* pChild : m_pChildren)
+		pChild->Save(doc, thisGO);
+	
+	pParent->append_node(thisGO);
+}
+
+void GameObject::Load(rapidxml::xml_node<>* pNode)
+{
+	using namespace rapidxml;
+
+	xml_node<>* pComponentsNode = pNode->first_node("Components");
+	LoadComponents(pComponentsNode, this);
+
+	for (xml_node<>* gameObjectNode = pNode->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
+	{
+		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };
+		const bool goActive{ std::string(gameObjectNode->first_attribute("Active")->value()) == "true" };
+
+		auto pNew = new GameObject(goName, goActive);
+		AddChild(pNew);
+
+		pNew->Load(gameObjectNode);
+	}
+}
+
 void GameObject::AddChild(GameObject* obj)
 {
 #if _DEBUG
@@ -69,12 +110,12 @@ void GameObject::AddChild(GameObject* obj)
 		}
 		else
 		{
-			obj->RootInitialize();
+			obj->Start();
 		}
 	}
 }
 
-void GameObject::RemoveChild(GameObject* obj)
+void GameObject::RemoveChild(GameObject* obj, bool deleteObject)
 {
 	auto it = find(m_pChildren.begin(), m_pChildren.end(), obj);
 
@@ -87,9 +128,11 @@ void GameObject::RemoveChild(GameObject* obj)
 #endif
 
 	m_pChildren.erase(it);
-	obj->m_pParentObject = nullptr;
 
-	SafeDelete(obj);
+	if(deleteObject)
+		SafeDelete(obj);
+	else
+		obj->m_pParentObject = nullptr;
 }
 #pragma endregion Add / Remove Child
 
@@ -178,6 +221,53 @@ void GameObject::SwapDownComponent(BaseComponent* pComp)
 	}
 }
 
+void GameObject::MakeChild()
+{
+	if(m_pParentObject)
+	{
+		// Already a child of another gameobject >> level deeper, child above this
+		const auto it{ std::find(m_pParentObject->GetChildren().begin(), m_pParentObject->GetChildren().end(), this) };
+		if (it != m_pParentObject->GetChildren().begin())
+		{
+			GameObject* newParent = *(it - 1);
+			m_pParentObject->RemoveChild(this, false);
+			newParent->AddChild(this);
+		}
+	}
+
+	else
+	{
+		// GameObject is in root of scene >> level deeper, gameobject above this
+		const auto it{ std::find(m_pParentScene->GetChildren().begin(), m_pParentScene->GetChildren().end(), this) };
+		if (it != m_pParentScene->GetChildren().begin())
+		{
+			GameObject* newParent = *(it - 1);
+			m_pParentScene->RemoveChild(this, false);
+			newParent->AddChild(this);
+		}
+	}
+}
+
+void GameObject::MakeParent()
+{
+	if (!m_pParentObject) // Gameobject is in root
+		return;
+
+	if(m_pParentObject->GetParent()) // Does this parent have a parent?
+	{
+		auto newParent = m_pParentObject->GetParent();
+		m_pParentObject->RemoveChild(this, false);
+		newParent->AddChild(this);
+	}
+
+	else // This parent is part of root (scene)
+	{
+		auto scene = m_pParentObject->GetScene();
+		m_pParentObject->RemoveChild(this, false);
+		scene->AddChild(this);
+	}
+}
+
 #pragma region Root Functions
 void GameObject::DrawHierarchy()
 {
@@ -190,125 +280,76 @@ void GameObject::DrawHierarchy()
 	if (ProtoEditor.GetCurrentSelected() == this)
 		nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
-	// Leaf
-	if(m_pChildren.empty())
+	if (m_pChildren.empty())
+		nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+
+	const bool open = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
+
+	labelText = "##NodeMenu" + thisAddress.str();
+	ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
+
+	if (ImGui::BeginPopup(labelText.c_str()))
 	{
-		nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-		ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
+		ImGui::Text("Actions");
+		ImGui::Separator();
 
-		if (ImGui::IsItemClicked())
-			ProtoEditor.SetCurrentSelected(this);
+		if (ImGui::Selectable("Add GameObject"))
+			AddChild(new GameObject(m_Name));
 
-		labelText = "NodeMenu##" + thisAddress.str();
-		ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
-
-		if (ImGui::BeginPopup(labelText.c_str()))
+		if(ImGui::Selectable("Swap Up"))
 		{
-			ImGui::Text("Actions");
-			ImGui::Separator();
+			if (m_pParentObject)
+				m_pParentObject->SwapUpChild(this);
 
-			if (ImGui::Selectable("Add GameObject"))
-				AddChild(new GameObject(m_Name));
-
-			if(ImGui::Selectable("Swap Up"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->SwapUpChild(this);
-
-				else
-					m_pParentScene->SwapUpChild(this);
-			}
-
-			if(ImGui::Selectable("Swap Down"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->SwapDownChild(this);
-
-				else
-					m_pParentScene->SwapDownChild(this);
-			}
-
-			if(ImGui::Selectable("Delete"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->RemoveChild(this);
-
-				else
-					m_pParentScene->RemoveChild(this);
-
-				if (ProtoEditor.GetCurrentSelected() == this)
-					ProtoEditor.SetCurrentSelected(nullptr);
-			}
-
-			ImGui::EndPopup();
+			else
+				m_pParentScene->SwapUpChild(this);
 		}
+
+		if(ImGui::Selectable("Swap Down"))
+		{
+			if (m_pParentObject)
+				m_pParentObject->SwapDownChild(this);
+
+			else
+				m_pParentScene->SwapDownChild(this);
+		}
+
+		if (ImGui::Selectable("Make Child"))
+		{
+			MakeChild();
+		}
+
+		if (ImGui::Selectable("Make Parent"))
+		{
+			MakeParent();
+		}
+
+		if(ImGui::Selectable("Delete"))
+		{
+			if (m_pParentObject)
+				m_pParentObject->RemoveChild(this);
+
+			else
+				m_pParentScene->RemoveChild(this);
+
+			if (ProtoEditor.GetCurrentSelected() == this)
+				ProtoEditor.SetCurrentSelected(nullptr);
+		}
+
+		ImGui::EndPopup();
 	}
+	
+	if (ImGui::IsItemClicked())
+		ProtoEditor.SetCurrentSelected(this);
 
-	// Tree
-	else
+	if (open)
 	{
-		const bool nodeOpen = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
-
-		if (ImGui::IsItemClicked())
-			ProtoEditor.SetCurrentSelected(this);
-
-		labelText = "NodeMenu##" + thisAddress.str();
-
-		ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
-
-		if (ImGui::BeginPopup(labelText.c_str()))
+		for (GameObject* pChild : m_pChildren)
 		{
-			ImGui::Text("Actions");
-			ImGui::Separator();
-
-			if (ImGui::Selectable("Add GameObject"))
-				AddChild(new GameObject(m_Name));
-
-			if (ImGui::Selectable("Swap Up"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->SwapUpChild(this);
-
-				else
-					m_pParentScene->SwapUpChild(this);
-			}
-
-			if (ImGui::Selectable("Swap Down"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->SwapDownChild(this);
-
-				else
-					m_pParentScene->SwapDownChild(this);
-			}
-
-			if (ImGui::Selectable("Delete"))
-			{
-				if (m_pParentObject)
-					m_pParentObject->RemoveChild(this);
-
-				else
-					m_pParentScene->RemoveChild(this);
-
-				if (ProtoEditor.GetCurrentSelected() == this)
-					ProtoEditor.SetCurrentSelected(nullptr);
-			}
-
-			ImGui::EndPopup();
+			pChild->DrawHierarchy();
 		}
 
-		if (nodeOpen)
-		{
-			if (!m_pChildren.empty())
-			{
-				for (GameObject* pChild : m_pChildren)
-				{
-					pChild->DrawHierarchy();
-				}
-
-				ImGui::TreePop();
-			}
-		}
+		ImGui::TreePop();
 	}
 }
 
@@ -318,141 +359,103 @@ bool GameObject::DrawInspector()
 	thisAddress << this;
 
 	std::string labelText;
-	BaseComponent* delComp{};
+	BaseComponent* pDelComp{};
 	
 	m_Name.resize(50);
 
-	labelText = "##Active" + thisAddress.str();
-	ImGui::Checkbox(labelText.c_str(), &m_IsActive);
-	ImGui::SameLine();
+	/* Inspector */ {
 
-	labelText = "##Name" + thisAddress.str();
-	ImGui::InputText(labelText.c_str(), &m_Name[0], 50);
+		/* First Row */ {
+			labelText = "##Active" + thisAddress.str();
+			ImGui::Checkbox(labelText.c_str(), &m_IsActive);
+			ImGui::SameLine();
 
-	ImGui::SameLine(310);
-
-	if (ImGui::Button("^"))
-	{
-		if (m_pParentObject)
-			m_pParentObject->SwapUpChild(this);
-
-		else
-			m_pParentScene->SwapUpChild(this);
-	}
-
-	ImGui::SameLine(335);
-	
-	if (ImGui::Button("v"))
-	{
-		if (m_pParentObject)
-			m_pParentObject->SwapDownChild(this);
-
-		else
-			m_pParentScene->SwapDownChild(this);
-	}
-	
-	ImGui::SameLine(360);
-	
-	if(ImGui::Button("X"))
-	{
-		if (m_pParentObject)
-			m_pParentObject->RemoveChild(this);
-
-		else
-			m_pParentScene->RemoveChild(this);
-
-		return false;
-	}
-	
-	for (BaseComponent* pComp : m_pComponents)
-	{
-		std::stringstream compAddress;
-		compAddress << pComp;
-		
-		ImGui::Separator();
-		ImGui::Spacing();
-		ImGui::SameLine();
-
-		pComp->DrawInspectorTitle();
-
-		if (!dynamic_cast<TransformComponent*>(pComp))
-		{
-			ImGui::SameLine(310);
-
-			labelText = "^##" + compAddress.str();
-			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
-				SwapUpComponent(pComp);
-			
-			ImGui::SameLine(335);
-			
-			labelText = "v##" + compAddress.str();
-			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
-				SwapDownComponent(pComp);
-			
-			ImGui::SameLine(360);
-
-			labelText = "X##" + compAddress.str();
-			if (ImGui::Button(labelText.c_str(), { 20, 0 }))
-				delComp = pComp;
+			labelText = "##Name" + thisAddress.str();
+			ImGui::InputText(labelText.c_str(), &m_Name[0], 50);
 		}
-		
-		pComp->DrawInspector();
-	}
 
-	if (delComp)
-		RemoveComponent(delComp);
+		for (BaseComponent* pComp : m_pComponents)
+		{
+			std::stringstream compAddress;
+			compAddress << pComp;
+
+			ImGuiProto::BeginComponentPanel(ImVec2{ -1, 0 }, pComp, &pDelComp, compAddress.str());
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+			
+			pComp->DrawInspector();
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+			
+			ImGuiProto::EndComponentPanel();
+		}
+	}
+		
+	if (pDelComp)
+		RemoveComponent(pDelComp);
 
 	return true;
 }
 
-void GameObject::RootInitialize()
+void GameObject::Start()
 {
 	if (m_IsInitialized)
 		return;
 
-	Initialize(); // User-Object
-
-	//Root-Component Initialization
+	// Components Start
 	for (BaseComponent* pComp : m_pComponents)
 	{
-		pComp->RootInitialize();
+		pComp->Start();
 	}
 
-	//Root-Object Initialization
+	// Children Start
 	for (GameObject* pChild : m_pChildren)
 	{
-		pChild->RootInitialize();
+		pChild->Start();
 	}
 
 	m_IsInitialized = true;
 }
 
-void GameObject::RootUpdate()
+void GameObject::Awake()
+{
+	// Components Awake
+	for (BaseComponent* pComp : m_pComponents)
+	{
+		pComp->Awake();
+	}
+
+	// Children Awake
+	for (GameObject* pChild : m_pChildren)
+	{
+		pChild->Awake();
+	}
+}
+
+void GameObject::Update()
 {
 	if (!m_IsActive)
 		return;
-	
-	Update();
 
-	//Component Update
+	// Components Update
 	for (BaseComponent* pComp : m_pComponents)
 	{
 		pComp->Update();
 	}
 
-	//Root-Object Update
+	// Children Update
 	for (GameObject* pChild : m_pChildren)
 	{
-		pChild->RootUpdate();
+		pChild->Update();
 	}
 }
 
-void GameObject::RootFixedUpdate()
+void GameObject::FixedUpdate()
 {
 	if (!m_IsActive)
 		return;
-
-	FixedUpdate();
 
 	//Component Update
 	for (BaseComponent* pComp : m_pComponents)
@@ -460,36 +463,33 @@ void GameObject::RootFixedUpdate()
 		pComp->FixedUpdate();
 	}
 
-	//Root-Object Update
+	// Children FixedUpdate
 	for (GameObject* pChild : m_pChildren)
 	{
-		pChild->RootFixedUpdate();
+		pChild->FixedUpdate();
 	}
 }
 
-void GameObject::RootDraw()
+void GameObject::Draw()
 {
 	if (!m_IsActive)
 		return;
-	
-	//User-Object Draw
-	Draw();
 
-	//Component Draw
+	//Components Draw
 	for (BaseComponent* pComp : m_pComponents)
 	{
 		pComp->Draw();
 	}
 
-	//Root-Object Draw
+	// Children Draw
 	for (GameObject* pChild : m_pChildren)
 	{
-		pChild->RootDraw();
+		pChild->Draw();
 	}
 }
 #pragma endregion Root Functions
 
-BaseScene* GameObject::GetScene() const
+Scene* GameObject::GetScene() const
 {
 	if (!m_pParentScene && m_pParentObject)
 	{

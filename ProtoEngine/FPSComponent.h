@@ -8,10 +8,10 @@ public:
 	
 protected:
 	void Update() override;
-	void FixedUpdate() override;
 	
 	void DrawInspectorTitle() override;
 
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
 private:
 	float m_Timer{ 0.21f };
 };

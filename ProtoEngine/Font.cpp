@@ -32,7 +32,7 @@ std::string Proto::Font::GetRelativePath() const
 	return m_RelativePath;
 }
 
-unsigned Proto::Font::GetSize() const
+unsigned& Proto::Font::GetSize()
 {
 	return m_Size;
 }

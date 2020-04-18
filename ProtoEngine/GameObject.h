@@ -1,13 +1,14 @@
 #pragma once
+#include "RapidXML/rapidxml.hpp"
 
 class BaseComponent;
 class TransformComponent;
-class BaseScene;
+class Scene;
 
 class GameObject
 {
 public:
-	GameObject(std::string name = "GameObject");
+	GameObject(std::string name = "GameObject", bool isActive = true);
 	virtual ~GameObject();
 
 	GameObject(const GameObject& other) = delete;
@@ -15,8 +16,11 @@ public:
 	GameObject& operator=(const GameObject& other) = delete;
 	GameObject& operator=(GameObject&& other) = delete;
 
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent);
+	void Load(rapidxml::xml_node<>* pNode);
+	
 	void AddChild(GameObject* obj);
-	void RemoveChild(GameObject* obj);
+	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
 	void AddComponent(BaseComponent* pComp);
 	void RemoveComponent(BaseComponent* pComp);
@@ -26,9 +30,12 @@ public:
 
 	void SwapUpComponent(BaseComponent* pComp);
 	void SwapDownComponent(BaseComponent* pComp);
+
+	void MakeChild();
+	void MakeParent();
 	
 	TransformComponent* GetTransform() const { return m_pTransform; }
-	BaseScene* GetScene() const;
+	Scene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
 	std::string& GetName() { return m_Name; }
 
@@ -114,31 +121,28 @@ public:
 	}
 #pragma endregion Template Methods
 
+	std::vector<GameObject*>& GetChildren() { return m_pChildren; }
+	
 	bool DrawInspector();
 	
 protected:
-	virtual void Initialize() {}
-	virtual void Draw() {}
-	virtual void PostDraw() {}
-	virtual void Update() {}
-	virtual void FixedUpdate() {}
-
 	void DrawHierarchy();
 	
 private:
-	friend class BaseScene;
+	friend class Scene;
 	
-	void RootInitialize();
-	void RootUpdate();
-	void RootFixedUpdate();
-	void RootDraw();
+	void Start();
+	void Awake();
+	void Update();
+	void FixedUpdate();
+	void Draw();
 
 	std::vector<GameObject*> m_pChildren;
 	std::vector<BaseComponent*> m_pComponents;
 
 	std::string m_Name;
 	bool m_IsInitialized, m_IsActive;
-	BaseScene* m_pParentScene;
+	Scene* m_pParentScene;
 	GameObject* m_pParentObject;
 	TransformComponent* m_pTransform;
 };

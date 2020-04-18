@@ -52,6 +52,9 @@
     <Filter Include="ImGui\Editor">
       <UniqueIdentifier>{4b4c60c6-0060-43e4-91e2-8af09269ef58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RapidXML">
+      <UniqueIdentifier>{311f9476-5c14-4615-8895-94c3ffebd04d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp">
@@ -70,9 +73,6 @@
       <Filter>Scenegraph</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>Scenegraph</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
     <ClCompile Include="FPSComponent.cpp">
@@ -141,6 +141,9 @@
     <ClCompile Include="ImGui_Proto.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scenegraph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -171,9 +174,6 @@
       <Filter>Scenegraph</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Scenegraph</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseScene.h">
       <Filter>Scenegraph</Filter>
     </ClInclude>
     <ClInclude Include="FPSComponent.h">
@@ -279,6 +279,24 @@
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="ImGui_Proto.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scenegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="RapidXML\rapidxml_utils.hpp">
+      <Filter>RapidXML</Filter>
+    </ClInclude>
+    <ClInclude Include="RapidXML\rapidxml.hpp">
+      <Filter>RapidXML</Filter>
+    </ClInclude>
+    <ClInclude Include="RapidXML\rapidxml_iterators.hpp">
+      <Filter>RapidXML</Filter>
+    </ClInclude>
+    <ClInclude Include="RapidXML\rapidxml_print.hpp">
+      <Filter>RapidXML</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtoScene_Parser.h">
       <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,19 +1,7 @@
 #include "ProtoEnginePCH.h"
 #include "BaseComponent.h"
-#include <cassert>
 
 #include "GameObject.h"
-
-void BaseComponent::RootInitialize()
-{
-	assert(!m_IsInitialized);
-	if (m_IsInitialized)
-		return;
-
-	Initialize();
-
-	m_IsInitialized = true;
-}
 
 TransformComponent* BaseComponent::GetTransform() const
 {

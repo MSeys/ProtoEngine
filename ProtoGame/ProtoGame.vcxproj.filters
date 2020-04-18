@@ -4,9 +4,6 @@
     <Filter Include="Games">
       <UniqueIdentifier>{e1b9dacb-2673-4f71-a6e4-15738bac2717}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes">
-      <UniqueIdentifier>{093fc29b-c466-4f3a-9b7b-166e3eef9615}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Observers">
       <UniqueIdentifier>{8a87252d-5ed5-4928-bad5-83b6bc6b817d}</UniqueIdentifier>
     </Filter>
@@ -16,9 +13,6 @@
     <ClCompile Include="SimpleGame.cpp">
       <Filter>Games</Filter>
     </ClCompile>
-    <ClCompile Include="StartScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="AchievementObserver.cpp">
       <Filter>Observers</Filter>
     </ClCompile>
@@ -27,15 +21,15 @@
     <ClInclude Include="SimpleGame.h">
       <Filter>Games</Filter>
     </ClInclude>
-    <ClInclude Include="StartScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Commands.h" />
     <ClInclude Include="AchievementObserver.h">
       <Filter>Observers</Filter>
     </ClInclude>
     <ClInclude Include="Events.h">
       <Filter>Observers</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorGame.h">
+      <Filter>Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

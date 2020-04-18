@@ -6,7 +6,6 @@ class GameObject;
 class BaseComponent
 {
 	friend class GameObject;
-	void RootInitialize();
 	
 public:
 	BaseComponent() = default;
@@ -20,16 +19,18 @@ public:
 	GameObject* GetGameObject() const { return m_pGameObject; }
 	TransformComponent* GetTransform() const;
 
-protected:
-	virtual void Initialize() = 0;
-	virtual void Update() = 0;
-	virtual void FixedUpdate() = 0;
-	virtual void Draw() = 0;
-
-	virtual void DrawInspectorTitle() = 0;
+	virtual void DrawInspectorTitle() {}
 	virtual void DrawInspector() = 0;
+	
+protected:
+	virtual void Start() {}
+	virtual void Awake() {}
+	virtual void Update() {}
+	virtual void FixedUpdate() {}
+	virtual void Draw() {}
+
+	virtual void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) = 0;
 
 	GameObject* m_pGameObject{};
-	bool m_IsInitialized{};
 };
 

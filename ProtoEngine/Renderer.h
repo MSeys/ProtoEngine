@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL.h>
-
+#include "Structs.h"
 #include "Singleton.h"
 
 struct SDL_Window;
@@ -18,8 +18,7 @@ namespace Proto
 		void Init(SDL_Window* window);
 		void Destroy();
 
-		void RenderTexture(const Texture2D& texture, float x, float y, const SDL_Color& color = { 255, 255, 255, 255 }) const;
-		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height, const SDL_Color& color = { 255, 255, 255, 255 }) const;
+		void RenderTexture(const Texture2D& texture, const RenderData& data) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
 	private:

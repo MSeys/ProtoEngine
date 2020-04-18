@@ -5,7 +5,7 @@
 #include "Singleton.h"
 #include "Utils.h"
 
-#define Time std::chrono::steady_clock::time_point  // NOLINT(cppcoreguidelines-macro-usage)
+#define TimePoint std::chrono::steady_clock::time_point  // NOLINT(cppcoreguidelines-macro-usage)
 
 namespace Proto
 {
@@ -13,9 +13,9 @@ namespace Proto
 	{
 
 	public:
-		void SetStartTime(const Time& startTime) { m_StartTime = startTime; }
-		void SetCurrTime(const Time& currTime) { m_CurrTime = currTime; }
-		Time GetCurrTime() const { return m_CurrTime; }
+		void SetStartTime(const TimePoint& startTime) { m_StartTime = startTime; }
+		void SetCurrTime(const TimePoint& currTime) { m_CurrTime = currTime; }
+		TimePoint GetCurrTime() const { return m_CurrTime; }
 		
 		void UpdateTime()
 		{
@@ -38,8 +38,7 @@ namespace Proto
 		int FPS{};
 
 	private:
-		Time m_StartTime;
-		Time m_CurrTime;
+		TimePoint m_StartTime;
+		TimePoint m_CurrTime;
 	};
 }
-

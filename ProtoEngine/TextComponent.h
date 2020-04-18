@@ -17,18 +17,19 @@ public:
 	void SetFontSize(unsigned size);
 	void SetColor(const SDL_Color& color);
 	void SetFont(const std::string& path);
+
+	void SetTextureData(const TextureData& texData);
+	void SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment);
 	
-protected:
-	void Initialize() override;
-	void Update() override;
-	void FixedUpdate() override;
-	
+protected:	
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
 
 	void Draw() override;
 
 	void UpdateText();
+
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
 	
 	std::string m_FontRelPath;
 	Proto::Texture2D* m_pTexture;

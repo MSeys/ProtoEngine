@@ -1,13 +1,7 @@
 #pragma once
 #include "BaseComponent.h"
 
-#pragma warning(push)
-#pragma warning (disable:4201)
-#include <glm/vec3.hpp>
-
-#pragma warning(pop)
-
-class TransformComponent : public BaseComponent
+class TransformComponent final : public BaseComponent
 {
 public:
 	TransformComponent() = default;
@@ -18,38 +12,24 @@ public:
 	TransformComponent& operator=(const TransformComponent& other) = delete;
 	TransformComponent& operator=(TransformComponent&& other) noexcept = delete;
 	
-	glm::vec2 GetPosition() const
-	{
-		if(GetGameObject()->GetParent())
-		{
-			return GetGameObject()->GetParent()->GetTransform()->GetPosition() + m_Position;
-		}
-		
-		return m_Position;
-	}
-
-	glm::vec2 GetScale() const
-	{
-		if (GetGameObject()->GetParent())
-		{
-			return GetGameObject()->GetParent()->GetTransform()->GetScale() + m_Scale;
-		}
-
-		return m_Scale;
-	}
+	glm::vec2 GetPosition() const;
+	glm::vec2 GetRotCenter() const;
+	float GetRotAngle() const;
+	glm::vec2 GetScale() const;
 	
 	void SetPosition(float x, float y);
+	void SetRotCenter(float x, float y);
+	void SetRotAngle(float angle);
 	void SetScale(float x, float y);
 	
 protected:
-	void Initialize() override;
-	void Update() override;
-	void FixedUpdate() override;
-	void Draw() override;
-
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
+	
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
 private:
-	glm::vec2 m_Position;
-	glm::vec2 m_Scale;
+	glm::vec2 m_Position{ 0, 0 };
+	glm::vec2 m_RotCenter{ 0, 0 };
+	float m_RotAngle{ 0 };
+	glm::vec2 m_Scale{ 1, 1 };
 };

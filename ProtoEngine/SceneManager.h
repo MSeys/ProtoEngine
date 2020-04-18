@@ -1,7 +1,7 @@
 #pragma once
 #include "Singleton.h"
 
-class BaseScene;
+class Scene;
 
 namespace Proto
 {
@@ -14,12 +14,12 @@ namespace Proto
 		SceneManager& operator=(const SceneManager& other) = delete;
 		SceneManager& operator=(SceneManager&& other) noexcept = delete;
 
-		void AddGameScene(BaseScene* pScene);
-		void RemoveGameScene(BaseScene* pScene);
+		void AddGameScene(Scene* pScene);
+		void RemoveGameScene(Scene* pScene);
 		void SetActiveGameScene(const std::wstring& sceneName);
 		void NextScene();
 		void PreviousScene();
-		BaseScene* GetActiveScene() const { return m_ActiveScene; }
+		Scene* GetActiveScene() const { return m_ActiveScene; }
 
 		void Update();
 		void FixedUpdate();
@@ -34,8 +34,8 @@ namespace Proto
 
 		void Initialize();
 
-		std::vector<BaseScene*> m_pScenes;
+		std::vector<Scene*> m_pScenes;
 		bool m_IsInitialized;
-		BaseScene* m_ActiveScene, * m_NewActiveScene;
+		Scene* m_ActiveScene, * m_NewActiveScene;
 	};
 }

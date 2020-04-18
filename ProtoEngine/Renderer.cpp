@@ -31,41 +31,36 @@ void Proto::Renderer::Destroy()
 	}
 }
 
-void Proto::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const SDL_Color& color) const
-{
-	SDL_Rect dst;	
-	dst.x = static_cast<int>(x);
-	dst.y = static_cast<int>(y);
-
-	if (ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
-	{
-		dst.x += int(ProtoSettings.GetRenderSettings().GameRenderOffset.x);
-		dst.y += int(ProtoSettings.GetRenderSettings().GameRenderOffset.y);
-	}
-	
-	SDL_QueryTexture(texture.GetSDLTexture(), nullptr, nullptr, &dst.w, &dst.h);
-
-	SDL_SetTextureColorMod(texture.GetSDLTexture(), color.r, color.g, color.b);
-	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), color.a);
-	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
-}
-
-void Proto::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height, const SDL_Color& color) const
+void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& data) const
 {
 	SDL_Rect dst;
-	dst.x = static_cast<int>(x);
-	dst.y = static_cast<int>(y);
+	dst.x = static_cast<int>(data.position.x);
+	dst.y = static_cast<int>(data.position.y);
 
 	if (ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
 	{
 		dst.x += int(ProtoSettings.GetRenderSettings().GameRenderOffset.x);
 		dst.y += int(ProtoSettings.GetRenderSettings().GameRenderOffset.y);
 	}
+
+	dst.w = static_cast<int>(abs(data.size.x));
+	dst.h = static_cast<int>(abs(data.size.y));
+
+	SDL_Point rotPoint{ int(data.rotationCenter.x - data.position.x), int(data.rotationCenter.y - data.position.y) };
+	SDL_RendererFlip flip{ SDL_FLIP_NONE };
+
+	if (data.size.x < 0)
+		flip = SDL_FLIP_HORIZONTAL;
+
+	if (data.size.y < 0)
+		flip = SDL_FLIP_VERTICAL;
+
+	if (data.size.x < 0 && data.size.y < 0)
+		flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
 	
-	dst.w = static_cast<int>(width);
-	dst.h = static_cast<int>(height);
 	SDL_SetTextureBlendMode(texture.GetSDLTexture(), SDL_BLENDMODE_BLEND);
-	SDL_SetTextureColorMod(texture.GetSDLTexture(), color.r, color.g, color.b);
-	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), color.a);
-	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
+	SDL_SetTextureColorMod(texture.GetSDLTexture(), data.color.r, data.color.g, data.color.b);
+	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), data.color.a);
+	
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, data.angle, &rotPoint, flip);
 }

@@ -59,16 +59,15 @@ void TextComponent::SetFont(const std::string& path)
 	UpdateText();
 }
 
-void TextComponent::Initialize()
+void TextComponent::SetTextureData(const TextureData& texData)
 {
+	m_TexData = texData;
 }
 
-void TextComponent::Update()
+void TextComponent::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
 {
-}
-
-void TextComponent::FixedUpdate()
-{
+	m_HorAlignment = horAlignment;
+	m_VerAlignment = verAlignment;
 }
 
 void TextComponent::DrawInspectorTitle()
@@ -127,7 +126,10 @@ void TextComponent::DrawInspector()
 		int newSize{ int(m_pFont->GetSize()) };
 
 		labelText = "##TEXT_COMP_FONT_SIZE" + thisAddress.str();
+
+		ImGui::PushItemWidth(250);
 		ImGui::DragInt(labelText.c_str(), &newSize, 1, 10, 100);
+		ImGui::PopItemWidth();
 
 		if (newSize != int(m_pFont->GetSize()))
 			SetFontSize(newSize);
@@ -142,7 +144,9 @@ void TextComponent::DrawInspector()
 		std::string newText{ m_Text };
 		newText.resize(m_Text.size());
 		labelText = "##TEXT_COMP_TEXT" + thisAddress.str();
+		ImGui::PushItemWidth(250);
 		ImGui::InputText(labelText.c_str(), &newText[0], 200);
+		ImGui::PopItemWidth();
 
 		if (newText != m_Text)
 		{
@@ -167,17 +171,25 @@ void TextComponent::Draw()
 {
 	if (!m_pTexture)
 		return;
-	float x{ m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x }, y{ m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y };
 
+	RenderData data;
+	data.position.x = m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x;
+	data.position.y = m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y;
+	data.size.x = m_pGameObject->GetTransform()->GetScale().x * m_TexData.width;
+	data.size.y = m_pGameObject->GetTransform()->GetScale().y * m_TexData.height;
+	data.rotationCenter = m_pGameObject->GetTransform()->GetRotCenter();
+	data.angle = m_pGameObject->GetTransform()->GetRotAngle();
+	data.color = { 255, 255, 255, m_TexData.color.a };
+	
 	switch (m_HorAlignment)
 	{
 	case HAlignment::LEFT:
 		break;
 	case HAlignment::CENTER:
-		x -= m_TexData.width / 2.f;
+		data.position.x -= m_TexData.width / 2.f;
 		break;
 	case HAlignment::RIGHT:
-		x -= m_TexData.width;
+		data.position.x -= m_TexData.width;
 		break;
 	default:
 		break;
@@ -186,10 +198,10 @@ void TextComponent::Draw()
 	switch (m_VerAlignment)
 	{
 	case VAlignment::TOP:
-		y -= m_TexData.height;
+		data.position.y -= m_TexData.height;
 		break;
 	case VAlignment::CENTER:
-		y -= m_TexData.height / 2.f;
+		data.position.y -= m_TexData.height / 2.f;
 		break;
 	case VAlignment::BOTTOM:
 		break;
@@ -197,9 +209,7 @@ void TextComponent::Draw()
 		break;
 	}
 
-	ProtoRenderer.RenderTexture(*m_pTexture, x, y,
-		m_pGameObject->GetTransform()->GetScale().x * m_TexData.width,
-		m_pGameObject->GetTransform()->GetScale().y * m_TexData.height, { 255, 255, 255, m_TexData.color.a });
+	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
 
 void TextComponent::UpdateText()
@@ -230,4 +240,51 @@ void TextComponent::UpdateText()
 	SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
 	m_TexData.width = float(width);
 	m_TexData.height = float(height);
+}
+
+void TextComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+{
+	using namespace rapidxml;
+	
+	xml_node<>* component = doc.allocate_node(node_element, "TextComponent");
+
+	// Font related
+	component->append_attribute(doc.allocate_attribute("FontLocation", doc.allocate_string(m_FontRelPath.c_str())));
+	component->append_attribute(doc.allocate_attribute("FontSize", doc.allocate_string(ToCString(m_pFont->GetSize()))));
+
+	// Texture Data related
+	component->append_attribute(doc.allocate_attribute("TexDataX", doc.allocate_string(ToCString(m_TexData.x))));
+	component->append_attribute(doc.allocate_attribute("TexDataY", doc.allocate_string(ToCString(m_TexData.y))));
+	component->append_attribute(doc.allocate_attribute("TexDataW", doc.allocate_string(ToCString(m_TexData.width))));
+	component->append_attribute(doc.allocate_attribute("TexDataH", doc.allocate_string(ToCString(m_TexData.height))));
+	component->append_attribute(doc.allocate_attribute("TexDataColorR", doc.allocate_string(ToCString(m_TexData.color.r))));
+	component->append_attribute(doc.allocate_attribute("TexDataColorG", doc.allocate_string(ToCString(m_TexData.color.g))));
+	component->append_attribute(doc.allocate_attribute("TexDataColorB", doc.allocate_string(ToCString(m_TexData.color.b))));
+	component->append_attribute(doc.allocate_attribute("TexDataColorA", doc.allocate_string(ToCString(m_TexData.color.a))));
+
+	// Text
+	component->append_attribute(doc.allocate_attribute("Text", m_Text.c_str()));
+
+	// Alignment related
+	std::string hAlignmentStr, vAlignmentStr;
+	switch (m_HorAlignment)
+	{
+	case HAlignment::LEFT:		hAlignmentStr = "Left"; break;
+	case HAlignment::CENTER:	hAlignmentStr = "Center"; break;
+	case HAlignment::RIGHT:		hAlignmentStr = "Right"; break;
+	default:;
+	}
+
+	switch (m_VerAlignment)
+	{
+	case VAlignment::TOP:		vAlignmentStr = "Top"; break;
+	case VAlignment::CENTER:	vAlignmentStr = "Center"; break;
+	case VAlignment::BOTTOM:	vAlignmentStr = "Bottom"; break;
+	default:;
+	}
+	
+	component->append_attribute(doc.allocate_attribute("HorizontalAlignment", doc.allocate_string(hAlignmentStr.c_str())));
+	component->append_attribute(doc.allocate_attribute("VerticalAlignment", doc.allocate_string(vAlignmentStr.c_str())));
+	
+	pParent->append_node(component);
 }

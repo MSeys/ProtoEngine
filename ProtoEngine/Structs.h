@@ -10,6 +10,15 @@ struct TextureData
 	SDL_Color color = { 255, 255, 255, 255 };
 };
 
+struct RenderData
+{
+	glm::vec2 position;
+	glm::vec2 size;
+	glm::vec2 rotationCenter;
+	float angle;
+	SDL_Color color;
+};
+
 enum class HAlignment
 {
 	LEFT, CENTER, RIGHT

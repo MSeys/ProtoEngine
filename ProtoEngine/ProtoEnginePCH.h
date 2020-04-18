@@ -71,3 +71,7 @@
 #include "ImGui_Proto.h"
 
 #include "portable-file-dialogs.h"
+#include "RapidXML/rapidxml.hpp"
+#include "RapidXML/rapidxml_iterators.hpp"
+#include "RapidXML/rapidxml_print.hpp"
+#include "RapidXML/rapidxml_utils.hpp"

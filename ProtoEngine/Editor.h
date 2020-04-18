@@ -1,12 +1,18 @@
 #pragma once
-#include "BaseScene.h"
+#include "Scene.h"
 #include "GameObject.h"
 #include "Singleton.h"
 
 #include "Components.h"
+#include "ImGui/imgui_internal.h"
+#include "portable-file-dialogs.h"
 
 constexpr double HIERARCHY_VERSION = 0.5;
 constexpr double INSPECTOR_VERSION = 1.0;
+
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 namespace Proto
 {
@@ -25,33 +31,33 @@ namespace Proto
 			const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
 
 
-			
-			ImGui::SetNextWindowPos({ 0, 20 }, ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize({ 350, ProtoSettings.GetWindowSize().y - 20 }, ImGuiCond_FirstUseEver);
-			
+
+			ImGui::SetNextWindowPos({ 0, 20 }, ImGuiCond_Always);
+			ImGui::SetNextWindowSize({ 350, ProtoSettings.GetWindowSize().y - 20 }, ImGuiCond_Always);
+
 			ImGui::Begin("##DOCKLEFT", nullptr, windowFlags);
-			
+
 			const ImGuiID leftDockSpace = ImGui::GetID("LeftDockSpace");
 			ImGui::DockSpace(leftDockSpace, {}, dockSpaceFlags);
 
 			ImGui::End();
 
 
-			
-			ImGui::SetNextWindowPos({ ProtoSettings.GetWindowSize().x - 400, 20 }, ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize({ 400, ProtoSettings.GetWindowSize().y - 20 }, ImGuiCond_FirstUseEver);
+
+			ImGui::SetNextWindowPos({ ProtoSettings.GetWindowSize().x - 400, 20 }, ImGuiCond_Always);
+			ImGui::SetNextWindowSize({ 400, ProtoSettings.GetWindowSize().y - 20 }, ImGuiCond_Always);
 
 			ImGui::Begin("##DOCKRIGHT", nullptr, windowFlags);
-			
+
 			const ImGuiID rightDockSpace = ImGui::GetID("RightDockSpace");
 			ImGui::DockSpace(rightDockSpace, {}, dockSpaceFlags);
-			
+
 			ImGui::End();
 
-			
-			
-			ImGui::SetNextWindowPos({ 350, ProtoSettings.GetWindowSize().y - 350 }, ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize({ ProtoSettings.GetWindowSize().x - 750, 350 }, ImGuiCond_FirstUseEver);
+
+
+			ImGui::SetNextWindowPos({ 350, ProtoSettings.GetWindowSize().y - 350 }, ImGuiCond_Always);
+			ImGui::SetNextWindowSize({ ProtoSettings.GetWindowSize().x - 750, 350 }, ImGuiCond_Always);
 
 			ImGui::Begin("##DOCKBOTTOM", nullptr, windowFlags);
 
@@ -61,7 +67,7 @@ namespace Proto
 			ImGui::End();
 
 		}
-		
+
 		void Draw()
 		{
 			SDL_Rect fullWindow{
@@ -69,7 +75,7 @@ namespace Proto
 					0,
 					int(ProtoSettings.GetWindowSize().x),
 					int(ProtoSettings.GetWindowSize().y) };
-			
+
 			SDL_Rect gameWindow{
 					int(ProtoSettings.GetRenderSettings().GameRenderOffset.x),
 					int(ProtoSettings.GetRenderSettings().GameRenderOffset.y),
@@ -80,21 +86,23 @@ namespace Proto
 			SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &fullWindow);
 			SDL_SetRenderDrawColor(ProtoRenderer.GetSDLRenderer(), 0, 0, 0, 255);
 			SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &gameWindow);
-			
+
 			DrawMenu();
 			ProtoLogger.Draw();
 			DrawHierarchy();
 			DrawInspector();
 
+			ImGui::ShowDemoWindow();
+
 		}
 
 		void SetCurrentSelected(GameObject* pGameObject) { m_pCurrentSelected = pGameObject; }
 		GameObject* GetCurrentSelected() const { return m_pCurrentSelected; }
-		
+
 	private:
 		void DrawAddComponent() const;
-		
-		void DrawMenu() const
+
+		void DrawMenu()
 		{
 			if (ImGui::BeginMainMenuBar())
 			{
@@ -102,15 +110,40 @@ namespace Proto
 				{
 					if (ImGui::MenuItem("New"))
 					{
-						
+						Scene* oldScene = ProtoScenes.GetActiveScene();
+						ProtoScenes.RemoveGameScene(oldScene);
+						ProtoScenes.AddGameScene(new Scene(L"Editor"));
+						ProtoScenes.SetActiveGameScene(L"Editor");
+
+						SafeDelete(oldScene);
 					}
+
+					if (ImGui::MenuItem("Save"))
+						m_OpenSavePopup = true;
 
 					if (ImGui::MenuItem("Open..."))
 					{
+						const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
+						const auto selection = pfd::open_file("Select a Scene", fullPath, { "ProtoScenes", "*.protoscene" }).result();
+						if (!selection.empty())
+						{							
+							Scene* oldScene = ProtoScenes.GetActiveScene();
+							ProtoScenes.RemoveGameScene(oldScene);
 
+							auto pNewScene = new Scene(L"Editor");
+							ProtoScenes.AddGameScene(pNewScene);
+							ProtoScenes.SetActiveGameScene(L"Editor");
+							
+							pNewScene->Load(selection[0].substr(fullPath.size()), &m_SaveFilePath, &m_SaveFileName);
+
+							SafeDelete(oldScene);
+							m_pCurrentSelected = nullptr;
+						}
 					}
+
 					ImGui::EndMenu();
 				}
+
 
 				if (ImGui::BeginMenu("Add"))
 				{
@@ -120,11 +153,74 @@ namespace Proto
 					}
 					ImGui::EndMenu();
 				}
-				
+
 				ImGui::EndMainMenuBar();
 			}
+
+			if (m_OpenSavePopup)
+				ImGui::OpenPopup("SavePopup");
+
+			if (ImGui::BeginPopupModal("SavePopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("Where would you like to save your Scene?\nNote: Stick to Data folder!");
+				ImGui::Separator();
+
+				m_SaveFileName.resize(50);
+				ImGui::Text("File Name: ");
+				ImGui::SameLine();
+				ImGui::InputText("##SAVE_FILE_NAME", &m_SaveFileName[0], 50);
+
+				ImGui::SameLine();
+				ImGui::Text(".protoscene");
+
+				m_SaveFilePath.resize(300);
+				ImGui::Text("File Location: ");
+				ImGui::SameLine();
+				ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFilePath[0], 300, ImGuiInputTextFlags_ReadOnly);
+				ImGui::SameLine();
+
+				if (ImGui::Button("...##SAVE_FILE_BUTTON"))
+				{
+					const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
+					const auto selection = pfd::select_folder("Select a Folder", fullPath).result();
+					if (!selection.empty())
+					{
+						m_SaveFilePath = selection.substr(fullPath.size());
+					}
+				}
+
+				if(m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
+				
+				if (ImGui::Button("OK", ImVec2(150, 0)))
+				{
+					m_OpenSavePopup = false;
+					ProtoScenes.GetActiveScene()->Save(m_SaveFilePath, m_SaveFileName);
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+				}
+
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel", ImVec2(150, 0)))
+				{
+					m_OpenSavePopup = false;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
-		
+
 		void DrawHierarchy() const
 		{
 			const std::string title{ "ProtoHierarchy V" + std::to_string(HIERARCHY_VERSION).substr(0, 3) };
@@ -132,11 +228,9 @@ namespace Proto
 			ImGui::Begin(title.c_str());
 
 			ProtoScenes.DrawHierarchy();
-			
+
 			ImGui::End();
 		}
-
-		GameObject* m_pCurrentSelected{};
 
 		void DrawInspector()
 		{
@@ -160,8 +254,13 @@ namespace Proto
 
 			ImGui::End();
 		}
-	};
 
+		GameObject* m_pCurrentSelected{};
+		bool m_OpenSavePopup{ false };
+		std::string m_SaveFilePath{};
+		std::string m_SaveFileName{};
+	};
+	
 	inline void Editor::DrawAddComponent() const
 	{
 		ImGui::Spacing();

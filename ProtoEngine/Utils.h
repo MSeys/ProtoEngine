@@ -24,3 +24,5 @@ T& VoidCast(void* pData)
 {
 	return *static_cast<T*>(pData);
 }
+
+#define ToCString(value) std::to_string(value).c_str()

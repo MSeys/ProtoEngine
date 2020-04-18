@@ -21,7 +21,7 @@ namespace Proto
 
 		std::string GetFullPath() const;
 		std::string GetRelativePath() const;
-		unsigned int GetSize() const;
+		unsigned int& GetSize();
 		
 	private:
 		std::string m_FullPath;
