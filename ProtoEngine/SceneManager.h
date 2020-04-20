@@ -17,10 +17,12 @@ namespace Proto
 		void AddGameScene(Scene* pScene);
 		void RemoveGameScene(Scene* pScene);
 		void SetActiveGameScene(const std::wstring& sceneName);
-		void NextScene();
-		void PreviousScene();
-		Scene* GetActiveScene() const { return m_ActiveScene; }
 
+		Scene* GetActiveScene() const { return m_ActiveScene; }
+		std::vector<Scene*> GetScenes() const { return m_pScenes; }
+		
+		void Start();
+		void Awake();
 		void Update();
 		void FixedUpdate();
 		void Draw() const;
@@ -32,10 +34,8 @@ namespace Proto
 
 		SceneManager();
 
-		void Initialize();
-
 		std::vector<Scene*> m_pScenes;
 		bool m_IsInitialized;
-		Scene* m_ActiveScene, * m_NewActiveScene;
+		Scene* m_ActiveScene;
 	};
 }

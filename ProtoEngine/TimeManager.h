@@ -22,20 +22,23 @@ namespace Proto
 			FPS = int(1.f / DeltaTime);
 			DeltaTime = std::chrono::duration<float>(m_CurrTime - m_StartTime).count();
 
-			if (ProtoSettings.GetWindowSettings().FPSState != FPSState::PROTO_CAPPED)
-				return;
+			if (ProtoSettings.GetWindowSettings().FPSState == FPSState::PROTO_CAPPED)
+			{
+				const int targetFPS_microSeconds{ int(SecondsToMicroSeconds(1.f / float(ProtoSettings.GetWindowSettings().FPSRate))) };
+				const int sleepTime_microSeconds{ targetFPS_microSeconds - int(SecondsToMicroSeconds(DeltaTime)) };
 
-			const int targetFPS_microSeconds{ int(SecondsToMicroSeconds(1.f / float(ProtoSettings.GetWindowSettings().FPSRate))) };
-			const int sleepTime_microSeconds{ targetFPS_microSeconds - int(SecondsToMicroSeconds(DeltaTime)) };
-			
-			std::this_thread::sleep_for(std::chrono::microseconds(sleepTime_microSeconds));
+				std::this_thread::sleep_for(std::chrono::microseconds(sleepTime_microSeconds));
 
-			DeltaTime += MicroSecondsToSeconds(float(sleepTime_microSeconds));
+				DeltaTime += MicroSecondsToSeconds(float(sleepTime_microSeconds));
+			}
+
+			DeltaTime *= TimeScale;
 		}
 
 		const float FixedDeltaTime{ 0.02f };
 		float DeltaTime{};
 		int FPS{};
+		float TimeScale{ 1 };
 
 	private:
 		TimePoint m_StartTime;

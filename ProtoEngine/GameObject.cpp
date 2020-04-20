@@ -5,7 +5,7 @@
 
 #include "Scene.h"
 #include "BaseComponent.h"
-#include "ProtoScene_Parser.h"
+#include "ProtoParser.h"
 #include "TransformComponent.h"
 #include "Utils.h"
 
@@ -63,7 +63,7 @@ void GameObject::Load(rapidxml::xml_node<>* pNode)
 	using namespace rapidxml;
 
 	xml_node<>* pComponentsNode = pNode->first_node("Components");
-	LoadComponents(pComponentsNode, this);
+	ProtoParser::XML::LoadComponents(pComponentsNode, this);
 
 	for (xml_node<>* gameObjectNode = pNode->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{

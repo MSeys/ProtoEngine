@@ -8,6 +8,10 @@
 #include "Singleton.h"
 #include <string>
 
+#include "BaseGame.h"
+#include "EditorGame.h"
+#include "Utils.h"
+
 enum class FPSRate
 {
 	PROTO_FPS_VERY_HIGH = 144,
@@ -27,17 +31,21 @@ enum class RenderMode
 	GAME, EDITOR
 };
 
-struct RenderSettings
+enum class EditorMode
 {
-	RenderMode RenderMode{ RenderMode::EDITOR };
-	glm::vec2 WindowSizeOffset{ 0, 0 };
+	EDIT, PLAY
+};
+
+struct EditorSettings
+{
+	glm::vec2 EditorWindowSize{ 0, 0 };
 	glm::vec2 GameRenderOffset{ 0, 0 };
 };
 
 struct WindowSettings
 {
 	std::string Title{ "ProtoEngine" };
-	glm::vec2 WindowSize{ 640, 480 };
+	glm::vec2 GameWindowSize{ 640, 480 };
 	FPSState FPSState{ FPSState::PROTO_UNCAPPED };
 	FPSRate FPSRate{ FPSRate::PROTO_FPS_NORMAL };
 };
@@ -47,30 +55,59 @@ namespace Proto
 	class SettingsManager : public Singleton<SettingsManager>
 	{
 	public:
-		void Init(const RenderSettings& renderSettings, const WindowSettings& windowSettings)
+		void Init(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings, const WindowSettings& windowSettings, const RenderMode& renderMode)
 		{
-			m_RenderSettings = renderSettings;
+			m_pGame = pGame;
+			m_pRefGame = pRefGame;
+			
+			m_EditorSettings = editorSettings;
 			m_WindowSettings = windowSettings;
+			m_RenderMode = renderMode;
 		}
 
-		RenderSettings GetRenderSettings() const { return m_RenderSettings; }
+		void Destroy()
+		{
+			if(m_pGame != m_pRefGame)
+				SafeDelete(m_pRefGame);
+			
+			SafeDelete(m_pGame);
+		}
+		
+		EditorSettings GetEditorSettings() const { return m_EditorSettings; }
 		WindowSettings GetWindowSettings() const { return m_WindowSettings; }
 
 		glm::vec2 GetWindowSize() const
 		{
-			glm::vec2 finalWindowSize{ m_WindowSettings.WindowSize };
+			if (m_RenderMode == RenderMode::EDITOR && m_EditorMode == EditorMode::EDIT)
+				return m_EditorSettings.EditorWindowSize;
 
-			if(m_RenderSettings.RenderMode == RenderMode::EDITOR)
-			{
-				finalWindowSize.x += GetRenderSettings().WindowSizeOffset.x;
-				finalWindowSize.y += GetRenderSettings().WindowSizeOffset.y;
-			}
-
-			return finalWindowSize;
+			return m_WindowSettings.GameWindowSize;
 		}
+
+		RenderMode GetRenderMode() const { return m_RenderMode; }
+		
+		void SetEditorMode(const EditorMode& editorMode) { m_EditorMode = editorMode; }
+		EditorMode GetEditorMode() const { return m_EditorMode; }
+
+		void TranslateEditorCamera(float x, float y)
+		{
+			m_EditorCamOffset.x += x;
+			m_EditorCamOffset.y += y;
+		}
+
+		glm::vec2 GetEditorCamera() const { return m_EditorCamOffset; }
+		BaseGame* GetGame() const { return m_pGame; }
+		BaseGame* GetRefGame() const { return m_pRefGame; }
 		
 	private:
-		RenderSettings m_RenderSettings{};
+		EditorSettings m_EditorSettings{};
 		WindowSettings m_WindowSettings{};
+
+		RenderMode m_RenderMode{ RenderMode::GAME };
+		EditorMode m_EditorMode{ EditorMode::EDIT };
+		
+		BaseGame* m_pGame{}, *m_pRefGame{};
+		
+		glm::vec2 m_EditorCamOffset{ 0, 0 };
 	};
 }

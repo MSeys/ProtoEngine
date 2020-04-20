@@ -10,9 +10,7 @@ Proto::SceneManager::SceneManager()
 	: m_pScenes(std::vector<Scene*>())
 	, m_IsInitialized(false)
 	, m_ActiveScene(nullptr)
-	, m_NewActiveScene(nullptr)
 {
-	Initialize();
 }
 
 Proto::SceneManager::~SceneManager()
@@ -23,41 +21,16 @@ Proto::SceneManager::~SceneManager()
 	}
 }
 
-void Proto::SceneManager::Initialize()
-{
-	if (m_IsInitialized)
-		return;
-
-	for (Scene* scene : m_pScenes)
-	{
-		scene->Start();
-		scene->Awake();
-	}
-
-	m_IsInitialized = true;
-}
-
 void Proto::SceneManager::Update()
 {	
-	if (m_NewActiveScene != nullptr)
-	{
-		//Set New Scene
-		m_ActiveScene = m_NewActiveScene;
-		m_NewActiveScene = nullptr;
-	}
-
 	if (m_ActiveScene != nullptr)
-	{
 		m_ActiveScene->Update();
-	}
 }
 
 void Proto::SceneManager::FixedUpdate()
 {
 	if (m_ActiveScene != nullptr)
-	{
 		m_ActiveScene->FixedUpdate();
-	}
 }
 
 void Proto::SceneManager::Draw() const
@@ -83,8 +56,8 @@ void Proto::SceneManager::AddGameScene(Scene* pScene)
 		if (m_IsInitialized)
 			pScene->Start();
 
-		if (m_ActiveScene == nullptr && m_NewActiveScene == nullptr)
-			m_NewActiveScene = pScene;
+		if (m_ActiveScene == nullptr)
+			m_ActiveScene = pScene;
 	}
 }
 
@@ -107,33 +80,23 @@ void Proto::SceneManager::SetActiveGameScene(const std::wstring& sceneName)
 
 	if (it != m_pScenes.end())
 	{
-		m_NewActiveScene = *it;
+		m_ActiveScene = *it;
 	}
 }
 
-void Proto::SceneManager::NextScene()
+void Proto::SceneManager::Start()
 {
-	for (unsigned int i = 0; i < m_pScenes.size(); ++i)
-	{
-		if (m_pScenes[i] == m_ActiveScene)
-		{
-			const auto nextScene = ++i % m_pScenes.size();
-			m_NewActiveScene = m_pScenes[nextScene];
-			break;
-		}
-	}
+	if (m_IsInitialized)
+		return;
+
+	for (Scene* scene : m_pScenes)
+		scene->Start();
+
+	m_IsInitialized = true;
 }
 
-void Proto::SceneManager::PreviousScene()
+void Proto::SceneManager::Awake()
 {
-	for (unsigned int i = 0; i < m_pScenes.size(); ++i)
-	{
-		if (m_pScenes[i] == m_ActiveScene)
-		{
-			if (i == 0) i = unsigned(m_pScenes.size());
-			--i;
-			m_NewActiveScene = m_pScenes[i];
-			break;
-		}
-	}
+	if (m_ActiveScene != nullptr)
+		m_ActiveScene->Awake();
 }

@@ -2,7 +2,7 @@
 #include "Structs.h"
 #include <string>
 
-#define ImColor_Blue ImVec4{ 0, 118.f / 255.f, 210.f / 255.f, 1.f }
+#define ImColor_Blue ImVec4{ 0, 118.f / 255.f, 210.f / 255.f, 1.f }  // NOLINT(cppcoreguidelines-macro-usage)
 namespace ImGuiProto
 {
 	void Position(TextureData& texData, const std::string& address);

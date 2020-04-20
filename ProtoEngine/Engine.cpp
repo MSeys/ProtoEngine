@@ -10,11 +10,16 @@
 
 #include "BaseGame.h"
 
-Proto::Engine::Engine(BaseGame* pGame, const RenderSettings& renderSettings, const WindowSettings& windowSettings)
-	: m_pGame(pGame)
+Proto::Engine::Engine(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings, const WindowSettings& windowSettings, RenderMode renderMode)
 {
+	if (!pGame)
+	{
+		pGame = new EditorGame();
+		renderMode = RenderMode::EDITOR;
+	}
+	
 	// ProtoSettings
-	ProtoSettings.Init(renderSettings, windowSettings);
+	ProtoSettings.Init(pGame, pRefGame, editorSettings, windowSettings, renderMode);
 	
 	Initialize();
 }
@@ -30,7 +35,7 @@ void Proto::Engine::Run() const
 
 	float fixedTimer{};
 	while(!m_Exit)
-	{
+	{		
 		ProtoTime.SetCurrTime(std::chrono::steady_clock::now());
 		ProtoTime.UpdateTime();
 		ProtoTime.SetStartTime(ProtoTime.GetCurrTime());
@@ -50,11 +55,8 @@ void Proto::Engine::Run() const
 		ImGui::NewFrame();
 		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
-		if (ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
-		{
-			ProtoEditor.DrawDocks();
+		if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
 			ProtoEditor.Draw();
-		}
 		
 		ProtoScenes.Draw();
 
@@ -72,8 +74,16 @@ void Proto::Engine::Initialize()
 	InitializeSDL();
 	InitializeEngineParts();
 
+
+	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
+		ProtoSettings.GetRefGame()->Initialize();
+
 	// Game
-	m_pGame->RootInitialize();
+	ProtoSettings.GetGame()->Initialize();
+	
+	ProtoScenes.Start();
+	if (ProtoSettings.GetRenderMode() == RenderMode::GAME)
+		ProtoScenes.Awake();
 
 	InitializeImGuiStyle();
 }
@@ -183,9 +193,6 @@ void Proto::Engine::InitializeImGuiStyle()
 
 void Proto::Engine::Cleanup()
 {
-	// Game
-	SafeDelete(m_pGame);
-	
 	CleanupEngineParts();
 	CleanupSDL();
 }
@@ -199,6 +206,9 @@ void Proto::Engine::CleanupSDL()
 
 void Proto::Engine::CleanupEngineParts()
 {
+	// ProtoSettings
+	ProtoSettings.Destroy();
+	
 	// ProtoContent
 	ProtoContent.Destroy();
 	

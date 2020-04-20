@@ -67,6 +67,18 @@ void SimpleGame::InitializeScene()
 	ProtoAchievements(bool).AddAchievement(new ConditionAchievement("Ah, you're finally awake!", "You started up the game for the first time.", true));
 	ProtoMessenger.Notify(nullptr, E_GAME_STARTED);
 	ProtoLogger.AddLog(LogLevel::Info, "Testing Logging.");
-	
-	ProtoScenes.AddGameScene(new Scene(L"StartScene", "/Scenes/test.protoscene"));
+
+	ProtoScenes.AddGameScene(new Scene("\\Scenes\\test.protoscene"));
+}
+
+void SimpleGame::DrawAddComponent()
+{
+	ImGui::Text("SimpleGame Comp 1");
+	ImGui::Text("SimpleGame Comp 2");
+}
+
+void SimpleGame::LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr)
+{
+	UNREFERENCED_PARAMETER(pComponents);
+	UNREFERENCED_PARAMETER(pCurr);
 }

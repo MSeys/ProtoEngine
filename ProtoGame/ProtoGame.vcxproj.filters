@@ -7,6 +7,9 @@
     <Filter Include="Observers">
       <UniqueIdentifier>{8a87252d-5ed5-4928-bad5-83b6bc6b817d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{5cf307be-ab78-4a28-9cfe-32d89311ef09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -27,9 +30,6 @@
     </ClInclude>
     <ClInclude Include="Events.h">
       <Filter>Observers</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorGame.h">
-      <Filter>Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

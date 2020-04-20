@@ -7,8 +7,10 @@ public:
 	void InitializeControls() override;
 	void InitializeScene() override;
 
+	void DrawAddComponent() override;
+	void LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr) override;
+	
 private:
 	std::string m_JumpDataExample{ "Boing!" };
 	AudioServices m_AudioServices{};
 };
-

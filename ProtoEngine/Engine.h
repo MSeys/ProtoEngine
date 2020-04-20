@@ -10,8 +10,9 @@ namespace Proto
 	class Engine
 	{
 	public:
-		Engine(BaseGame* pGame, const RenderSettings& renderSettings = { RenderMode::GAME, { 0, 0 }, { 0, 0 }},
-								const WindowSettings& windowSettings = { "ProtoEngine", {640, 480 }, FPSState::PROTO_VSYNC, FPSRate::PROTO_FPS_NORMAL });
+		Engine(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings = { { 1920, 1080 }, { 1920 / 3, 100 }},
+								const WindowSettings& windowSettings = { "ProtoEngine", {640, 480 }, FPSState::PROTO_VSYNC, FPSRate::PROTO_FPS_NORMAL },
+								RenderMode renderMode = RenderMode::GAME);
 		~Engine();
 		
 		Engine(const Engine& other) = delete;
@@ -24,7 +25,6 @@ namespace Proto
 	private:
 		SDL_Window* m_Window{};
 
-		BaseGame* m_pGame;
 		bool m_Exit{ false };
 		
 		void Initialize();

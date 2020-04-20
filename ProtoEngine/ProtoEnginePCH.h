@@ -11,7 +11,7 @@
 #include <windows.h>
 
 #define STRINGIFY(x) #x
-#define CompStringify(x, y) bool(x == #y)
+#define CompStringify(x, y) bool((x) == #y)
 
 // Define Singletons
 #include "SettingsManager.h"

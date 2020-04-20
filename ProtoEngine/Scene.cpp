@@ -5,11 +5,15 @@
 
 #include "GameObject.h"
 #include "Utils.h"
+#include "ProtoParser.h"
 
-Scene::Scene(std::wstring sceneName, const std::string& filePath)
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+
+Scene::Scene(const std::string& filePath)
 	: m_pChildren(std::vector<GameObject*>())
 	, m_IsInitialized(false)
-	, m_SceneName(std::move(sceneName))
 {
 	if (!filePath.empty())
 		Load(filePath);
@@ -37,6 +41,9 @@ void Scene::Save(const std::string& filePath, const std::string& fileName)
 
 	xml_node<>* scene = doc.allocate_node(node_element, "Scene");
 	scene->append_attribute(doc.allocate_attribute("version", "1.0"));
+
+	const std::string convertedSceneName{ WStringToString(m_SceneName.c_str()) };  // NOLINT(readability-redundant-string-cstr)
+	scene->append_attribute(doc.allocate_attribute("Name", convertedSceneName.c_str()));
 	scene->append_attribute(doc.allocate_attribute("type", "protoscene"));
 	
 	for(auto pGameObject : m_pChildren)
@@ -48,6 +55,7 @@ void Scene::Save(const std::string& filePath, const std::string& fileName)
 
 	const std::string path{ ProtoContent.GetDataPath() + filePath.c_str() + "\\" + fileName.c_str() + ".protoscene" };  // NOLINT(readability-redundant-string-cstr)
 																														// c_str() is necessary as strings have reserved space (filled with '\0')
+	fs::create_directory(ProtoContent.GetDataPath() + filePath.c_str());  // NOLINT(readability-redundant-string-cstr)
 	std::ofstream fileStored(path);
 	fileStored << doc;
 	fileStored.close();
@@ -56,11 +64,14 @@ void Scene::Save(const std::string& filePath, const std::string& fileName)
 
 void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::string* pFileName)
 {
+	m_FilePath = filePath.substr(0, filePath.rfind('\\'));
+	m_FileName = filePath.substr(m_FilePath.size() + 1);
+	m_FileName = m_FileName.substr(0, m_FileName.rfind('.'));
+	
 	if(pFolderPath && pFileName)
 	{
-		*pFolderPath = filePath.substr(0, filePath.rfind('\\'));
-		*pFileName = filePath.substr(pFolderPath->size() + 1);
-		*pFileName = pFileName->substr(0, pFileName->rfind('.'));
+		*pFolderPath = m_FilePath;
+		*pFileName = m_FileName;
 	}
 	
 	using namespace rapidxml;
@@ -76,6 +87,8 @@ void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::str
 	doc.parse<0>(&content[0]);
 
 	xml_node<>* scene = doc.first_node("Scene");
+	m_SceneName = StringToWString(ProtoParser::XML::ParseString(scene,"Name"));
+	
 	for(xml_node<>* gameObjectNode = scene->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
 		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };

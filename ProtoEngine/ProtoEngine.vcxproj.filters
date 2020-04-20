@@ -93,9 +93,6 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="SettingsManager.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Engine.cpp">
       <Filter>Core\Engine</Filter>
     </ClCompile>
@@ -138,10 +135,22 @@
     <ClCompile Include="ContentManager.cpp">
       <Filter>Content</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui_Proto.cpp">
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scenegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtoParser.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="ImGui_Proto.cpp">
+      <Filter>ImGui\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>ImGui\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor.cpp">
+      <Filter>ImGui\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGame.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
   </ItemGroup>
@@ -154,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="Texture2D.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="BaseComponent.h">
       <Filter>Components</Filter>
@@ -278,9 +284,6 @@
     <ClInclude Include="ContentManager.h">
       <Filter>Content</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui_Proto.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scenegraph</Filter>
     </ClInclude>
@@ -296,8 +299,17 @@
     <ClInclude Include="RapidXML\rapidxml_print.hpp">
       <Filter>RapidXML</Filter>
     </ClInclude>
-    <ClInclude Include="ProtoScene_Parser.h">
+    <ClInclude Include="ProtoParser.h">
       <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui_Proto.h">
+      <Filter>ImGui\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorGame.h">
+      <Filter>Scenegraph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

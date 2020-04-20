@@ -37,10 +37,16 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& 
 	dst.x = static_cast<int>(data.position.x);
 	dst.y = static_cast<int>(data.position.y);
 
-	if (ProtoSettings.GetRenderSettings().RenderMode == RenderMode::EDITOR)
+	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
 	{
-		dst.x += int(ProtoSettings.GetRenderSettings().GameRenderOffset.x);
-		dst.y += int(ProtoSettings.GetRenderSettings().GameRenderOffset.y);
+		dst.x += int(ProtoSettings.GetEditorSettings().GameRenderOffset.x);
+		dst.y += int(ProtoSettings.GetEditorSettings().GameRenderOffset.y);
+
+		if(ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+		{
+			dst.x += int(ProtoSettings.GetEditorCamera().x);
+			dst.y += int(ProtoSettings.GetEditorCamera().y);
+		}
 	}
 
 	dst.w = static_cast<int>(abs(data.size.x));

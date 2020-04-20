@@ -23,7 +23,8 @@ void Proto::InputManager::Update()
 	
 	if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && !io.WantTextInput)
 	{
-		m_ControllerHandler.Update();
+		if(ProtoSettings.GetRenderMode() == RenderMode::GAME || ProtoSettings.GetEditorMode() == EditorMode::PLAY)
+			m_ControllerHandler.Update();
 	}
 
 	m_KBMHandler.UpdateOutPoll();
@@ -70,11 +71,25 @@ void Proto::InputManager::Update()
 			io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
 			io.KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
 			io.KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);
+
+			if(ProtoSettings.GetRenderMode() == RenderMode::EDITOR && ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+			{
+				if (key == SDL_SCANCODE_ESCAPE)
+					ProtoCommands.ForceExit();
+			}
+
 		}
 
 		if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && !io.WantTextInput)
 		{
-			m_KBMHandler.UpdateInPoll(e);
+			if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR && ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+			{
+				if (e.type == SDL_MOUSEMOTION && e.motion.state & SDL_BUTTON_MMASK)
+					ProtoSettings.TranslateEditorCamera(float(e.motion.xrel), float(e.motion.yrel));
+			}
+			
+			if (ProtoSettings.GetRenderMode() == RenderMode::GAME || ProtoSettings.GetEditorMode() == EditorMode::PLAY)
+				m_KBMHandler.UpdateInPoll(e);
 		}
 	}
 
