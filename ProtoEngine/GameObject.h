@@ -5,12 +5,14 @@ class BaseComponent;
 class TransformComponent;
 class Scene;
 
+using GameObjectID = unsigned int;
+
 class GameObject
 {
 public:
-	GameObject(std::string name = "GameObject", bool isActive = true);
+	GameObject(GameObjectID ID, std::string name = "GameObject", bool isActive = true);
 	virtual ~GameObject();
-
+	
 	GameObject(const GameObject& other) = delete;
 	GameObject(GameObject&& other) = delete;
 	GameObject& operator=(const GameObject& other) = delete;
@@ -33,11 +35,14 @@ public:
 
 	void MakeChild();
 	void MakeParent();
+
+	GameObject* FindGameObjectWithIDinChildren(GameObjectID id);
 	
 	TransformComponent* GetTransform() const { return m_pTransform; }
 	Scene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
 	std::string& GetName() { return m_Name; }
+	GameObjectID GetID() const { return m_ID; }
 
 #pragma region
 	template <class T>
@@ -141,6 +146,7 @@ private:
 	std::vector<BaseComponent*> m_pComponents;
 
 	std::string m_Name;
+	GameObjectID m_ID;
 	bool m_IsInitialized, m_IsActive;
 	Scene* m_pParentScene;
 	GameObject* m_pParentObject;

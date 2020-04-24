@@ -174,7 +174,7 @@ void Proto::Editor::DrawMenu()
 		{
 			if (ImGui::MenuItem("GameObject"))
 			{
-				ProtoScenes.GetActiveScene()->AddChild(new GameObject());
+				ProtoScenes.GetActiveScene()->AddChild(new GameObject(ProtoScenes.GetActiveScene()->RequestNewID()));
 			}
 			ImGui::EndMenu();
 		}

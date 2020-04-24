@@ -9,10 +9,11 @@
 #include "TransformComponent.h"
 #include "Utils.h"
 
-GameObject::GameObject(std::string name, bool isActive)
+GameObject::GameObject(GameObjectID ID, std::string name, bool isActive)
 	: m_pChildren(std::vector<GameObject*>())
 	, m_pComponents(std::vector<BaseComponent*>())
 	, m_Name(std::move(name))
+	, m_ID(ID)
 	, m_IsInitialized(false)
 	, m_IsActive(isActive)
 	, m_pParentScene(nullptr)
@@ -43,6 +44,7 @@ void GameObject::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPare
 	
 	xml_node<>* thisGO = doc.allocate_node(node_element, "GameObject");
 	thisGO->append_attribute(doc.allocate_attribute("Name", doc.allocate_string(m_Name.c_str())));
+	thisGO->append_attribute(doc.allocate_attribute("ID", doc.allocate_string(ToCString(m_ID))));
 	thisGO->append_attribute(doc.allocate_attribute("Active", m_IsActive ? "true" : "false"));
 
 	xml_node<>* thisComponents = doc.allocate_node(node_element, "Components");
@@ -68,9 +70,10 @@ void GameObject::Load(rapidxml::xml_node<>* pNode)
 	for (xml_node<>* gameObjectNode = pNode->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
 		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };
+		const GameObjectID id{ ProtoParser::XML::ParseUInt(gameObjectNode, "ID") };
 		const bool goActive{ std::string(gameObjectNode->first_attribute("Active")->value()) == "true" };
 
-		auto pNew = new GameObject(goName, goActive);
+		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
 
 		pNew->Load(gameObjectNode);
@@ -268,6 +271,22 @@ void GameObject::MakeParent()
 	}
 }
 
+GameObject* GameObject::FindGameObjectWithIDinChildren(GameObjectID id)
+{
+	GameObject* pFoundHere = *std::find(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
+	if (pFoundHere)
+		return pFoundHere;
+	
+	for (GameObject* pGameObject : m_pChildren)
+	{
+		GameObject* pFoundInChildren = pGameObject->FindGameObjectWithIDinChildren(id);
+		if (pFoundInChildren)
+			return pFoundInChildren;
+	}
+
+	return nullptr;
+}
+
 #pragma region Root Functions
 void GameObject::DrawHierarchy()
 {
@@ -294,7 +313,7 @@ void GameObject::DrawHierarchy()
 		ImGui::Separator();
 
 		if (ImGui::Selectable("Add GameObject"))
-			AddChild(new GameObject(m_Name));
+			AddChild(new GameObject(GetScene()->RequestNewID(), m_Name));
 
 		if(ImGui::Selectable("Swap Up"))
 		{
@@ -372,6 +391,9 @@ bool GameObject::DrawInspector()
 
 			labelText = "##Name" + thisAddress.str();
 			ImGui::InputText(labelText.c_str(), &m_Name[0], 50);
+
+			ImGui::SameLine();
+			ImGui::Text(("ID: " + std::to_string(m_ID)).c_str());
 		}
 
 		for (BaseComponent* pComp : m_pComponents)
@@ -403,6 +425,9 @@ void GameObject::Start()
 {
 	if (m_IsInitialized)
 		return;
+
+	if (GetScene()->GetCurrentID() < m_ID)
+		GetScene()->SetCurrentID(m_ID);
 
 	// Components Start
 	for (BaseComponent* pComp : m_pComponents)

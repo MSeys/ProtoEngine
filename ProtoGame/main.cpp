@@ -36,6 +36,4 @@ int main(int, char* [])
 
 // TODO: List of features to make
 // Game Camera		> Separate GameObject in Scene? Has target gameobject that can be given using ID?
-// Unique ID		> int > Given on Start / file, Max found ID + 1 (Stored in ProtoSettings?)
-// Find GameObject with ID
 // Instantiate and Destroy functions

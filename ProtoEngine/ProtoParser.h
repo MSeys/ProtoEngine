@@ -17,6 +17,7 @@ namespace ProtoParser
 		void LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 
 		int ParseInt(rapidxml::xml_node<>* pComp, const std::string& name);
+		unsigned int ParseUInt(rapidxml::xml_node<>* pComp, const std::string& name);
 		float ParseFloat(rapidxml::xml_node<>* pComp, const std::string& name);
 		Uint8 ParseUint8(rapidxml::xml_node<>* pComp, const std::string& name);
 		std::string ParseString(rapidxml::xml_node<>* pComp, const std::string& name);

@@ -37,6 +37,12 @@ protected:
 	void SetFilePath(const std::string& filePath) { m_FilePath = filePath; }
 	std::string GetFileName() const { return m_FileName; }
 	void SetFileName(const std::string& fileName) { m_FileName = fileName; }
+
+	GameObjectID RequestNewID() { return ++m_CurrentID; }
+	GameObjectID GetCurrentID() const { return m_CurrentID; }
+	void SetCurrentID(GameObjectID id) { m_CurrentID = id; }
+
+	GameObject* FindGameObjectWithID(GameObjectID id) const;
 	
 private:
 	friend class Proto::SceneManager;
@@ -55,4 +61,6 @@ private:
 
 	std::string m_FilePath;
 	std::string m_FileName;
+
+	GameObjectID m_CurrentID{ 0 };
 };

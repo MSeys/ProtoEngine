@@ -22,6 +22,11 @@ int ProtoParser::XML::ParseInt(xml_node<>* pComp, const std::string& name)
 	return stoi(std::string(pComp->first_attribute(name.c_str())->value()));
 }
 
+unsigned int ProtoParser::XML::ParseUInt(xml_node<>* pComp, const std::string& name)
+{
+	return stoul(std::string(pComp->first_attribute(name.c_str())->value()));
+}
+
 float ProtoParser::XML::ParseFloat(xml_node<>* pComp, const std::string& name)
 {
 	return stof(std::string(pComp->first_attribute(name.c_str())->value()));

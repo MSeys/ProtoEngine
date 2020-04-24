@@ -92,9 +92,10 @@ void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::str
 	for(xml_node<>* gameObjectNode = scene->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
 		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };
+		const GameObjectID id{ ProtoParser::XML::ParseUInt(gameObjectNode, "ID") };
 		const bool goActive{ std::string(gameObjectNode->first_attribute("Active")->value()) == "true" }; 
 		
-		auto pNew = new GameObject(goName, goActive);
+		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
 		
 		pNew->Load(gameObjectNode);
@@ -172,6 +173,22 @@ void Scene::DrawHierarchy()
 	{
 		pChild->DrawHierarchy();
 	}
+}
+
+GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
+{
+	GameObject* pFoundHere = *std::find(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
+	if (pFoundHere)
+		return pFoundHere;
+	
+	for (GameObject* pGameObject : m_pChildren)
+	{
+		GameObject* pFoundInChildren = pGameObject->FindGameObjectWithIDinChildren(id);
+		if (pFoundInChildren)
+			return pFoundInChildren;
+	}
+
+	return nullptr;
 }
 
 void Scene::Start()
