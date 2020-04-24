@@ -273,7 +273,7 @@ void GameObject::MakeParent()
 
 GameObject* GameObject::FindGameObjectWithIDinChildren(GameObjectID id)
 {
-	GameObject* pFoundHere = *std::find(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
+	GameObject* pFoundHere = *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
 	if (pFoundHere)
 		return pFoundHere;
 	

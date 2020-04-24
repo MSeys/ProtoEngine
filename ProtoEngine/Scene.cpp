@@ -177,7 +177,7 @@ void Scene::DrawHierarchy()
 
 GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 {
-	GameObject* pFoundHere = *std::find(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
+	GameObject* pFoundHere = *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return unsigned(pObject->GetID()) == unsigned(id); });
 	if (pFoundHere)
 		return pFoundHere;
 	
