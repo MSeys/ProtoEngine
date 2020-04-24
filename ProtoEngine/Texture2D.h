@@ -9,7 +9,7 @@ namespace Proto
 	{
 	public:
 		SDL_Texture* GetSDLTexture() const;
-		explicit Texture2D(SDL_Texture* texture, std::string fullPath, std::string relativePath);
+		explicit Texture2D(SDL_Texture* pTexture, std::string fullPath, std::string relativePath);
 		~Texture2D();
 
 		Texture2D(const Texture2D &) = delete;
@@ -23,6 +23,6 @@ namespace Proto
 	private:
 		std::string m_FullPath;
 		std::string m_RelativePath;
-		SDL_Texture* m_Texture;
+		SDL_Texture* m_pTexture;
 	};
 }

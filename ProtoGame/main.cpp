@@ -27,7 +27,6 @@ int main(int, char* [])
 	windowSettings.FPSRate = FPSRate::PROTO_FPS_VERY_HIGH;
 	
 	editorSettings.EditorWindowSize = { 1920, 1080 };
-	editorSettings.GameRenderOffset = { 1920 / 2 - 320, 150 };
 	
 	const Proto::Engine engine{ pGame, pRefGame, editorSettings, windowSettings };
 	

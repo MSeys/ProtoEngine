@@ -55,10 +55,11 @@ void Proto::Engine::Run() const
 		ImGui::NewFrame();
 		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
-		if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
+		if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR) // Draw Editor + Scene and Game Window
 			ProtoEditor.Draw();
-		
-		ProtoScenes.Draw();
+
+		else // Normal Game Draw
+			ProtoScenes.Draw();
 
 		ImGui::Render();
 		ImGuiSDL::Render(ImGui::GetDrawData());
@@ -73,7 +74,6 @@ void Proto::Engine::Initialize()
 {
 	InitializeSDL();
 	InitializeEngineParts();
-
 
 	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
 		ProtoSettings.GetRefGame()->Initialize();
@@ -214,6 +214,9 @@ void Proto::Engine::CleanupEngineParts()
 	
 	// ProtoRenderer
 	ProtoRenderer.Destroy();
+
+	// ProtoEditor
+	ProtoEditor.Destroy();
 
 	// ProtoInput
 	ProtoInput.Destroy();

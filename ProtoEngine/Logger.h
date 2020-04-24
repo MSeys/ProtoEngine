@@ -5,8 +5,6 @@
 #include <iomanip>
 #include <vector>
 
-constexpr double LOGGER_VERSION = 1.6;
-
 enum class LogLevel
 {
 	Info = 1, Trace = 2, Debug = 3, Warning = 4, Error = 5, Achievement = 6

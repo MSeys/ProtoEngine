@@ -1,38 +1,22 @@
 #include "ProtoEnginePCH.h"
 #include "Editor.h"
 
+#include "Texture2D.h"
+
 void Proto::Editor::Init()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	SDL_Texture* pGameTexture{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
+										int(ProtoSettings.GetWindowSettings().GameWindowSize.x), int(ProtoSettings.GetWindowSettings().GameWindowSize.y)) };
+
+	m_pGameWindow = new Texture2D(pGameTexture, "", "");
 }
 
 void Proto::Editor::Draw()
 {
 	DrawDocks();
-
-	SDL_Rect fullWindow{
-			0,
-			0,
-			int(ProtoSettings.GetEditorSettings().EditorWindowSize.x),
-			int(ProtoSettings.GetEditorSettings().EditorWindowSize.y) };
-
-	SDL_Rect gameWindow{
-			int(ProtoSettings.GetEditorSettings().GameRenderOffset.x),
-			int(ProtoSettings.GetEditorSettings().GameRenderOffset.y),
-			int(ProtoSettings.GetWindowSettings().GameWindowSize.x),
-			int(ProtoSettings.GetWindowSettings().GameWindowSize.y) };
-
-	if(ProtoSettings.GetEditorMode() == EditorMode::EDIT)
-	{
-		gameWindow.x += int(ProtoSettings.GetEditorCamera().x);
-		gameWindow.y += int(ProtoSettings.GetEditorCamera().y);
-	}
-
-	SDL_SetRenderDrawColor(ProtoRenderer.GetSDLRenderer(), 25, 25, 25, 80);
-	SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &fullWindow);
-	SDL_SetRenderDrawColor(ProtoRenderer.GetSDLRenderer(), 0, 0, 0, 255);
-	SDL_RenderFillRect(ProtoRenderer.GetSDLRenderer(), &gameWindow);
 
 	DrawMenu();
 	DrawEditorModeMenu();
@@ -43,7 +27,16 @@ void Proto::Editor::Draw()
 	DrawHierarchy();
 	DrawInspector();
 
+	DrawViewWindow();
+	DrawGameWindow();
+
 	ImGui::ShowDemoWindow();
+}
+
+void Proto::Editor::Destroy()
+{
+	SafeDelete(m_pViewWindow);
+	SafeDelete(m_pGameWindow);
 }
 
 void Proto::Editor::DrawDocks()
@@ -75,6 +68,8 @@ void Proto::Editor::DrawDocks()
 
 	ImGui::End();
 
+
+	
 	ImGui::SetNextWindowPos({ 350, 20 }, ImGuiCond_Always);
 	ImGui::SetNextWindowSize({ ProtoSettings.GetEditorSettings().EditorWindowSize.x - 750, 100 }, ImGuiCond_Always);
 
@@ -85,8 +80,22 @@ void Proto::Editor::DrawDocks()
 
 	ImGui::End();
 
-	ImGui::SetNextWindowPos({ 350, ProtoSettings.GetEditorSettings().EditorWindowSize.y - 350 }, ImGuiCond_Always);
-	ImGui::SetNextWindowSize({ ProtoSettings.GetEditorSettings().EditorWindowSize.x - 750, 350 }, ImGuiCond_Always);
+
+	
+	ImGui::SetNextWindowPos({ 350, 120 }, ImGuiCond_Always);
+	ImGui::SetNextWindowSize({ ProtoSettings.GetEditorSettings().EditorWindowSize.x - 750, ProtoSettings.GetEditorSettings().EditorWindowSize.y - 420 }, ImGuiCond_Always);
+
+	ImGui::Begin("##DOCKMIDDLE", nullptr, windowFlags);
+
+	m_MiddleDockSpace = ImGui::GetID("MiddleDockSpace");
+	ImGui::DockSpace(m_MiddleDockSpace, {}, dockSpaceFlags);
+
+	ImGui::End();
+
+	
+	
+	ImGui::SetNextWindowPos({ 350, ProtoSettings.GetEditorSettings().EditorWindowSize.y - 300 }, ImGuiCond_Always);
+	ImGui::SetNextWindowSize({ ProtoSettings.GetEditorSettings().EditorWindowSize.x - 750, 300 }, ImGuiCond_Always);
 
 	ImGui::Begin("##DOCKBOTTOM", nullptr, windowFlags);
 
@@ -174,12 +183,12 @@ void Proto::Editor::DrawMenu()
 	}
 
 	if (m_OpenNewPopup)
-		ImGui::OpenPopup("NewPopup");
+		ImGui::OpenPopup("Open New...");
 
 	if (m_OpenSaveAsPopup)
-		ImGui::OpenPopup("SaveAsPopup");
+		ImGui::OpenPopup("Save As...");
 
-	if (ImGui::BeginPopupModal("NewPopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Open New...", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Please fill in the necessary info to create a new scene.\nNote: Stick to Data folder for saving your scenes.");
 		ImGui::Separator();
@@ -254,7 +263,7 @@ void Proto::Editor::DrawMenu()
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal("SaveAsPopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Save As...", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Please fill in the necessary info to create save your scene.\nNote: Stick to Data folder for saving your scenes.");
 		ImGui::Separator();
@@ -338,10 +347,8 @@ void Proto::Editor::DrawMenu()
 
 void Proto::Editor::DrawEditorModeMenu()
 {
-	const std::string title{ "ProtoEditor V" + std::to_string(EDITOR_MENU_VERSION).substr(0, 3) + " | " + WStringToString(ProtoScenes.GetActiveScene()->GetSceneName()) };
-
 	ImGui::SetNextWindowDockID(m_TopDockSpace, ImGuiCond_Always);
-	ImGui::Begin(title.c_str());
+	ImGui::Begin("Editor");
 	ImGui::Indent(ImGui::GetWindowWidth() / 2 - 150);
 	
 	EditorMode newMode{ ProtoSettings.GetEditorMode() };
@@ -407,10 +414,8 @@ void Proto::Editor::DrawEditorModeMenu()
 
 void Proto::Editor::DrawHierarchy() const
 {
-	const std::string title{ "ProtoHierarchy V" + std::to_string(HIERARCHY_VERSION).substr(0, 3) };
-
 	ImGui::SetNextWindowDockID(m_LeftDockSpace, ImGuiCond_FirstUseEver);
-	ImGui::Begin(title.c_str());
+	ImGui::Begin("Hierarchy");
 	ProtoScenes.DrawHierarchy();
 	ImGui::End();
 }
@@ -420,10 +425,8 @@ void Proto::Editor::DrawInspector()
 	if (!m_pCurrentSelected)
 		return;
 
-	const std::string title{ "ProtoInspector V" + std::to_string(INSPECTOR_VERSION).substr(0, 3) };
-
 	ImGui::SetNextWindowDockID(m_RightDockSpace, ImGuiCond_FirstUseEver);
-	ImGui::Begin(title.c_str());
+	ImGui::Begin("Inspector");
 
 	if (!m_pCurrentSelected->DrawInspector())
 	{
@@ -464,4 +467,84 @@ void Proto::Editor::DrawAddComponent() const
 		
 		ImGui::EndPopup();
 	}
+}
+
+void Proto::Editor::DrawViewWindow()
+{
+	ImGui::SetNextWindowDockID(m_MiddleDockSpace, ImGuiCond_Always);
+	if (ImGui::Begin("Scene View"))
+	{
+		ProtoSettings.SetEditorRenderMode(RenderMode::EDITOR);
+		
+		const glm::vec2 windowSize{ ImGui::GetWindowSize().x, ImGui::GetWindowSize().y }, viewTextureSize{ ImGui::GetWindowSize().x - 35.f, ImGui::GetWindowSize().y - 35.f };
+		const float titleBarHeight{ ImGui::GetCurrentWindow()->TitleBarHeight() };
+		
+		SafeDelete(m_pViewWindow);
+		SDL_Texture* pViewTexture{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
+									int(ImGui::GetWindowSize().x - 35), int(ImGui::GetWindowSize().y - 35)) };
+		
+		m_pViewWindow = new Texture2D(pViewTexture, "", "");
+		
+		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pViewWindow->GetSDLTexture());
+		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+
+		ProtoScenes.Draw();
+
+		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+
+		ImVec2 cursorPos;
+		cursorPos.x = (windowSize.x - viewTextureSize.x) * 0.5f;
+		cursorPos.y = (windowSize.y - titleBarHeight - viewTextureSize.y) * 0.5f + titleBarHeight;
+		ImGui::SetCursorPos(cursorPos);
+		ImGui::Image(m_pViewWindow->GetSDLTexture(), { viewTextureSize.x, viewTextureSize.y });
+	}
+	ImGui::End();
+}
+
+void Proto::Editor::DrawGameWindow()
+{
+	ImGui::SetNextWindowDockID(m_MiddleDockSpace, ImGuiCond_Always);
+	if (ImGui::Begin("Game View"))
+	{
+		if (ImGui::IsWindowHovered())
+		{
+			ImGui::CaptureKeyboardFromApp(false);
+			ImGui::CaptureMouseFromApp(false);
+		}
+
+		const glm::vec2 windowSize{ ImGui::GetWindowSize().x, ImGui::GetWindowSize().y };
+		const float titleBarHeight{ ImGui::GetCurrentWindow()->TitleBarHeight() };
+		const glm::vec2 gameWindowSize{ ProtoSettings.GetWindowSettings().GameWindowSize };
+		
+		ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pGameWindow->GetSDLTexture());
+		SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+
+		ProtoScenes.Draw();
+
+		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+
+		glm::vec2 scaleXGameWindowSize{ gameWindowSize };
+		if(gameWindowSize.x > windowSize.x - 35)
+		{
+			ProtoSettings.SetGameAspectRatio((windowSize.x - 35) / gameWindowSize.x);
+			scaleXGameWindowSize = gameWindowSize * ProtoSettings.GetGameAspectRatio();
+		}
+
+		glm::vec2 scaleYGameWindowSize{ scaleXGameWindowSize };
+		if(scaleXGameWindowSize.y > windowSize.y - 35)
+		{
+			ProtoSettings.SetGameAspectRatio((windowSize.y - 35) / gameWindowSize.y);
+			scaleYGameWindowSize = gameWindowSize * ProtoSettings.GetGameAspectRatio();
+		}
+		
+		ImVec2 cursorPos;
+		cursorPos.x = (windowSize.x - scaleYGameWindowSize.x) * 0.5f;
+		cursorPos.y = (windowSize.y - titleBarHeight - scaleYGameWindowSize.y) * 0.5f + titleBarHeight;
+		ImGui::SetCursorPos(cursorPos);
+
+		ProtoSettings.SetGameMouseOffset({ ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y });
+		ImGui::Image(m_pGameWindow->GetSDLTexture(), { scaleYGameWindowSize.x, scaleYGameWindowSize.y });
+	}
+	ImGui::End();
 }

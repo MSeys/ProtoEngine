@@ -39,10 +39,7 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& 
 
 	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
 	{
-		dst.x += int(ProtoSettings.GetEditorSettings().GameRenderOffset.x);
-		dst.y += int(ProtoSettings.GetEditorSettings().GameRenderOffset.y);
-
-		if(ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+		if(ProtoSettings.GetEditorRenderMode() == RenderMode::EDITOR)
 		{
 			dst.x += int(ProtoSettings.GetEditorCamera().x);
 			dst.y += int(ProtoSettings.GetEditorCamera().y);

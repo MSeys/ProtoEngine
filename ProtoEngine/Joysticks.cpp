@@ -130,7 +130,12 @@ void Mouse::UpdateInPoll(const SDL_Event& currState)
 	{
 		m_CurrState = JoystickState::Moving;
 
-		m_Data.Position = { float(currState.motion.x), float(currState.motion.y) };
+		if(ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
+			m_Data.Position = { float((-ProtoSettings.GetGameMouseOffset().x + currState.motion.x) / ProtoSettings.GetGameAspectRatio()),
+								float((-ProtoSettings.GetGameMouseOffset().y + currState.motion.y) / ProtoSettings.GetGameAspectRatio()) };
+		else
+			m_Data.Position = { float(currState.motion.x), float(currState.motion.y) };
+		
 		m_Data.LeftMouseDown = bool(currState.motion.state & SDL_BUTTON_LMASK);
 		m_Data.RightMouseDown = bool(currState.motion.state & SDL_BUTTON_RMASK);
 	}

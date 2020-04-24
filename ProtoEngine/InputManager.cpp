@@ -20,12 +20,14 @@ void Proto::InputManager::Destroy()
 void Proto::InputManager::Update()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	
+
 	if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && !io.WantTextInput)
 	{
 		if(ProtoSettings.GetRenderMode() == RenderMode::GAME || ProtoSettings.GetEditorMode() == EditorMode::PLAY)
 			m_ControllerHandler.Update();
 	}
+
+	
 
 	m_KBMHandler.UpdateOutPoll();
 
@@ -40,17 +42,7 @@ void Proto::InputManager::Update()
 			break;
 		}
 
-		if (e.type == SDL_WINDOWEVENT)
-		{
-			// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L38
-			if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-			{
-				io.DisplaySize.x = static_cast<float>(e.window.data1);
-				io.DisplaySize.y = static_cast<float>(e.window.data2);
-			}
-		}
-
-		else if (e.type == SDL_MOUSEWHEEL)
+		if (e.type == SDL_MOUSEWHEEL)
 		{
 			// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L46
 			wheel = e.wheel.y;
@@ -74,20 +66,18 @@ void Proto::InputManager::Update()
 
 			if(ProtoSettings.GetRenderMode() == RenderMode::EDITOR && ProtoSettings.GetEditorMode() == EditorMode::EDIT)
 			{
-				if (key == SDL_SCANCODE_ESCAPE)
+				if (e.key.keysym.sym == SDLK_ESCAPE)
 					ProtoCommands.ForceExit();
 			}
-
 		}
 
+		else if (ProtoSettings.GetEditorRenderMode() == RenderMode::EDITOR && e.type == SDL_MOUSEMOTION && e.motion.state & SDL_BUTTON_MMASK)
+			ProtoSettings.TranslateEditorCamera(float(e.motion.xrel), float(e.motion.yrel));
+
+
+		
 		if (!io.WantCaptureKeyboard && !io.WantCaptureMouse && !io.WantTextInput)
 		{
-			if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR && ProtoSettings.GetEditorMode() == EditorMode::EDIT)
-			{
-				if (e.type == SDL_MOUSEMOTION && e.motion.state & SDL_BUTTON_MMASK)
-					ProtoSettings.TranslateEditorCamera(float(e.motion.xrel), float(e.motion.yrel));
-			}
-			
 			if (ProtoSettings.GetRenderMode() == RenderMode::GAME || ProtoSettings.GetEditorMode() == EditorMode::PLAY)
 				m_KBMHandler.UpdateInPoll(e);
 		}

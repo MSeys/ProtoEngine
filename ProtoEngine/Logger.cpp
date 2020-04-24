@@ -47,9 +47,7 @@ void Proto::Logger::AddLog(const LogLevel& logLevel, const std::string& logText)
 
 void Proto::Logger::Draw()
 {
-	const std::string title{ "ProtoLogger V" + std::to_string(LOGGER_VERSION).substr(0, 3) };
-
-	ImGui::Begin(title.c_str());
+	ImGui::Begin("Logger");
 
 	ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
 	ImGui::SameLine();

@@ -10,7 +10,7 @@ namespace Proto
 	class Engine
 	{
 	public:
-		Engine(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings = { { 1920, 1080 }, { 1920 / 3, 100 }},
+		Engine(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings = { { 1920, 1080 } },
 								const WindowSettings& windowSettings = { "ProtoEngine", {640, 480 }, FPSState::PROTO_VSYNC, FPSRate::PROTO_FPS_NORMAL },
 								RenderMode renderMode = RenderMode::GAME);
 		~Engine();

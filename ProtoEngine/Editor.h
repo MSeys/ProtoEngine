@@ -8,10 +8,6 @@
 #include "ImGui/imgui_internal.h"
 #include "portable-file-dialogs.h"
 
-constexpr double HIERARCHY_VERSION = 0.5;
-constexpr double EDITOR_MENU_VERSION = 0.1;
-constexpr double INSPECTOR_VERSION = 1.0;
-
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 
@@ -24,6 +20,7 @@ namespace Proto
 	public:
 		void Init();
 		void Draw();
+		void Destroy();
 		
 		void SetCurrentSelected(GameObject* pGameObject) { m_pCurrentSelected = pGameObject; }
 		GameObject* GetCurrentSelected() const { return m_pCurrentSelected; }
@@ -40,6 +37,9 @@ namespace Proto
 		void DrawHierarchy() const;
 		void DrawInspector();
 		void DrawAddComponent() const;
+
+		void DrawViewWindow();
+		void DrawGameWindow();
 		
 		GameObject* m_pCurrentSelected{};
 
@@ -54,5 +54,9 @@ namespace Proto
 		ImGuiID m_BottomDockSpace{};
 		ImGuiID m_LeftDockSpace{};
 		ImGuiID m_RightDockSpace{};
+		ImGuiID m_MiddleDockSpace{};
+
+		Texture2D* m_pViewWindow{};
+		Texture2D* m_pGameWindow{};
 	};
 }

@@ -39,7 +39,6 @@ enum class EditorMode
 struct EditorSettings
 {
 	glm::vec2 EditorWindowSize{ 0, 0 };
-	glm::vec2 GameRenderOffset{ 0, 0 };
 };
 
 struct WindowSettings
@@ -89,6 +88,15 @@ namespace Proto
 		void SetEditorMode(const EditorMode& editorMode) { m_EditorMode = editorMode; }
 		EditorMode GetEditorMode() const { return m_EditorMode; }
 
+		void SetEditorRenderMode(const RenderMode& editorRenderMode) { m_EditorRenderMode = editorRenderMode; }
+		RenderMode GetEditorRenderMode() const { return m_EditorRenderMode; }
+
+		void SetGameMouseOffset(const glm::vec2& offset) { m_GameMousePosOffset = offset; }
+		glm::vec2 GetGameMouseOffset() const { return m_GameMousePosOffset; }
+
+		void SetGameAspectRatio(float aspectRatio) { m_GameAspectRatio = aspectRatio; }
+		float GetGameAspectRatio() const { return m_GameAspectRatio; }
+		
 		void TranslateEditorCamera(float x, float y)
 		{
 			m_EditorCamOffset.x += x;
@@ -105,9 +113,12 @@ namespace Proto
 
 		RenderMode m_RenderMode{ RenderMode::GAME };
 		EditorMode m_EditorMode{ EditorMode::EDIT };
+		RenderMode m_EditorRenderMode{ RenderMode::EDITOR };
 		
 		BaseGame* m_pGame{}, *m_pRefGame{};
 		
 		glm::vec2 m_EditorCamOffset{ 0, 0 };
+		glm::vec2 m_GameMousePosOffset{ 0, 0 };
+		float m_GameAspectRatio{ 1 };
 	};
 }
