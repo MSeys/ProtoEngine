@@ -235,7 +235,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ImGui_Proto.cpp">
+    <ClCompile Include="ProtoGui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -257,7 +257,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ImageComponent.cpp" />
-    <ClCompile Include="ProtoParser.cpp" />
+    <ClCompile Include="ProtoUtils.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -290,7 +290,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
-    <ClInclude Include="ImGui_Proto.h" />
+    <ClInclude Include="ProtoGui.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Joysticks.h" />
     <ClInclude Include="KBMHandler.h" />
@@ -300,7 +300,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="ProtoEnginePCH.h" />
     <ClInclude Include="ImageComponent.h" />
-    <ClInclude Include="ProtoParser.h" />
+    <ClInclude Include="ProtoUtils.h" />
     <ClInclude Include="RapidXML\rapidxml.hpp" />
     <ClInclude Include="RapidXML\rapidxml_iterators.hpp" />
     <ClInclude Include="RapidXML\rapidxml_print.hpp" />
@@ -318,7 +318,6 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="Triggers.h" />
-    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

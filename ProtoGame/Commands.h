@@ -9,7 +9,7 @@ public:
 	{
 		auto& dataStr{ VoidCast<std::string>(EData) };
 		ProtoLogger.AddLog(LogLevel::Debug, "JumpCommand::Execute > " + IData.StringCode + " > " + dataStr);
-		ServiceLocator::GetAudio().PlayAudio(L"jump.wav");
+		ProtoAudio::GetAudio().PlayAudio(L"jump.wav");
 		dataStr = "Boing V2.0";
 	}
 };
@@ -20,7 +20,7 @@ public:
 	void Execute() override
 	{
 		ProtoLogger.AddLog(LogLevel::Debug, "FireCommand::Execute > I set FIIIIIIIRE to the raaaain!");
-		ServiceLocator::GetAudio().PlayAudio(L"fire.wav");
+		ProtoAudio::GetAudio().PlayAudio(L"fire.wav");
 	}
 };
 
@@ -30,7 +30,7 @@ public:
 	void Execute() override
 	{
 		ProtoLogger.AddLog(LogLevel::Debug, "DuckCommand::Execute > HOOOOOONK! Quack! Quack!");
-		ServiceLocator::GetAudio().PlayAudio(L"quack.wav");
+		ProtoAudio::GetAudio().PlayAudio(L"quack.wav");
 	}
 };
 
@@ -40,7 +40,7 @@ public:
 	void Execute() override
 	{
 		ProtoLogger.AddLog(LogLevel::Debug, "FartCommand::Execute > Prrrrrttt! WHO FARTED?");
-		ServiceLocator::GetAudio().PlayAudio(L"fart.wav");
+		ProtoAudio::GetAudio().PlayAudio(L"fart.wav");
 	}
 };
 
@@ -113,9 +113,9 @@ class SwitchAudioServiceCommand : public Command
 	void Execute() override
 	{
 		AudioServices& audioServices{ *static_cast<AudioServices*>(EData) };
-		if (&ServiceLocator::GetAudio() == &audioServices.PlayerAudio)
-			ServiceLocator::RegisterAudioService(&audioServices.LogAudio);
+		if (&ProtoAudio::GetAudio() == &audioServices.PlayerAudio)
+			ProtoAudio::RegisterAudioService(&audioServices.LogAudio);
 		else
-			ServiceLocator::RegisterAudioService(&audioServices.PlayerAudio);
+			ProtoAudio::RegisterAudioService(&audioServices.PlayerAudio);
 	}
 };

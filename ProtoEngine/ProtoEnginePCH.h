@@ -39,7 +39,7 @@
 #define ProtoTime Proto::TimeManager::GetInstance()
 
 #include "Audio.h"
-#define ProtoAudio ServiceLocator
+#define ProtoAudio AudioServiceLocator
 
 #include "Messenger.h"
 #define ProtoMessenger Proto::Messenger::GetInstance()
@@ -53,7 +53,7 @@
 #define ProtoEditor Proto::Editor::GetInstance()
 
 
-#include "Utils.h"
+#include "ProtoUtils.h"
 #include "Components.h"
 #include "Structs.h"
 
@@ -68,7 +68,7 @@
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
-#include "ImGui_Proto.h"
+#include "ProtoGui.h"
 
 #include "portable-file-dialogs.h"
 #include "RapidXML/rapidxml.hpp"

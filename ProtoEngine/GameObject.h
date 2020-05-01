@@ -7,11 +7,11 @@ class Scene;
 
 using GameObjectID = unsigned int;
 
-class GameObject
+class GameObject final
 {
 public:
 	GameObject(GameObjectID ID, std::string name = "GameObject", bool isActive = true);
-	virtual ~GameObject();
+	~GameObject();
 	
 	GameObject(const GameObject& other) = delete;
 	GameObject(GameObject&& other) = delete;
@@ -128,7 +128,7 @@ public:
 
 	std::vector<GameObject*>& GetChildren() { return m_pChildren; }
 	
-	bool DrawInspector();
+	void DrawInspector();
 	
 protected:
 	void DrawHierarchy();

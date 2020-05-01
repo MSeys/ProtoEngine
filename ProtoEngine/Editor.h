@@ -39,7 +39,7 @@ namespace Proto
 		void DrawAddComponent() const;
 
 		void DrawViewWindow();
-		void DrawGameWindow();
+		void DrawGameWindow() const;
 		
 		GameObject* m_pCurrentSelected{};
 

@@ -3,7 +3,7 @@
 #include <thread>
 
 #include "Singleton.h"
-#include "Utils.h"
+#include "ProtoUtils.h"
 
 #define TimePoint std::chrono::steady_clock::time_point  // NOLINT(cppcoreguidelines-macro-usage)
 

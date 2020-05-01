@@ -43,7 +43,7 @@ public:
 	void StopAllSounds() override {}
 };
 
-class ServiceLocator
+class AudioServiceLocator
 {
 public:
 	static void Init() { audioService = &defaultAudioService; }

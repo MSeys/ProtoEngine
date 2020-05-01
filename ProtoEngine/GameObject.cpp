@@ -5,9 +5,7 @@
 
 #include "Scene.h"
 #include "BaseComponent.h"
-#include "ProtoParser.h"
 #include "TransformComponent.h"
-#include "Utils.h"
 
 GameObject::GameObject(GameObjectID ID, std::string name, bool isActive)
 	: m_pChildren(std::vector<GameObject*>())
@@ -43,9 +41,10 @@ void GameObject::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPare
 	using namespace rapidxml;
 	
 	xml_node<>* thisGO = doc.allocate_node(node_element, "GameObject");
-	thisGO->append_attribute(doc.allocate_attribute("Name", doc.allocate_string(m_Name.c_str())));
-	thisGO->append_attribute(doc.allocate_attribute("ID", doc.allocate_string(ToCString(m_ID))));
-	thisGO->append_attribute(doc.allocate_attribute("Active", m_IsActive ? "true" : "false"));
+	
+	ProtoSaver::XML::SaveString("Name", m_Name, doc, thisGO);
+	ProtoSaver::XML::Save<GameObjectID>("ID", m_ID, doc, thisGO);
+	ProtoSaver::XML::Save<bool>("Active", m_IsActive, doc, thisGO);
 
 	xml_node<>* thisComponents = doc.allocate_node(node_element, "Components");
 	
@@ -69,9 +68,9 @@ void GameObject::Load(rapidxml::xml_node<>* pNode)
 
 	for (xml_node<>* gameObjectNode = pNode->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
-		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };
-		const GameObjectID id{ ProtoParser::XML::ParseUInt(gameObjectNode, "ID") };
-		const bool goActive{ std::string(gameObjectNode->first_attribute("Active")->value()) == "true" };
+		const std::string goName{ ProtoParser::XML::ParseString(gameObjectNode, "Name") };
+		const GameObjectID id{ ProtoParser::XML::Parse<unsigned int>(gameObjectNode, "ID") };
+		const bool goActive{ ProtoParser::XML::Parse<bool>(gameObjectNode, "Active") };
 
 		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
@@ -290,11 +289,6 @@ GameObject* GameObject::FindGameObjectWithIDinChildren(GameObjectID id)
 #pragma region Root Functions
 void GameObject::DrawHierarchy()
 {
-	std::stringstream thisAddress;
-	thisAddress << this;
-
-	std::string labelText;
-
 	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 	if (ProtoEditor.GetCurrentSelected() == this)
 		nodeFlags |= ImGuiTreeNodeFlags_Selected;
@@ -304,10 +298,9 @@ void GameObject::DrawHierarchy()
 
 	const bool open = ImGui::TreeNodeEx(this, nodeFlags, m_Name.c_str());
 
-	labelText = "##NodeMenu" + thisAddress.str();
-	ImGui::OpenPopupOnItemClick(labelText.c_str(), ImGuiMouseButton_Right);
+	ImGui::OpenPopupOnItemClick("##NodeMenu", ImGuiMouseButton_Right);
 
-	if (ImGui::BeginPopup(labelText.c_str()))
+	if (ImGui::BeginPopup("##NodeMenu"))
 	{
 		ImGui::Text("Actions");
 		ImGui::Separator();
@@ -372,25 +365,22 @@ void GameObject::DrawHierarchy()
 	}
 }
 
-bool GameObject::DrawInspector()
+void GameObject::DrawInspector()
 {
-	std::stringstream thisAddress;
-	thisAddress << this;
-
 	std::string labelText;
 	BaseComponent* pDelComp{};
 	
 	m_Name.resize(50);
 
+	ImGui::PushID(this);
+	
 	/* Inspector */ {
 
 		/* First Row */ {
-			labelText = "##Active" + thisAddress.str();
-			ImGui::Checkbox(labelText.c_str(), &m_IsActive);
+			ImGui::Checkbox("##Active", &m_IsActive);
 			ImGui::SameLine();
 
-			labelText = "##Name" + thisAddress.str();
-			ImGui::InputText(labelText.c_str(), &m_Name[0], 50);
+			ImGui::InputText("##Name", &m_Name[0], 50);
 
 			ImGui::SameLine();
 			ImGui::Text(("ID: " + std::to_string(m_ID)).c_str());
@@ -398,10 +388,8 @@ bool GameObject::DrawInspector()
 
 		for (BaseComponent* pComp : m_pComponents)
 		{
-			std::stringstream compAddress;
-			compAddress << pComp;
-
-			ImGuiProto::BeginComponentPanel(ImVec2{ -1, 0 }, pComp, &pDelComp, compAddress.str());
+			ImGui::PushID(pComp);
+			ProtoGui::Presets::BeginComponentPanel(ImVec2{ -1, 0 }, pComp, &pDelComp);
 
 			ImGui::Spacing();
 			ImGui::Spacing();
@@ -411,14 +399,15 @@ bool GameObject::DrawInspector()
 			ImGui::Spacing();
 			ImGui::Spacing();
 			
-			ImGuiProto::EndComponentPanel();
+			ProtoGui::Presets::EndComponentPanel();
+			ImGui::PopID();
 		}
 	}
 		
 	if (pDelComp)
 		RemoveComponent(pDelComp);
 
-	return true;
+	ImGui::PopID();
 }
 
 void GameObject::Start()
@@ -517,9 +506,7 @@ void GameObject::Draw()
 Scene* GameObject::GetScene() const
 {
 	if (!m_pParentScene && m_pParentObject)
-	{
 		return m_pParentObject->GetScene();
-	}
 
 	return m_pParentScene;
 }

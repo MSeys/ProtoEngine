@@ -1,5 +1,5 @@
 #include "ProtoEnginePCH.h"
-#include "ImGui_Proto.h"
+#include "ProtoGui.h"
 
 #include "ContentManager.h"
 #include "Font.h"
@@ -7,66 +7,50 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 
-void ImGuiProto::Position(TextureData& texData, const std::string& address)
+void ProtoGui::Presets::Position(TextureData& texData, int id)
 {
-	std::string labelText;
-
-	/* Position */ {
-		ImGui::Text("Position");
-
-		/* Position X */ {
-			ImGui::SameLine(100);
-			ImGui::Text("X");
-			ImGui::SameLine(115);
-
-			ImGui::PushItemWidth(70);
-			labelText = "##POS_X" + address;
-			ImGui::DragFloat(labelText.c_str(), &texData.x, 1, 0, 0, "%.1f");
-			ImGui::PopItemWidth();
-		}
-
-		/* Position Y */ {
-			ImGui::SameLine(200);
-			ImGui::Text("Y");
-			ImGui::SameLine(215);
-
-			ImGui::PushItemWidth(70);
-			labelText = "##POS_Y" + address;
-			ImGui::DragFloat(labelText.c_str(), &texData.y, 1, 0, 0, "%.1f");
-			ImGui::PopItemWidth();
-		}
-	}
-}
-
-void ImGuiProto::Size(TextureData& texData, const std::string& address)
-{
-	std::string labelText;
+	ImGui::PushID(id);
 	
-	/* Size */ {
-		ImGui::Text("Size");
+	ProtoGuiData pgData{ true, 0, -1, true, 70 };
+	const DragData dragData{ 0.1f, 0, 0, "%.1f" };
+	
+	ImGui::Text("Position");
+	ImGui::SameLine(100);
 
-		ImGui::SameLine(100);
-		ImGui::Text("W");
-		ImGui::SameLine(115);
+	pgData.sameLineOffset = 115;
+	ProtoGui::Drag<float>("X", pgData, "##PRESET_POS_X", texData.x, dragData);
+	ImGui::SameLine(200);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##SIZE_WIDTH" + address;
-		ImGui::DragFloat(labelText.c_str(), &texData.width, 1, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
+	pgData.sameLineOffset = 215;
+	ProtoGui::Drag<float>("Y", pgData, "##PRESET_POS_Y", texData.y, dragData);
 
-		ImGui::SameLine(200);
-		ImGui::Text("H");
-		ImGui::SameLine(215);
-
-		ImGui::PushItemWidth(70);
-		labelText = "##SIZE_HEIGHT" + address;
-		ImGui::DragFloat(labelText.c_str(), &texData.height, 1, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
-	}
+	ImGui::PopID();
 }
 
-void ImGuiProto::Alignment(HAlignment& hAlignment, VAlignment& vAlignment)
+void ProtoGui::Presets::Size(TextureData& texData, int id)
 {
+	ImGui::PushID(id);
+	
+	ProtoGuiData pgData{ true, 0, -1, true, 70 };
+	const DragData dragData{ 0.1f, 0, 0, "%.1f" };
+
+	ImGui::Text("Size");
+	ImGui::SameLine(100);
+
+	pgData.sameLineOffset = 115;
+	ProtoGui::Drag<float>("W", pgData, "##PRESET_SIZE_W", texData.width, dragData);
+	ImGui::SameLine(200);
+
+	pgData.sameLineOffset = 215;
+	ProtoGui::Drag<float>("H", pgData, "##PRESET_SIZE_H", texData.height, dragData);
+
+	ImGui::PopID();
+}
+
+void ProtoGui::Presets::Alignment(HAlignment& hAlignment, VAlignment& vAlignment, int id)
+{
+	ImGui::PushID(id);
+	
 	/* Alignment */ {
 		ImGui::Text("Alignment");
 
@@ -166,25 +150,29 @@ void ImGuiProto::Alignment(HAlignment& hAlignment, VAlignment& vAlignment)
 			}
 		}
 	}
+
+	ImGui::PopID();
 }
 
-void ImGuiProto::Color(const std::string& text, const TextureData& texData, SDL_Color& color, const std::string& address)
+void ProtoGui::Presets::Color(const std::string& text, const TextureData& texData, SDL_Color& color, int id)
 {
+	ImGui::PushID(id);
+	
 	ImGui::Text(text.c_str());
 	ImGui::SameLine(100);
 
-	const std::string labelText{ "##COLOR" + address };
-
 	float colors[4] = { float(texData.color.r) / 255.f, float(texData.color.g) / 255.f, float(texData.color.b) / 255.f, float(texData.color.a) / 255.f };
 	ImGui::PushItemWidth(250);
-	ImGui::ColorEdit4(labelText.c_str(), &colors[0]);
+	ImGui::ColorEdit4("##PRESET_COLOR", &colors[0]);
 	color = { Uint8(colors[0] * 255), Uint8(colors[1] * 255), Uint8(colors[2] * 255), Uint8(colors[3] * 255) };
 	ImGui::PopItemWidth();
+
+	ImGui::PopID();
 }
 
 
 // Derived from https://github.com/ocornut/imgui/issues/1496
-void ImGuiProto::BeginGroupPanel(const char* name, const ImVec2& size)
+void ProtoGui::Presets::BeginGroupPanel(const char* name, const ImVec2& size)
 {
 	ImGui::BeginGroup();
 
@@ -236,7 +224,7 @@ ImVec2 operator*(const ImVec2& lhs, const float& rhs)
 	return ImVec2{ lhs.x * rhs, lhs.y * rhs };
 }
 
-void ImGuiProto::EndGroupPanel()
+void ProtoGui::Presets::EndGroupPanel()
 {
 	ImGui::PopItemWidth();
 
@@ -279,7 +267,7 @@ void ImGuiProto::EndGroupPanel()
 	ImGui::EndGroup();
 }
 
-void ImGuiProto::BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrComp, BaseComponent** pDelComp, const std::string& address)
+void ProtoGui::Presets::BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrComp, BaseComponent** pDelComp)
 {
 	ImGui::BeginGroup();
 
@@ -306,25 +294,21 @@ void ImGuiProto::BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrCom
 
 	pCurrComp->DrawInspectorTitle();
 
-	std::string labelText;
 	if (!dynamic_cast<TransformComponent*>(pCurrComp))
 	{
 		ImGui::SameLine(270);
 
-		labelText = "^##" + address;
-		if (ImGui::Button(labelText.c_str(), { 20, 20 }))
+		if (ImGui::Button("^", { 20, 20 }))
 			pCurrComp->GetGameObject()->SwapUpComponent(pCurrComp);
 
 		ImGui::SameLine(300);
 
-		labelText = "v##" + address;
-		if (ImGui::Button(labelText.c_str(), { 20, 20 }))
+		if (ImGui::Button("v", { 20, 20 }))
 			pCurrComp->GetGameObject()->SwapDownComponent(pCurrComp);
 
 		ImGui::SameLine(330);
 
-		labelText = "X##" + address;
-		if (ImGui::Button(labelText.c_str(), { 20, 20 }))
+		if (ImGui::Button("X", { 20, 20 }))
 			*pDelComp = pCurrComp;
 	}
 	
@@ -340,7 +324,7 @@ void ImGuiProto::BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrCom
 	ImGui::PushItemWidth(effectiveSize.x - frameHeight);
 }
 
-void ImGuiProto::EndComponentPanel()
+void ProtoGui::Presets::EndComponentPanel()
 {
 	EndGroupPanel();
 }

@@ -28,21 +28,22 @@ void FPSComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPa
 {
 	using namespace rapidxml;
 
-	xml_node<>* component = doc.allocate_node(node_element, "FPSComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "FPSComponent");
 
 	// Font related
-	component->append_attribute(doc.allocate_attribute("FontLocation", doc.allocate_string(m_FontRelPath.c_str())));
-	component->append_attribute(doc.allocate_attribute("FontSize", doc.allocate_string(ToCString(m_pFont->GetSize()))));
+	ProtoSaver::XML::SaveString("FontLocation", m_FontRelPath, doc, pComp);
+	ProtoSaver::XML::Save<unsigned int>("FontSize", m_pFont->GetSize(), doc, pComp);
 
 	// Texture Data related
-	component->append_attribute(doc.allocate_attribute("TexDataX", doc.allocate_string(ToCString(m_TexData.x))));
-	component->append_attribute(doc.allocate_attribute("TexDataY", doc.allocate_string(ToCString(m_TexData.y))));
-	component->append_attribute(doc.allocate_attribute("TexDataW", doc.allocate_string(ToCString(m_TexData.width))));
-	component->append_attribute(doc.allocate_attribute("TexDataH", doc.allocate_string(ToCString(m_TexData.height))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorR", doc.allocate_string(ToCString(m_TexData.color.r))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorG", doc.allocate_string(ToCString(m_TexData.color.g))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorB", doc.allocate_string(ToCString(m_TexData.color.b))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorA", doc.allocate_string(ToCString(m_TexData.color.a))));
+	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataY", m_TexData.y, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataW", m_TexData.width, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataH", m_TexData.height, doc, pComp);
+
+	ProtoSaver::XML::Save<Uint8>("TexDataColorR", m_TexData.color.r, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorG", m_TexData.color.g, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorB", m_TexData.color.b, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorA", m_TexData.color.a, doc, pComp);
 
 	// Alignment related
 	std::string hAlignmentStr, vAlignmentStr;
@@ -62,8 +63,8 @@ void FPSComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPa
 	default:;
 	}
 
-	component->append_attribute(doc.allocate_attribute("HorizontalAlignment", doc.allocate_string(hAlignmentStr.c_str())));
-	component->append_attribute(doc.allocate_attribute("VerticalAlignment", doc.allocate_string(vAlignmentStr.c_str())));
+	ProtoSaver::XML::SaveString("HorizontalAlignment", hAlignmentStr, doc, pComp);
+	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
 
-	pParent->append_node(component);
+	pParent->append_node(pComp);
 }

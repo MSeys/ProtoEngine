@@ -138,12 +138,6 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
-    <ClCompile Include="ProtoParser.cpp">
-      <Filter>Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui_Proto.cpp">
-      <Filter>ImGui\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>ImGui\Editor</Filter>
     </ClCompile>
@@ -152,6 +146,12 @@
     </ClCompile>
     <ClCompile Include="EditorGame.cpp">
       <Filter>Scenegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtoGui.cpp">
+      <Filter>ImGui\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtoUtils.cpp">
+      <Filter>Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -201,9 +201,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Structs.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="TimeManager.h">
@@ -299,17 +296,17 @@
     <ClInclude Include="RapidXML\rapidxml_print.hpp">
       <Filter>RapidXML</Filter>
     </ClInclude>
-    <ClInclude Include="ProtoParser.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui_Proto.h">
-      <Filter>ImGui\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="EditorGame.h">
       <Filter>Scenegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtoGui.h">
+      <Filter>ImGui\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtoUtils.h">
+      <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,6 +2,10 @@
 #include "BaseComponent.h"
 #include "Structs.h"
 
+namespace Proto {
+	class Texture2D;
+}
+
 class ImageComponent : public BaseComponent
 {
 public:

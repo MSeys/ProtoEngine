@@ -2,7 +2,6 @@
 #include "ImageComponent.h"
 
 #include "Texture2D.h"
-#include "Utils.h"
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
@@ -101,23 +100,16 @@ void ImageComponent::DrawInspectorTitle()
 
 void ImageComponent::DrawInspector()
 {
-	std::stringstream thisAddress;
-	thisAddress << this;
-
-	std::string labelText;
-
 	/* Image */ {
 		ImGui::Text("Image");
 		ImGui::SameLine(100);
 
 		ImGui::PushItemWidth(175);
-		labelText = "##RENDER_COMP_FILE_PATH" + thisAddress.str();
-		ImGui::InputText(labelText.c_str(), &m_TexRelPath[0], 300, ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputText("##RENDER_COMP_FILE_PATH", &m_TexRelPath[0], 300, ImGuiInputTextFlags_ReadOnly);
 		ImGui::PopItemWidth();
 
 		ImGui::SameLine(285);
-		labelText = "...##RENDER_COMP_FILE_PATH_BUTTON" + thisAddress.str();
-		if (ImGui::Button(labelText.c_str()))
+		if (ImGui::Button("...##RENDER_COMP_FILE_PATH_BUTTON"))
 		{
 			const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
 			const auto selection = pfd::open_file("Select an Image", fullPath, { "Image Files", "*.png *.jpg *.jpeg *.PNG" }).result();
@@ -140,34 +132,35 @@ void ImageComponent::DrawInspector()
 	if (!m_pTexture)
 		return;
 
-	ImGuiProto::Position(m_TexData, thisAddress.str());
-	ImGuiProto::Size(m_TexData, thisAddress.str());
+	ProtoGui::Presets::Position(m_TexData);
+	ProtoGui::Presets::Size(m_TexData);
 
 	ImGui::PushID(this);
-	ImGuiProto::Alignment(m_HorAlignment, m_VerAlignment);
+	ProtoGui::Presets::Alignment(m_HorAlignment, m_VerAlignment);
 	ImGui::PopID();
 
-	ImGuiProto::Color("Color", m_TexData, m_TexData.color, thisAddress.str());
+	ProtoGui::Presets::Color("Color", m_TexData, m_TexData.color);
 }
 
 void ImageComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 
-	xml_node<>* component = doc.allocate_node(node_element, "ImageComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "ImageComponent");
 
 	// Image
-	component->append_attribute(doc.allocate_attribute("ImageLocation", doc.allocate_string(m_TexRelPath.c_str())));
+	ProtoSaver::XML::SaveString("ImageLocation", m_TexRelPath, doc, pComp);
 
 	// Texture Data related
-	component->append_attribute(doc.allocate_attribute("TexDataX", doc.allocate_string(ToCString(m_TexData.x))));
-	component->append_attribute(doc.allocate_attribute("TexDataY", doc.allocate_string(ToCString(m_TexData.y))));
-	component->append_attribute(doc.allocate_attribute("TexDataW", doc.allocate_string(ToCString(m_TexData.width))));
-	component->append_attribute(doc.allocate_attribute("TexDataH", doc.allocate_string(ToCString(m_TexData.height))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorR", doc.allocate_string(ToCString(m_TexData.color.r))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorG", doc.allocate_string(ToCString(m_TexData.color.g))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorB", doc.allocate_string(ToCString(m_TexData.color.b))));
-	component->append_attribute(doc.allocate_attribute("TexDataColorA", doc.allocate_string(ToCString(m_TexData.color.a))));
+	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataY", m_TexData.y, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataW", m_TexData.width, doc, pComp);
+	ProtoSaver::XML::Save<float>("TexDataH", m_TexData.height, doc, pComp);
+
+	ProtoSaver::XML::Save<Uint8>("TexDataColorR", m_TexData.color.r, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorG", m_TexData.color.g, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorB", m_TexData.color.b, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("TexDataColorA", m_TexData.color.a, doc, pComp);
 
 	// Alignment related
 	std::string hAlignmentStr, vAlignmentStr;
@@ -187,8 +180,8 @@ void ImageComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* p
 	default:;
 	}
 
-	component->append_attribute(doc.allocate_attribute("HorizontalAlignment", doc.allocate_string(hAlignmentStr.c_str())));
-	component->append_attribute(doc.allocate_attribute("VerticalAlignment", doc.allocate_string(vAlignmentStr.c_str())));
+	ProtoSaver::XML::SaveString("HorizontalAlignment", hAlignmentStr, doc, pComp);
+	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
 
-	pParent->append_node(component);
+	pParent->append_node(pComp);
 }

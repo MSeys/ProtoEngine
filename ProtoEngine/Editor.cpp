@@ -428,12 +428,7 @@ void Proto::Editor::DrawInspector()
 	ImGui::SetNextWindowDockID(m_RightDockSpace, ImGuiCond_FirstUseEver);
 	ImGui::Begin("Inspector");
 
-	if (!m_pCurrentSelected->DrawInspector())
-	{
-		m_pCurrentSelected = nullptr;
-		ImGui::End();
-		return;
-	}
+	m_pCurrentSelected->DrawInspector();
 
 	ImGui::Separator();
 
@@ -501,7 +496,7 @@ void Proto::Editor::DrawViewWindow()
 	ImGui::End();
 }
 
-void Proto::Editor::DrawGameWindow()
+void Proto::Editor::DrawGameWindow() const
 {
 	ImGui::SetNextWindowDockID(m_MiddleDockSpace, ImGuiCond_Always);
 	if (ImGui::Begin("Game View"))

@@ -1,4 +1,4 @@
 #include "ProtoEnginePCH.h"
 #include "Audio.h"
-Audio* ServiceLocator::audioService = nullptr;
-NullAudio ServiceLocator::defaultAudioService;
+Audio* AudioServiceLocator::audioService = nullptr;
+NullAudio AudioServiceLocator::defaultAudioService;

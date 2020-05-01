@@ -10,7 +10,7 @@
 
 #include "BaseGame.h"
 #include "EditorGame.h"
-#include "Utils.h"
+#include "ProtoUtils.h"
 
 enum class FPSRate
 {

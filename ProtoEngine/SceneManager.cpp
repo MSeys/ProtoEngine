@@ -4,7 +4,6 @@
 #include <SDL.h>
 
 #include "Scene.h"
-#include "Utils.h"
 
 Proto::SceneManager::SceneManager()
 	: m_pScenes(std::vector<Scene*>())

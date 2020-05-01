@@ -24,10 +24,5 @@
 			<FPSComponent FontLocation="\Kenney Thick.ttf" FontSize="25" TexDataX="163.000000" TexDataY="98.000000" TexDataW="350.000000" TexDataH="29.000000" TexDataColorR="207" TexDataColorG="34" TexDataColorB="34" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="GameObject" ID="8" Active="true">
-		<Components>
-			<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-		</Components>
-	</GameObject>
 </Scene>
 

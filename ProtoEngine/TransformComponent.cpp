@@ -68,101 +68,70 @@ void TransformComponent::DrawInspectorTitle()
 
 void TransformComponent::DrawInspector()
 {
-	std::stringstream thisAddress;
-	thisAddress << this;
-
-	std::string labelText;
-
+	ProtoGui::ProtoGuiData pgData{ true, 0, -1, true, 70 };
+	ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.1f" };
+	
 	/* Position */ {
 		ImGui::Text("Position");
-
 		ImGui::SameLine(100);
-		ImGui::Text("X");
-		ImGui::SameLine(115);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_POS_X" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_Position.x, 0.1f, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
-
+		pgData.sameLineOffset = 115;
+		ProtoGui::Drag<float>("X", pgData, "##TRANSFORM_POS_X", m_Position.x, dragData);
 		ImGui::SameLine(200);
-		ImGui::Text("Y");
-		ImGui::SameLine(215);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_POS_Y" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_Position.y, 0.1f, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
+		pgData.sameLineOffset = 215;
+		ProtoGui::Drag<float>("Y", pgData, "##TRANSFORM_POS_Y", m_Position.y, dragData);
 	}
 
 	/* Rotation */ {
 		ImGui::Text("Rot. Center");
-
 		ImGui::SameLine(100);
-		ImGui::Text("X");
-		ImGui::SameLine(115);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_ROT_POS_X" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_RotCenter.x, 0.1f, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
-
+		pgData.sameLineOffset = 115;
+		ProtoGui::Drag<float>("X", pgData, "##TRANSFORM_ROT_POS_X", m_RotCenter.x, dragData);
 		ImGui::SameLine(200);
-		ImGui::Text("Y");
-		ImGui::SameLine(215);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_ROT_POS_Y" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_RotCenter.y, 0.1f, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
+		pgData.sameLineOffset = 215;
+		ProtoGui::Drag<float>("Y", pgData, "##TRANSFORM_ROT_POS_Y", m_RotCenter.y, dragData);
 
 		ImGui::Text("Rot. Angle");
 		
 		ImGui::SameLine(115);
-		
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_ROT_ANGLE" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_RotAngle, 0.1f, 0, 0, "%.1f");
-		ImGui::PopItemWidth();
+
+		pgData.sameLineOffset = 115;
+		ProtoGui::Drag<float>("", pgData, "##TRANSFORM_ROT_ANGLE", m_RotAngle, dragData);
 	}
 
 	/* Scale */ {
 		ImGui::Text("Scale");
-
 		ImGui::SameLine(100);
-		ImGui::Text("X");
-		ImGui::SameLine(115);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_SCALE_X" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_Scale.x, 0.01f, 0, 0, "%.2f");
-		ImGui::PopItemWidth();
-
+		dragData.v_speed = 0.01f;
+		dragData.format = "%.2f";
+		
+		pgData.sameLineOffset = 115;
+		ProtoGui::Drag<float>("X", pgData, "##TRANSFORM_SCALE_X", m_Scale.x, dragData);
 		ImGui::SameLine(200);
-		ImGui::Text("Y");
-		ImGui::SameLine(215);
 
-		ImGui::PushItemWidth(70);
-		labelText = "##TRANSFORM_SCALE_Y" + thisAddress.str();
-		ImGui::DragFloat(labelText.c_str(), &m_Scale.y, 0.01f, 0, 0, "%.2f");
-		ImGui::PopItemWidth();
+		pgData.sameLineOffset = 215;
+		ProtoGui::Drag<float>("Y", pgData, "##TRANSFORM_SCALE_Y", m_Scale.y, dragData);
 	}
 }
 
 void TransformComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
+	xml_node<>* pComp = doc.allocate_node(node_element, "TransformComponent");
 	
-	xml_node<>* component = doc.allocate_node(node_element, "TransformComponent");
-	component->append_attribute(doc.allocate_attribute("PositionX", doc.allocate_string(ToCString(m_Position.x))));
-	component->append_attribute(doc.allocate_attribute("PositionY", doc.allocate_string(ToCString(m_Position.y))));
+	ProtoSaver::XML::Save<float>("PositionX", m_Position.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("PositionY", m_Position.y, doc, pComp);
 	
-	component->append_attribute(doc.allocate_attribute("RotCenterX", doc.allocate_string(ToCString(m_RotCenter.x))));
-	component->append_attribute(doc.allocate_attribute("RotCenterY", doc.allocate_string(ToCString(m_RotCenter.y))));
-	component->append_attribute(doc.allocate_attribute("RotAngle", doc.allocate_string(ToCString(m_RotAngle))));
-
-	component->append_attribute(doc.allocate_attribute("ScaleX", doc.allocate_string(ToCString(m_Scale.x))));
-	component->append_attribute(doc.allocate_attribute("ScaleY", doc.allocate_string(ToCString(m_Scale.y))));
+	ProtoSaver::XML::Save<float>("RotCenterX", m_RotCenter.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("RotCenterY", m_RotCenter.y, doc, pComp);
+	ProtoSaver::XML::Save<float>("RotAngle", m_RotAngle, doc, pComp);
 	
-	pParent->append_node(component);
+	ProtoSaver::XML::Save<float>("ScaleX", m_Scale.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("ScaleY", m_Scale.y, doc, pComp);
+	
+	pParent->append_node(pComp);
 }

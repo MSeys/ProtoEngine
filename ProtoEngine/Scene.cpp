@@ -4,8 +4,6 @@
 #include <fstream>
 
 #include "GameObject.h"
-#include "Utils.h"
-#include "ProtoParser.h"
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
@@ -91,9 +89,9 @@ void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::str
 	
 	for(xml_node<>* gameObjectNode = scene->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
-		const std::string goName{ gameObjectNode->first_attribute("Name")->value() };
-		const GameObjectID id{ ProtoParser::XML::ParseUInt(gameObjectNode, "ID") };
-		const bool goActive{ std::string(gameObjectNode->first_attribute("Active")->value()) == "true" }; 
+		const std::string goName{ ProtoParser::XML::ParseString(gameObjectNode, "Name") };
+		const GameObjectID id{ ProtoParser::XML::Parse<unsigned int>(gameObjectNode, "ID") };
+		const bool goActive{ ProtoParser::XML::ParseString(gameObjectNode, "Active") == "true" };
 		
 		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
@@ -152,18 +150,14 @@ void Scene::SwapUpChild(GameObject* obj)
 {
 	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
 	if (it != m_pChildren.begin())
-	{
 		std::swap(*it, *(it - 1));
-	}
 }
 
 void Scene::SwapDownChild(GameObject* obj)
 {
 	const auto it{ std::find(m_pChildren.begin(), m_pChildren.end(), obj) };
 	if (it != m_pChildren.end() - 1)
-	{
 		std::swap(*it, *(it + 1));
-	}
 }
 
 #pragma region Root Functions
@@ -171,7 +165,9 @@ void Scene::DrawHierarchy()
 {
 	for (auto pChild : m_pChildren)
 	{
+		ImGui::PushID(pChild);
 		pChild->DrawHierarchy();
+		ImGui::PopID();
 	}
 }
 
@@ -197,9 +193,7 @@ void Scene::Start()
 		return;
 
 	for (auto pChild : m_pChildren)
-	{
 		pChild->Start();
-	}
 
 	m_IsInitialized = true;
 }
@@ -207,32 +201,24 @@ void Scene::Start()
 void Scene::Awake()
 {
 	for (auto pChild : m_pChildren)
-	{
 		pChild->Awake();
-	}
 }
 
 void Scene::Update()
 {
 	for (auto pChild : m_pChildren)
-	{
 		pChild->Update();
-	}
 }
 
 void Scene::FixedUpdate()
 {
 	for (auto pChild : m_pChildren)
-	{
 		pChild->FixedUpdate();
-	}
 }
 
 void Scene::Draw()
 {
 	for (auto pChild : m_pChildren)
-	{
 		pChild->Draw();
-	}
 }
 #pragma endregion Root Functions
