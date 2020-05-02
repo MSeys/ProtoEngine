@@ -11,10 +11,10 @@ FPSComponent::FPSComponent(Proto::Font* pFont, const TextureData& texData)
 
 void FPSComponent::Update()
 {
-	m_Timer += ProtoTime.DeltaTime;
+	m_Timer += ProtoTime.DeltaTime_Unscaled;
 	if (m_Timer > 0.2f)
 	{
-		SetText(std::to_string(ProtoTime.FPS) + " FPS");
+		SetText(std::to_string(ProtoTime.FPS_Unscaled) + " FPS");
 		m_Timer = 0.f;
 	}
 }

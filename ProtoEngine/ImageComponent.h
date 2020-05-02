@@ -6,7 +6,7 @@ namespace Proto {
 	class Texture2D;
 }
 
-class ImageComponent : public BaseComponent
+class ImageComponent final : public BaseComponent
 {
 public:
 	ImageComponent(Proto::Texture2D* pTexture, const TextureData& texData);

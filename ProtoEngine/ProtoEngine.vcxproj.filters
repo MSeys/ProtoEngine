@@ -153,6 +153,9 @@
     <ClCompile Include="ProtoUtils.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="CameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -307,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="ProtoUtils.h">
       <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

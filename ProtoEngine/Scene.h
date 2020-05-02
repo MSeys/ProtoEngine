@@ -1,4 +1,5 @@
 #pragma once
+#include "CameraComponent.h"
 class GameObject;
 
 namespace Proto {
@@ -19,6 +20,10 @@ public:
 
 	void AddChild(GameObject* obj);
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
+
+	bool HasActiveCamera() const { return m_pActiveCamera != nullptr; }
+	glm::vec2 GetActiveCamera() const;
+	void SetActiveCamera(CameraComponent* pCamera);
 	
 protected:
 	void DrawHierarchy();
@@ -40,7 +45,7 @@ protected:
 
 	GameObjectID RequestNewID() { return ++m_CurrentID; }
 	GameObjectID GetCurrentID() const { return m_CurrentID; }
-	void SetCurrentID(GameObjectID id) { m_CurrentID = id; }
+	void SetCurrentID(const GameObjectID& id) { m_CurrentID = id; }
 
 	GameObject* FindGameObjectWithID(GameObjectID id) const;
 	
@@ -48,6 +53,7 @@ private:
 	friend class Proto::SceneManager;
 	friend class Proto::Editor;
 	friend class GameObject;
+	friend class CameraComponent;
 
 	void Start();
 	void Awake();
@@ -63,4 +69,5 @@ private:
 	std::string m_FileName;
 
 	GameObjectID m_CurrentID{ 0 };
+	CameraComponent* m_pActiveCamera{};
 };

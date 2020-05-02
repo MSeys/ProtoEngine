@@ -91,7 +91,7 @@ void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::str
 	{
 		const std::string goName{ ProtoParser::XML::ParseString(gameObjectNode, "Name") };
 		const GameObjectID id{ ProtoParser::XML::Parse<unsigned int>(gameObjectNode, "ID") };
-		const bool goActive{ ProtoParser::XML::ParseString(gameObjectNode, "Active") == "true" };
+		const bool goActive{ ProtoParser::XML::Parse<bool>(gameObjectNode, "Active") };
 		
 		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
@@ -185,6 +185,23 @@ GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 	}
 
 	return nullptr;
+}
+
+void Scene::SetActiveCamera(CameraComponent* pCamera)
+{
+	if (m_pActiveCamera)
+		m_pActiveCamera->SetActive(false);
+
+	m_pActiveCamera = pCamera;
+	m_pActiveCamera->SetActive(true);
+}
+
+glm::vec2 Scene::GetActiveCamera() const
+{
+	if (m_pActiveCamera)
+		return m_pActiveCamera->GetPosition();
+
+	return { 0, 0 };
 }
 
 void Scene::Start()

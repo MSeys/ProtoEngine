@@ -25,7 +25,7 @@ public:
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
 	void AddComponent(BaseComponent* pComp);
-	void RemoveComponent(BaseComponent* pComp);
+	void RemoveComponent(BaseComponent* pComp, bool deleteComp = true);
 
 	void SwapUpChild(GameObject* obj);
 	void SwapDownChild(GameObject* obj);

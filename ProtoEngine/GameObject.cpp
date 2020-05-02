@@ -25,14 +25,10 @@ GameObject::GameObject(GameObjectID ID, std::string name, bool isActive)
 GameObject::~GameObject()
 {
 	for (BaseComponent* pComp : m_pComponents)
-	{
 		SafeDelete(pComp);
-	}
-
+	
 	for (GameObject* pChild : m_pChildren)
-	{
 		SafeDelete(pChild);
-	}
 }
 
 #pragma region Add / Remove Child
@@ -107,13 +103,10 @@ void GameObject::AddChild(GameObject* obj)
 		const auto scene = GetScene();
 
 		if (scene == nullptr)
-		{
 			std::cout << "GameObject::AddChild > Failed to initialize the added GameObject! (Parent GameObject is not part of a Scene)" << std::endl;
-		}
+
 		else
-		{
 			obj->Start();
-		}
 	}
 }
 
@@ -160,9 +153,12 @@ void GameObject::AddComponent(BaseComponent* pComp)
 
 	m_pComponents.push_back(pComp);
 	pComp->m_pGameObject = this;
+
+	if (m_IsInitialized)
+		pComp->Start();
 }
 
-void GameObject::RemoveComponent(BaseComponent* pComp)
+void GameObject::RemoveComponent(BaseComponent* pComp, bool deleteComp)
 {
 	auto it = find(m_pComponents.begin(), m_pComponents.end(), pComp);
 
@@ -181,9 +177,16 @@ void GameObject::RemoveComponent(BaseComponent* pComp)
 #endif
 
 	m_pComponents.erase(it);
-	pComp->m_pGameObject = nullptr;
 
-	SafeDelete(pComp);
+	if (deleteComp)
+	{
+		if (dynamic_cast<CameraComponent*>(pComp) == GetScene()->m_pActiveCamera)
+			GetScene()->SetActiveCamera(nullptr);
+		
+		SafeDelete(pComp);
+	}
+	else
+		pComp->m_pGameObject = nullptr;
 }
 #pragma endregion Add / Remove Component
 
@@ -405,7 +408,7 @@ void GameObject::DrawInspector()
 	}
 		
 	if (pDelComp)
-		RemoveComponent(pDelComp);
+		RemoveComponent(pDelComp, true);
 
 	ImGui::PopID();
 }

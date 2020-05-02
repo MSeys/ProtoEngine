@@ -30,6 +30,12 @@ T& VoidCast(void* pData)
 	return *static_cast<T*>(pData);
 }
 
+template <typename T>
+T Lerp(const T& x, const T& y, const float& s)
+{
+	return x + (y - x) * s;
+}
+
 float SecondsToMicroSeconds(float seconds);
 float MicroSecondsToSeconds(float microSeconds);
 
@@ -89,7 +95,8 @@ namespace ProtoParser
 			void LoadImageComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadTextComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadFPSComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-
+			void LoadCameraComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+			
 			void LoadTexData(rapidxml::xml_node<>* pComp, TextureData& texData);
 			void LoadAlignments(rapidxml::xml_node<>* pComp, HAlignment& horAlignment, VAlignment& verAlignment);
 		}

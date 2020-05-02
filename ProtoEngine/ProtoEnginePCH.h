@@ -53,6 +53,9 @@
 #define ProtoEditor Proto::Editor::GetInstance()
 
 
+#include "Texture2D.h"
+#include "Font.h"
+
 #include "ProtoUtils.h"
 #include "Components.h"
 #include "Structs.h"

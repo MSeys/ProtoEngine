@@ -108,8 +108,8 @@ void TextComponent::DrawInspector()
 	if (!m_pFont)
 		return;
 
-	ProtoGui::Presets::Position(m_TexData);
-	ProtoGui::Presets::Size(m_TexData);
+	ProtoGui::Presets::Position(m_TexData.x, m_TexData.y);
+	ProtoGui::Presets::Size(m_TexData.width, m_TexData.height);
 	
 	/* Font Size */ {
 		ImGui::Text("Font Size");

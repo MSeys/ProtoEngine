@@ -6,10 +6,11 @@ using namespace rapidxml;
 void ProtoParser::XML::LoadComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
 	Helper::LoadTransformComponent(pComponents, pCurr);
+	Helper::LoadCameraComponent(pComponents, pCurr);
 	Helper::LoadImageComponents(pComponents, pCurr);
 	Helper::LoadTextComponents(pComponents, pCurr);
 	Helper::LoadFPSComponents(pComponents, pCurr);
-
+		
 	if (ProtoSettings.GetRenderMode() == RenderMode::GAME)
 		ProtoSettings.GetGame()->LoadComponents(pComponents, pCurr);
 
@@ -49,15 +50,15 @@ void ProtoParser::XML::Helper::LoadTransformComponent(xml_node<>* pComponents, G
 
 void ProtoParser::XML::Helper::LoadImageComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pImageCompNode = pComponents->first_node("ImageComponent"); pImageCompNode; pImageCompNode = pImageCompNode->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("ImageComponent"); pComp; pComp = pComp->next_sibling())
 	{
-		const std::string imageLocation{ ParseString(pImageCompNode, "ImageLocation") };
+		const std::string imageLocation{ ParseString(pComp, "ImageLocation") };
 		TextureData texData;
-		LoadTexData(pImageCompNode, texData);
+		LoadTexData(pComp, texData);
 
 		HAlignment horAlignment;
 		VAlignment verAlignment;
-		LoadAlignments(pImageCompNode, horAlignment, verAlignment);
+		LoadAlignments(pComp, horAlignment, verAlignment);
 
 		auto pImageComp = new ImageComponent(ProtoContent.GetTexture(imageLocation), texData);
 		pCurr->AddComponent(pImageComp);
@@ -68,19 +69,19 @@ void ProtoParser::XML::Helper::LoadImageComponents(xml_node<>* pComponents, Game
 
 void ProtoParser::XML::Helper::LoadTextComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pTextCompNode = pComponents->first_node("TextComponent"); pTextCompNode; pTextCompNode = pTextCompNode->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("TextComponent"); pComp; pComp = pComp->next_sibling())
 	{
-		const std::string fontLocation{ ParseString(pTextCompNode, "FontLocation") };
-		const int fontSize{ Parse<int>(pTextCompNode, "FontSize") };
+		const std::string fontLocation{ ParseString(pComp, "FontLocation") };
+		const int fontSize{ Parse<int>(pComp, "FontSize") };
 
 		TextureData texData;
-		LoadTexData(pTextCompNode, texData);
+		LoadTexData(pComp, texData);
 
-		const std::string text{ ParseString(pTextCompNode, "Text") };
+		const std::string text{ ParseString(pComp, "Text") };
 
 		HAlignment horAlignment;
 		VAlignment verAlignment;
-		LoadAlignments(pTextCompNode, horAlignment, verAlignment);
+		LoadAlignments(pComp, horAlignment, verAlignment);
 
 		auto pTextComp = new TextComponent(text, ProtoContent.GetFont(fontLocation, fontSize), texData);
 		pCurr->AddComponent(pTextComp);
@@ -91,22 +92,36 @@ void ProtoParser::XML::Helper::LoadTextComponents(xml_node<>* pComponents, GameO
 
 void ProtoParser::XML::Helper::LoadFPSComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pFPSCompNode = pComponents->first_node("FPSComponent"); pFPSCompNode; pFPSCompNode = pFPSCompNode->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("FPSComponent"); pComp; pComp = pComp->next_sibling())
 	{
-		const std::string fontLocation{ ParseString(pFPSCompNode, "FontLocation") };
-		const int fontSize{ Parse<int>(pFPSCompNode, "FontSize") };
+		const std::string fontLocation{ ParseString(pComp, "FontLocation") };
+		const int fontSize{ Parse<int>(pComp, "FontSize") };
 
 		TextureData texData;
-		LoadTexData(pFPSCompNode, texData);
+		LoadTexData(pComp, texData);
 
 		HAlignment horAlignment;
 		VAlignment verAlignment;
-		LoadAlignments(pFPSCompNode, horAlignment, verAlignment);
+		LoadAlignments(pComp, horAlignment, verAlignment);
 
 		auto pFPSComp = new FPSComponent(ProtoContent.GetFont(fontLocation, fontSize), texData);
 		pCurr->AddComponent(pFPSComp);
 		pFPSComp->SetAlignment(horAlignment, verAlignment);
 		pFPSComp->SetTextureData(texData);
+	}
+}
+
+void ProtoParser::XML::Helper::LoadCameraComponent(xml_node<>* pComponents, GameObject* pCurr)
+{
+	for (xml_node<>* pComp = pComponents->first_node("CameraComponent"); pComp; pComp = pComp->next_sibling())
+	{
+		glm::vec2 position;
+		position.x = Parse<float>(pComp, "PositionX");
+		position.y = Parse<float>(pComp, "PositionY");
+
+		const bool active{ Parse<bool>(pComp, "Active") };
+
+		pCurr->AddComponent(new CameraComponent(position, active));
 	}
 }
 

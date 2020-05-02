@@ -37,14 +37,7 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& 
 	dst.x = static_cast<int>(data.position.x);
 	dst.y = static_cast<int>(data.position.y);
 
-	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
-	{
-		if(ProtoSettings.GetEditorRenderMode() == RenderMode::EDITOR)
-		{
-			dst.x += int(ProtoSettings.GetEditorCamera().x);
-			dst.y += int(ProtoSettings.GetEditorCamera().y);
-		}
-	}
+	CalculateRenderOffset(dst.x, dst.y);
 
 	dst.w = static_cast<int>(abs(data.size.x));
 	dst.h = static_cast<int>(abs(data.size.y));
@@ -66,4 +59,28 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& 
 	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), data.color.a);
 	
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, data.angle, &rotPoint, flip);
+}
+
+void Proto::Renderer::CalculateRenderOffset(int& x, int& y) const
+{
+	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
+	{
+		if (ProtoSettings.GetEditorRenderMode() == RenderMode::EDITOR)
+		{
+			x += int(ProtoSettings.GetEditorCamera().x);
+			y += int(ProtoSettings.GetEditorCamera().y);
+		}
+
+		else
+		{
+			x -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().x);
+			y -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().y);
+		}
+	}
+
+	else
+	{
+		x -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().x);
+		y -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().y);
+	}
 }

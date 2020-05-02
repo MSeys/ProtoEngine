@@ -1,7 +1,7 @@
 #pragma once
 #include "TextComponent.h"
 
-class FPSComponent : public TextComponent
+class FPSComponent final : public TextComponent
 {
 public:
 	FPSComponent(Proto::Font* pFont, const TextureData& texData);

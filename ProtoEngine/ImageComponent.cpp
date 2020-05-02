@@ -132,8 +132,8 @@ void ImageComponent::DrawInspector()
 	if (!m_pTexture)
 		return;
 
-	ProtoGui::Presets::Position(m_TexData);
-	ProtoGui::Presets::Size(m_TexData);
+	ProtoGui::Presets::Position(m_TexData.x, m_TexData.y);
+	ProtoGui::Presets::Size(m_TexData.width, m_TexData.height);
 
 	ImGui::PushID(this);
 	ProtoGui::Presets::Alignment(m_HorAlignment, m_VerAlignment);

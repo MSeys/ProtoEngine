@@ -23,6 +23,8 @@ void Proto::Editor::Draw()
 
 	ImGui::SetNextWindowDockID(m_BottomDockSpace, ImGuiCond_FirstUseEver);
 	ProtoLogger.Draw();
+
+	DrawInfo();
 	
 	DrawHierarchy();
 	DrawInspector();
@@ -412,6 +414,48 @@ void Proto::Editor::DrawEditorModeMenu()
 	ImGui::End();
 }
 
+void Proto::Editor::DrawInfo() const
+{
+	ImGui::SetNextWindowDockID(m_BottomDockSpace, ImGuiCond_FirstUseEver);
+	if(ImGui::Begin("Info"))
+	{
+		ProtoGui::Presets::BeginGroupPanel("Engine");
+
+		ImGui::Text(("TimeScale: " + std::to_string(ProtoTime.TimeScale)).c_str());
+		ImGui::Text(("DeltaTime: " + std::to_string(ProtoTime.DeltaTime)).c_str());
+		ImGui::Text(("FPS: " + std::to_string(ProtoTime.FPS)).c_str());
+
+		ImGui::Text(("DeltaTime (U): " + std::to_string(ProtoTime.DeltaTime_Unscaled)).c_str());
+		ImGui::Text(("FPS (U): " + std::to_string(ProtoTime.FPS_Unscaled)).c_str());
+
+		ProtoGui::Presets::EndGroupPanel();
+
+		ProtoGui::Presets::BeginGroupPanel("Game");
+
+		ImGui::Text(("Scene: " + WStringToString(ProtoScenes.GetActiveScene()->GetSceneName())).c_str());
+		ImGui::Text("Camera: ");
+		ImGui::SameLine();
+		
+		if(ProtoScenes.GetActiveScene()->HasActiveCamera())
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0, 1, 0, 1 });
+			ImGui::Text("Found (Camera is Dynamic)");
+			ImGui::PopStyleColor();
+		}
+
+		else
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 1, 0, 0, 1 });
+			ImGui::Text("None Found (Camera is Static)");
+			ImGui::PopStyleColor();
+		}
+
+		ProtoGui::Presets::EndGroupPanel();
+	}
+
+	ImGui::End();
+}
+
 void Proto::Editor::DrawHierarchy() const
 {
 	ImGui::SetNextWindowDockID(m_LeftDockSpace, ImGuiCond_FirstUseEver);
@@ -449,6 +493,9 @@ void Proto::Editor::DrawAddComponent() const
 		ImGui::Text("Component");
 		ImGui::Separator();
 
+		if (ImGui::Selectable("Camera"))
+			m_pCurrentSelected->AddComponent(new CameraComponent({}, false));
+		
 		if (ImGui::Selectable("Image"))
 			m_pCurrentSelected->AddComponent(new ImageComponent(nullptr, {}));
 
@@ -457,7 +504,7 @@ void Proto::Editor::DrawAddComponent() const
 
 		if (ImGui::Selectable("FPS Component"))
 			m_pCurrentSelected->AddComponent(new FPSComponent(nullptr, {}));
-
+		
 		ProtoSettings.GetRefGame()->DrawAddComponent();
 		
 		ImGui::EndPopup();

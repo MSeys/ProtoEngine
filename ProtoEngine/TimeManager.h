@@ -20,8 +20,10 @@ namespace Proto
 		void UpdateTime()
 		{
 			FPS = int(1.f / DeltaTime);
+			FPS_Unscaled = int(1.f / DeltaTime_Unscaled);
+			
 			DeltaTime = std::chrono::duration<float>(m_CurrTime - m_StartTime).count();
-
+						
 			if (ProtoSettings.GetWindowSettings().FPSState == FPSState::PROTO_CAPPED)
 			{
 				const int targetFPS_microSeconds{ int(SecondsToMicroSeconds(1.f / float(ProtoSettings.GetWindowSettings().FPSRate))) };
@@ -31,7 +33,8 @@ namespace Proto
 
 				DeltaTime += MicroSecondsToSeconds(float(sleepTime_microSeconds));
 			}
-
+			
+			DeltaTime_Unscaled = DeltaTime;
 			DeltaTime *= TimeScale;
 		}
 
@@ -39,6 +42,9 @@ namespace Proto
 		float DeltaTime{};
 		int FPS{};
 		float TimeScale{ 1 };
+
+		float DeltaTime_Unscaled;
+		int FPS_Unscaled;
 
 	private:
 		TimePoint m_StartTime;

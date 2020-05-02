@@ -7,7 +7,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 
-void ProtoGui::Presets::Position(TextureData& texData, int id)
+void ProtoGui::Presets::Position(float& x, float& y, int id)
 {
 	ImGui::PushID(id);
 	
@@ -18,16 +18,16 @@ void ProtoGui::Presets::Position(TextureData& texData, int id)
 	ImGui::SameLine(100);
 
 	pgData.sameLineOffset = 115;
-	ProtoGui::Drag<float>("X", pgData, "##PRESET_POS_X", texData.x, dragData);
+	ProtoGui::Drag<float>("X", pgData, "##PRESET_POS_X", x, dragData);
 	ImGui::SameLine(200);
 
 	pgData.sameLineOffset = 215;
-	ProtoGui::Drag<float>("Y", pgData, "##PRESET_POS_Y", texData.y, dragData);
+	ProtoGui::Drag<float>("Y", pgData, "##PRESET_POS_Y", y, dragData);
 
 	ImGui::PopID();
 }
 
-void ProtoGui::Presets::Size(TextureData& texData, int id)
+void ProtoGui::Presets::Size(float& w, float& h, int id)
 {
 	ImGui::PushID(id);
 	
@@ -38,11 +38,11 @@ void ProtoGui::Presets::Size(TextureData& texData, int id)
 	ImGui::SameLine(100);
 
 	pgData.sameLineOffset = 115;
-	ProtoGui::Drag<float>("W", pgData, "##PRESET_SIZE_W", texData.width, dragData);
+	ProtoGui::Drag<float>("W", pgData, "##PRESET_SIZE_W", w, dragData);
 	ImGui::SameLine(200);
 
 	pgData.sameLineOffset = 215;
-	ProtoGui::Drag<float>("H", pgData, "##PRESET_SIZE_H", texData.height, dragData);
+	ProtoGui::Drag<float>("H", pgData, "##PRESET_SIZE_H", h, dragData);
 
 	ImGui::PopID();
 }

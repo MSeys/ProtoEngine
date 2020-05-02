@@ -21,8 +21,11 @@ namespace Proto
 		void RenderTexture(const Texture2D& texture, const RenderData& data) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
+		
 	private:
 		SDL_Renderer* m_Renderer{};
+
+		void CalculateRenderOffset(int& x, int& y) const;
 	};
 }
 

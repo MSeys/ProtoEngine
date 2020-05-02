@@ -33,7 +33,8 @@ namespace Proto
 		void DrawDocks();
 		void DrawMenu();
 		void DrawEditorModeMenu();
-
+		void DrawInfo() const;
+		
 		void DrawHierarchy() const;
 		void DrawInspector();
 		void DrawAddComponent() const;

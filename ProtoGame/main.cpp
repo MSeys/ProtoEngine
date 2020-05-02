@@ -35,5 +35,5 @@ int main(int, char* [])
 }
 
 // TODO: List of features to make
-// Game Camera		> Separate GameObject in Scene? Has target gameobject that can be given using ID?
-// Instantiate and Destroy functions
+// Collisions + RigidBody
+// SpriteSheet Component + Animations
