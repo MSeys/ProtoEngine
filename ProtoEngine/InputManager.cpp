@@ -88,7 +88,7 @@ void Proto::InputManager::Update()
 
 	// Based on https://github.com/Tyyppi77/imgui_sdl/blob/master/example.cpp#L55
 	// Setup low-level inputs (e.g. on Win32, GetKeyboardState(), or write to those fields from your Windows message loop handlers, etc.)
-	io.DeltaTime = 1.0f / 60.0f;
+	io.DeltaTime = ProtoTime.DeltaTime_Unscaled;
 	io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 	io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 	io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);

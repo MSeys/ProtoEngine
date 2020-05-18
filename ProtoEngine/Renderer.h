@@ -19,7 +19,8 @@ namespace Proto
 		void Destroy();
 
 		void RenderTexture(const Texture2D& texture, const RenderData& data) const;
-
+		void RenderLineRect(const SDL_Rect& rect, const SDL_Color& color) const;
+		
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; }
 		
 	private:

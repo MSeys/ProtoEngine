@@ -1,7 +1,6 @@
-
 #pragma once
 #include "GameObject.h"
-#include "Components.h"
+#include "EngineBehaviours.h"
 
 #pragma warning(push)
 #pragma warning (disable:4201)
@@ -11,6 +10,9 @@
 #include <string>
 #include <codecvt>
 #include <locale>
+
+#include "Box2D.h"
+#include "ImGui/imgui.h"
 
 #define ToCString(value) std::to_string(value).c_str()
 
@@ -39,8 +41,7 @@ T Lerp(const T& x, const T& y, const float& s)
 float SecondsToMicroSeconds(float seconds);
 float MicroSecondsToSeconds(float microSeconds);
 
-std::string WStringToString(const std::wstring& wstring);
-std::wstring StringToWString(const std::string& string);
+
 
 namespace ProtoSaver
 {
@@ -54,8 +55,15 @@ namespace ProtoSaver
 			if(typeid(T) == typeid(bool))
 				pComp->append_attribute(doc.allocate_attribute(name, doc.allocate_string(bool(value) ? "true" : "false")));
 
-			else 
-				pComp->append_attribute(doc.allocate_attribute(name, doc.allocate_string(ToCString(value))));
+			else
+			{
+				
+				std::string valueStr{ std::to_string(value) };
+				if (valueStr.empty())
+					valueStr = "\0";
+				
+				pComp->append_attribute(doc.allocate_attribute(name, doc.allocate_string(valueStr.c_str())));
+			}
 		}
 	}
 }
@@ -92,6 +100,8 @@ namespace ProtoParser
 		namespace Helper
 		{
 			void LoadTransformComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+			void LoadRigidBody2DComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+			void LoadBoxCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadImageComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadTextComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadFPSComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
@@ -101,4 +111,26 @@ namespace ProtoParser
 			void LoadAlignments(rapidxml::xml_node<>* pComp, HAlignment& horAlignment, VAlignment& verAlignment);
 		}
 	}
+}
+
+namespace ProtoConvert
+{
+	std::string ToString(const std::wstring& wstring);
+	std::wstring ToWString(const std::string& string);
+
+	b2Vec2 ToBox2DVec(const glm::vec2& vec);
+	b2Vec2 ToBox2DVec(const ImVec2& vec);
+	b2Vec3 ToBox2DVec(const glm::vec3& vec);
+	
+	ImVec2 ToImGuiVec(const glm::vec2& vec);
+	ImVec2 ToImGuiVec(const b2Vec2& vec);
+	ImVec4 ToImGuiVec(const glm::vec4& vec);
+
+	glm::vec2 ToGLMVec(const b2Vec2& vec);
+	glm::vec2 ToGLMVec(const ImVec2& vec);
+	glm::vec3 ToGLMVec(const b2Vec3& vec);
+	glm::vec4 ToGLMVec(const ImVec4& vec);
+
+	float ToDegrees(float radians);
+	float ToRadians(float degrees);
 }

@@ -11,7 +11,7 @@ public:
 	
 	void Initialize();
 	
-	virtual void DrawAddComponent() {}
+	virtual void DrawAddComponent(GameObject* pCurrentSelected) { UNREFERENCED_PARAMETER(pCurrentSelected); }
 	virtual void LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr)
 	{
 		UNREFERENCED_PARAMETER(pComponents);

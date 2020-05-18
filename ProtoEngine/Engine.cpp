@@ -48,6 +48,7 @@ void Proto::Engine::Run() const
 		fixedTimer += ProtoTime.DeltaTime;
 		while(fixedTimer >= ProtoTime.FixedDeltaTime)
 		{
+			ProtoPhysics.Step();
 			ProtoScenes.FixedUpdate();
 			fixedTimer -= ProtoTime.FixedDeltaTime;
 		}
@@ -81,9 +82,8 @@ void Proto::Engine::Initialize()
 	// Game
 	ProtoSettings.GetGame()->Initialize();
 	
-	ProtoScenes.Start();
 	if (ProtoSettings.GetRenderMode() == RenderMode::GAME)
-		ProtoScenes.Awake();
+		ProtoScenes.Begin();
 
 	InitializeImGuiStyle();
 }
@@ -93,13 +93,17 @@ void Proto::Engine::InitializeSDL()
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 
+	Uint32 flags{ SDL_WINDOW_OPENGL };
+	if (ProtoSettings.GetEditorSettings().FullWindowMode)
+		flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+	
 	m_Window = SDL_CreateWindow(
 		ProtoSettings.GetWindowSettings().Title.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		int(ProtoSettings.GetWindowSize().x),
 		int(ProtoSettings.GetWindowSize().y),
-		SDL_WINDOW_OPENGL
+		flags
 	);
 
 	if (!m_Window)
@@ -108,6 +112,9 @@ void Proto::Engine::InitializeSDL()
 
 void Proto::Engine::InitializeEngineParts()
 {
+	// ProtoPhysics
+	ProtoPhysics.Init();
+	
 	// ProtoRenderer
 	ProtoRenderer.Init(m_Window);
 
@@ -120,8 +127,6 @@ void Proto::Engine::InitializeEngineParts()
 	
 	// ProtoInput
 	ProtoInput.Init();
-	ProtoInput.AddKey(SDLK_ESCAPE, STRINGIFY(SDLK_ESCAPE));
-	ProtoInput.GetKey(SDLK_ESCAPE).SetCommand(ButtonState::Pressed, COMMAND_EXIT);
 	
 	// ProtoResource
 	ProtoContent.Init("../Data/");
@@ -206,6 +211,9 @@ void Proto::Engine::CleanupSDL()
 
 void Proto::Engine::CleanupEngineParts()
 {
+	// ProtoPhysics
+	ProtoPhysics.Destroy();
+	
 	// ProtoSettings
 	ProtoSettings.Destroy();
 	

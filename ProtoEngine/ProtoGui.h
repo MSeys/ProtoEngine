@@ -61,7 +61,7 @@ namespace ProtoGui
 		void EndGroupPanel();
 
 		// Derived from https://github.com/ocornut/imgui/issues/1496
-		void BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrComp, BaseComponent** pDelComp);
+		void BeginComponentPanel(const ImVec2& size, BaseBehaviour* pCurrComp, BaseBehaviour** pDelComp);
 		void EndComponentPanel();
 	}
 }

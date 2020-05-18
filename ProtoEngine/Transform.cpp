@@ -1,7 +1,7 @@
 #include "ProtoEnginePCH.h"
-#include "TransformComponent.h"
+#include "Transform.h"
 
-glm::vec2 TransformComponent::GetPosition() const
+glm::vec2 Transform::GetPosition() const
 {
 	if (GetGameObject()->GetParent())
 	{
@@ -11,7 +11,7 @@ glm::vec2 TransformComponent::GetPosition() const
 	return m_Position;
 }
 
-glm::vec2 TransformComponent::GetRotCenter() const
+glm::vec2 Transform::GetRotCenter() const
 {
 	if (GetGameObject()->GetParent())
 	{
@@ -21,7 +21,7 @@ glm::vec2 TransformComponent::GetRotCenter() const
 	return m_RotCenter;
 }
 
-float TransformComponent::GetRotAngle() const
+float Transform::GetRotAngle() const
 {
 	if (GetGameObject()->GetParent())
 	{
@@ -31,7 +31,7 @@ float TransformComponent::GetRotAngle() const
 	return m_RotAngle;
 }
 
-glm::vec2 TransformComponent::GetScale() const
+glm::vec2 Transform::GetScale() const
 {
 	if (GetGameObject()->GetParent())
 	{
@@ -41,32 +41,32 @@ glm::vec2 TransformComponent::GetScale() const
 	return m_Scale;
 }
 
-void TransformComponent::SetPosition(const float x, const float y)
+void Transform::SetPosition(const float x, const float y)
 {
 	m_Position = { x, y };
 }
 
-void TransformComponent::SetRotCenter(float x, float y)
+void Transform::SetRotCenter(float x, float y)
 {
 	m_RotCenter = { x, y };
 }
 
-void TransformComponent::SetRotAngle(float angle)
+void Transform::SetRotAngle(float angle)
 {
 	m_RotAngle = angle;
 }
 
-void TransformComponent::SetScale(float x, float y)
+void Transform::SetScale(float x, float y)
 {
 	m_Scale = { x, y };
 }
 
-void TransformComponent::DrawInspectorTitle()
+void Transform::DrawInspectorTitle()
 {
 	ImGui::Text("Transform");
 }
 
-void TransformComponent::DrawInspector()
+void Transform::DrawInspector()
 {
 	ProtoGui::ProtoGuiData pgData{ true, 0, -1, true, 70 };
 	ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.1f" };
@@ -118,10 +118,10 @@ void TransformComponent::DrawInspector()
 	}
 }
 
-void TransformComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void Transform::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "TransformComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "Transform");
 	
 	ProtoSaver::XML::Save<float>("PositionX", m_Position.x, doc, pComp);
 	ProtoSaver::XML::Save<float>("PositionY", m_Position.y, doc, pComp);

@@ -47,33 +47,34 @@ void Proto::Logger::AddLog(const LogLevel& logLevel, const std::string& logText)
 
 void Proto::Logger::Draw()
 {
-	ImGui::Begin("Logger");
-
-	ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
-	ImGui::SameLine();
-
-	if (ImGui::Button("Clear"))
+	if (ImGui::Begin("Logger"))
 	{
-		for (std::vector<Log>& logContainer : m_Logs)
-			logContainer.clear();
+		ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
+		ImGui::SameLine();
+
+		if (ImGui::Button("Clear"))
+		{
+			for (std::vector<Log>& logContainer : m_Logs)
+				logContainer.clear();
+		}
+
+		ImGui::SameLine();
+		static int currentID = 0;
+		ImGui::Combo("Logger Type Filter", &currentID, "All\0Info\0Trace\0Debug\0Warning\0Error\0Achievement\0");
+
+		ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+		for (const Log& log : m_Logs[currentID])
+			ImGui::Text(log.ToText().c_str());
+
+		ImGui::PopStyleVar();
+
+		if (m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+			ImGui::SetScrollHereY(1.0f);
+
+		ImGui::EndChild();
 	}
 	
-	ImGui::SameLine();
-	static int currentID = 0;
-	ImGui::Combo("Logger Type Filter", &currentID, "All\0Info\0Trace\0Debug\0Warning\0Error\0Achievement\0");
-
-	ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-
-	for (const Log& log : m_Logs[currentID])
-		ImGui::Text(log.ToText().c_str());
-
-	ImGui::PopStyleVar();
-
-	if (m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-		ImGui::SetScrollHereY(1.0f);
-
-	ImGui::EndChild();
-
 	ImGui::End();
 }

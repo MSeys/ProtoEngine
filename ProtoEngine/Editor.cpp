@@ -18,9 +18,6 @@ void Proto::Editor::Draw()
 {
 	DrawDocks();
 
-	DrawMenu();
-	DrawEditorModeMenu();
-
 	ImGui::SetNextWindowDockID(m_BottomDockSpace, ImGuiCond_FirstUseEver);
 	ProtoLogger.Draw();
 
@@ -31,6 +28,9 @@ void Proto::Editor::Draw()
 
 	DrawViewWindow();
 	DrawGameWindow();
+
+	DrawMenu();
+	DrawEditorModeMenu();
 
 	ImGui::ShowDemoWindow();
 }
@@ -111,15 +111,26 @@ void Proto::Editor::DrawMenu()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("Editor", ProtoSettings.GetEditorMode() == EditorMode::EDIT))
+		{
+			if (ImGui::MenuItem("Reset Selected"))
+				m_pCurrentSelected = nullptr;
+
+			if (ImGui::MenuItem("Exit"))
+				ProtoCommands.ForceExit();
+
+			ImGui::EndMenu();
+		}
+	
+		if (ImGui::BeginMenu("File", ProtoSettings.GetEditorMode() == EditorMode::EDIT))
 		{
 			if (ImGui::MenuItem("New"))
 				m_OpenNewPopup = true;
 
 			if (ImGui::MenuItem("Save"))
 			{
-				ProtoScenes.GetActiveScene()->Save(m_SaveFilePath, m_SaveFileName);
-				ProtoLogger.AddLog(LogLevel::Info, "Scene \'" + WStringToString(ProtoScenes.GetActiveScene()->GetSceneName()) + "\' was saved.");
+				ProtoScenes.GetCurrentScene()->Save();
+				ProtoLogger.AddLog(LogLevel::Info, "Scene \'" + ProtoConvert::ToString(ProtoScenes.GetCurrentScene()->GetSceneName()) + "\' was saved.");
 			}
 
 			if (ImGui::MenuItem("Save As..."))
@@ -133,13 +144,20 @@ void Proto::Editor::DrawMenu()
 					const auto selection = pfd::open_file("Select a Scene", fullPath, { "ProtoScenes", "*.protoscene" }).result();
 					if (!selection.empty())
 					{
-						auto pNewScene = new Scene();
-						pNewScene->Load(selection[0].substr(fullPath.size()), &m_SaveFilePath, &m_SaveFileName);
-						ProtoScenes.AddGameScene(pNewScene);
-						ProtoScenes.SetActiveGameScene(pNewScene->GetSceneName());
+						const std::string filePath{ selection[0].substr(fullPath.size()) };
+
+						auto pNewScene = new Scene(filePath);
+						pNewScene->Load();
+						
+						ProtoScenes.Add(pNewScene);
+						ProtoScenes.SetCurrentScene(pNewScene->GetSceneName());
 
 						m_pCurrentSelected = nullptr; // Selected from previous Scene doesn't count here anymore
-						m_SceneName = WStringToString(pNewScene->GetSceneName());
+
+						// Load new editor values
+						m_SaveFileFolderStructure = pNewScene->GetFileFolderStructure();
+						m_SaveFileName = pNewScene->GetFileName();
+						m_SceneName = ProtoConvert::ToString(pNewScene->GetSceneName());
 					}
 				}
 				
@@ -147,15 +165,17 @@ void Proto::Editor::DrawMenu()
 				{
 					for(Scene* pScene : ProtoScenes.GetScenes())
 					{
-						if (pScene == ProtoScenes.GetActiveScene() || pScene->GetSceneName() == L"Temp")
+						if (pScene->GetSceneName() == L"Temp")
 							continue;
 						
-						if (ImGui::MenuItem(WStringToString(pScene->GetSceneName()).c_str()))
+						if (ImGui::MenuItem(ProtoConvert::ToString(pScene->GetSceneName()).c_str()))
 						{
-							ProtoScenes.SetActiveGameScene(pScene->GetSceneName());
+							ProtoScenes.SetCurrentScene(pScene->GetSceneName());
+							ProtoScenes.GetCurrentScene()->Reset();
+							ProtoScenes.GetCurrentScene()->Load();
 							
-							m_SceneName = WStringToString(pScene->GetSceneName());
-							m_SaveFilePath = pScene->GetFilePath();
+							m_SceneName = ProtoConvert::ToString(pScene->GetSceneName());
+							m_SaveFileFolderStructure = pScene->GetFileFolderStructure();
 							m_SaveFileName = pScene->GetFileName();
 							
 							m_pCurrentSelected = nullptr; // Selected from previous Scene doesn't count here anymore
@@ -171,13 +191,11 @@ void Proto::Editor::DrawMenu()
 			ImGui::EndMenu();
 		}
 
-
-		if (ImGui::BeginMenu("Add"))
+		if (ImGui::BeginMenu("Add", ProtoSettings.GetEditorMode() == EditorMode::EDIT))
 		{
 			if (ImGui::MenuItem("GameObject"))
-			{
-				ProtoScenes.GetActiveScene()->AddChild(new GameObject(ProtoScenes.GetActiveScene()->RequestNewID()));
-			}
+				ProtoScenes.GetCurrentScene()->AddChild(new GameObject(ProtoScenes.GetCurrentScene()->RequestNewID()));
+			
 			ImGui::EndMenu();
 		}
 
@@ -185,12 +203,12 @@ void Proto::Editor::DrawMenu()
 	}
 
 	if (m_OpenNewPopup)
-		ImGui::OpenPopup("Open New...");
+		ImGui::OpenPopup("New...");
 
 	if (m_OpenSaveAsPopup)
 		ImGui::OpenPopup("Save As...");
 
-	if (ImGui::BeginPopupModal("Open New...", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("New...", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Please fill in the necessary info to create a new scene.\nNote: Stick to Data folder for saving your scenes.");
 		ImGui::Separator();
@@ -208,10 +226,10 @@ void Proto::Editor::DrawMenu()
 		ImGui::SameLine();
 		ImGui::Text(".protoscene");
 
-		m_SaveFilePath.resize(300);
+		m_SaveFileFolderStructure.resize(300);
 		ImGui::Text("File Location: ");
 		ImGui::SameLine();
-		ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFilePath[0], 300, ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFileFolderStructure[0], 300, ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 
 		if (ImGui::Button("...##SAVE_FILE_BUTTON"))
@@ -220,11 +238,11 @@ void Proto::Editor::DrawMenu()
 			const auto selection = pfd::select_folder("Select a Folder", fullPath).result();
 			if (!selection.empty())
 			{
-				m_SaveFilePath = selection.substr(fullPath.size());
+				m_SaveFileFolderStructure = selection.substr(fullPath.size());
 			}
 		}
 
-		if (m_SceneName[0] == '\0' || m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+		if (m_SceneName[0] == '\0' || m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -234,20 +252,18 @@ void Proto::Editor::DrawMenu()
 		{
 			m_OpenNewPopup = false;
 
-			auto pNewScene = new Scene();
-			pNewScene->SetSceneName(StringToWString(m_SceneName));
-			pNewScene->SetFilePath(m_SaveFilePath);
-			pNewScene->SetFileName(m_SaveFileName);
+			auto pNewScene = new Scene(ProtoConvert::ToWString(m_SceneName), m_SaveFileFolderStructure, m_SaveFileName);
+			pNewScene->Save();
 			
-			ProtoScenes.AddGameScene(pNewScene);
-			ProtoScenes.SetActiveGameScene(pNewScene->GetSceneName());
+			ProtoScenes.Add(pNewScene);
+			ProtoScenes.SetCurrentScene(pNewScene->GetSceneName());
 
 			m_pCurrentSelected = nullptr;
 			
 			ImGui::CloseCurrentPopup();
 		}
 
-		if (m_SceneName[0] == '\0' || m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+		if (m_SceneName[0] == '\0' || m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
 		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
@@ -283,10 +299,10 @@ void Proto::Editor::DrawMenu()
 		ImGui::SameLine();
 		ImGui::Text(".protoscene");
 
-		m_SaveFilePath.resize(300);
+		m_SaveFileFolderStructure.resize(300);
 		ImGui::Text("File Location: ");
 		ImGui::SameLine();
-		ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFilePath[0], 300, ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFileFolderStructure[0], 300, ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 
 		if (ImGui::Button("...##SAVE_FILE_BUTTON"))
@@ -295,11 +311,11 @@ void Proto::Editor::DrawMenu()
 			const auto selection = pfd::select_folder("Select a Folder", fullPath).result();
 			if (!selection.empty())
 			{
-				m_SaveFilePath = selection.substr(fullPath.size());
+				m_SaveFileFolderStructure = selection.substr(fullPath.size());
 			}
 		}
 
-		if (m_SceneName[0] == '\0' || m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+		if (m_SceneName[0] == '\0' || m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -309,26 +325,19 @@ void Proto::Editor::DrawMenu()
 		{
 			m_OpenSaveAsPopup = false;
 
-			const std::wstring oldSceneName{ ProtoScenes.GetActiveScene()->GetSceneName() }; // Temporarily store old scene name
+			auto pNewScene = new Scene(ProtoConvert::ToWString(m_SceneName), m_SaveFileFolderStructure, m_SaveFileName);
+			pNewScene->LoadAs(ProtoScenes.GetCurrentScene()->GetFilePath());
+			pNewScene->Save(); // Actually also immediately save as file so it isn't just memory.
 
-			ProtoScenes.GetActiveScene()->SetSceneName(StringToWString(m_SceneName)); // Temporarily change Scene name to new Scene name
-			ProtoScenes.GetActiveScene()->Save(m_SaveFilePath, m_SaveFileName); // Saves to new file path and name, with the new Scene name. // READY FOR LOAD
-			ProtoScenes.GetActiveScene()->SetSceneName(oldSceneName); // Reset Scene name
-			
-			// Build up path for Loading // c_str() is necessary as strings have reserved space (filled with '\0')
-			const std::string path{ ProtoContent.GetDataPath() + m_SaveFilePath.c_str() + "\\" + m_SaveFileName.c_str() + ".protoscene" }; // NOLINT(readability-redundant-string-cstr)
-			
-			Scene* pNewScene = new Scene(path); // Create the new scene with the newly made file.
-			ProtoScenes.AddGameScene(pNewScene);
-			ProtoScenes.SetActiveGameScene(pNewScene->GetSceneName());
+			ProtoScenes.Add(pNewScene);
+			ProtoScenes.SetCurrentScene(pNewScene->GetSceneName());
 
-			m_SceneName = WStringToString(pNewScene->GetSceneName());
 			m_pCurrentSelected = nullptr;
 			
 			ImGui::CloseCurrentPopup();
 		}
 
-		if (m_SceneName[0] == '\0' || m_SaveFilePath[0] == '\0' || m_SaveFileName[0] == '\0')
+		if (m_SceneName[0] == '\0' || m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
 		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
@@ -350,66 +359,68 @@ void Proto::Editor::DrawMenu()
 void Proto::Editor::DrawEditorModeMenu()
 {
 	ImGui::SetNextWindowDockID(m_TopDockSpace, ImGuiCond_Always);
-	ImGui::Begin("Editor");
-	ImGui::Indent(ImGui::GetWindowWidth() / 2 - 150);
-	
-	EditorMode newMode{ ProtoSettings.GetEditorMode() };
-	if(ProtoSettings.GetEditorMode() == EditorMode::PLAY)
+
+	if (ImGui::Begin("Editor"))
 	{
-		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		ImGui::Indent(ImGui::GetWindowWidth() / 2 - 150);
+
+		EditorMode newMode{ ProtoSettings.GetEditorMode() };
+		if (ProtoSettings.GetEditorMode() == EditorMode::PLAY)
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+
+		if (ImGui::Button("Play", { 150, 30 }))
+		{
+			newMode = EditorMode::PLAY;
+			ProtoScenes.GetCurrentScene()->Save();
+
+			ProtoTime.TimeScale = 1;
+
+			ProtoScenes.GetCurrentScene()->Start();
+			ProtoScenes.GetCurrentScene()->Awake();
+		}
+
+		if (ProtoSettings.GetEditorMode() == EditorMode::PLAY)
+		{
+			ImGui::PopItemFlag();
+			ImGui::PopStyleVar();
+		}
+
+		ImGui::SameLine();
+
+		if (ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+
+		if (ImGui::Button("Edit", { 150, 30 }))
+		{
+			newMode = EditorMode::EDIT;
+
+			GameObjectID currentSelectedID{ 0 };
+			if (m_pCurrentSelected)
+				currentSelectedID = m_pCurrentSelected->GetID();
+
+			ProtoScenes.GetCurrentScene()->Reset();
+			ProtoScenes.GetCurrentScene()->Load();
+
+			if (currentSelectedID != 0)
+				m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(currentSelectedID);
+
+			ProtoTime.TimeScale = 0;
+		}
+
+		if (ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+		{
+			ImGui::PopItemFlag();
+			ImGui::PopStyleVar();
+		}
+
+		ProtoSettings.SetEditorMode(newMode);
 	}
-	
-	if (ImGui::Button("Play", { 150, 30 }))
-	{
-		newMode = EditorMode::PLAY;
-		ProtoScenes.GetActiveScene()->Save(m_SaveFilePath, m_SaveFileName);
-
-		ProtoTime.TimeScale = 1;
-		ProtoScenes.Awake();
-	}
-
-	if (ProtoSettings.GetEditorMode() == EditorMode::PLAY)
-	{
-		ImGui::PopItemFlag();
-		ImGui::PopStyleVar();
-	}
-
-	ImGui::SameLine();
-
-	if (ProtoSettings.GetEditorMode() == EditorMode::EDIT)
-	{
-		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-	}
-
-	if (ImGui::Button("Edit", { 150, 30 }))
-	{
-		newMode = EditorMode::EDIT;
-
-		Scene* oldScene = ProtoScenes.GetActiveScene();
-		ProtoScenes.RemoveGameScene(oldScene);
-
-		// Build up path for Loading // c_str() is necessary as strings have reserved space (filled with '\0')
-		const std::string path{ ProtoContent.GetDataPath() + m_SaveFilePath.c_str() + "\\" + m_SaveFileName.c_str() + ".protoscene" }; // NOLINT(readability-redundant-string-cstr)
-		const auto pNewScene{ new Scene(path) };
-
-		ProtoScenes.AddGameScene(pNewScene);
-		ProtoScenes.SetActiveGameScene(pNewScene->GetSceneName());
-
-		SafeDelete(oldScene);
-		m_pCurrentSelected = nullptr;
-
-		ProtoTime.TimeScale = 0;
-	}
-
-	if (ProtoSettings.GetEditorMode() == EditorMode::EDIT)
-	{
-		ImGui::PopItemFlag();
-		ImGui::PopStyleVar();
-	}
-
-	ProtoSettings.SetEditorMode(newMode);
 	
 	ImGui::End();
 }
@@ -432,11 +443,11 @@ void Proto::Editor::DrawInfo() const
 
 		ProtoGui::Presets::BeginGroupPanel("Game");
 
-		ImGui::Text(("Scene: " + WStringToString(ProtoScenes.GetActiveScene()->GetSceneName())).c_str());
+		ImGui::Text(("Scene: " + ProtoConvert::ToString(ProtoScenes.GetCurrentScene()->GetSceneName())).c_str());
 		ImGui::Text("Camera: ");
 		ImGui::SameLine();
 		
-		if(ProtoScenes.GetActiveScene()->HasActiveCamera())
+		if(ProtoScenes.GetCurrentScene()->HasActiveCamera())
 		{
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0, 1, 0, 1 });
 			ImGui::Text("Found (Camera is Dynamic)");
@@ -459,24 +470,24 @@ void Proto::Editor::DrawInfo() const
 void Proto::Editor::DrawHierarchy() const
 {
 	ImGui::SetNextWindowDockID(m_LeftDockSpace, ImGuiCond_FirstUseEver);
-	ImGui::Begin("Hierarchy");
-	ProtoScenes.DrawHierarchy();
+	if(ImGui::Begin("Hierarchy"))
+		ProtoScenes.DrawHierarchy();
+	
 	ImGui::End();
 }
 
-void Proto::Editor::DrawInspector()
+void Proto::Editor::DrawInspector() const
 {
 	if (!m_pCurrentSelected)
 		return;
 
 	ImGui::SetNextWindowDockID(m_RightDockSpace, ImGuiCond_FirstUseEver);
-	ImGui::Begin("Inspector");
-
-	m_pCurrentSelected->DrawInspector();
-
-	ImGui::Separator();
-
-	DrawAddComponent();
+	if (ImGui::Begin("Inspector"))
+	{
+		m_pCurrentSelected->DrawInspector();
+		ImGui::Separator();
+		DrawAddComponent();
+	}
 
 	ImGui::End();
 }
@@ -493,22 +504,38 @@ void Proto::Editor::DrawAddComponent() const
 		ImGui::Text("Component");
 		ImGui::Separator();
 
-		if (ImGui::Selectable("Camera"))
-			m_pCurrentSelected->AddComponent(new CameraComponent({}, false));
-		
-		if (ImGui::Selectable("Image"))
-			m_pCurrentSelected->AddComponent(new ImageComponent(nullptr, {}));
-
-		if (ImGui::Selectable("Text"))
-			m_pCurrentSelected->AddComponent(new TextComponent("", nullptr, {}));
-
-		if (ImGui::Selectable("FPS Component"))
-			m_pCurrentSelected->AddComponent(new FPSComponent(nullptr, {}));
-		
-		ProtoSettings.GetRefGame()->DrawAddComponent();
+		DrawAddComponentsList();
+		ProtoSettings.GetRefGame()->DrawAddComponent(m_pCurrentSelected);
 		
 		ImGui::EndPopup();
 	}
+}
+
+void Proto::Editor::DrawAddComponentsList() const
+{
+	if (ImGui::Selectable("Camera"))
+		m_pCurrentSelected->AddComponent(new Camera(m_pCurrentSelected->RequestNewID(), {}, false));
+
+	if (ImGui::Selectable("Image"))
+		m_pCurrentSelected->AddComponent(new Image(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
+
+	if (ImGui::Selectable("Text"))
+		m_pCurrentSelected->AddComponent(new Text(m_pCurrentSelected->RequestNewID(), true, "", nullptr, {}));
+
+	if (ImGui::Selectable("FPS Text"))
+		m_pCurrentSelected->AddComponent(new FPSText(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
+
+	if (ImGui::Selectable("RigidBody2D"))
+	{
+		if (!m_pCurrentSelected->HasComponent<RigidBody2D>())
+			m_pCurrentSelected->AddComponent(new RigidBody2D(m_pCurrentSelected->RequestNewID(), RigidBodyType::STATIC));
+		else
+			ProtoLogger.AddLog(LogLevel::Warning, "RigidBody2D found on GameObject \'" + m_pCurrentSelected->GetName() + "\'. Only ONE allowed.");
+	}
+
+	if (ImGui::Selectable("BoxCollider2D"))
+		m_pCurrentSelected->AddComponent(new BoxCollider2D(m_pCurrentSelected->RequestNewID(), true));
+
 }
 
 void Proto::Editor::DrawViewWindow()
@@ -518,12 +545,12 @@ void Proto::Editor::DrawViewWindow()
 	{
 		ProtoSettings.SetEditorRenderMode(RenderMode::EDITOR);
 		
-		const glm::vec2 windowSize{ ImGui::GetWindowSize().x, ImGui::GetWindowSize().y }, viewTextureSize{ ImGui::GetWindowSize().x - 35.f, ImGui::GetWindowSize().y - 35.f };
+		const glm::vec2 windowSize{ ProtoConvert::ToGLMVec(ImGui::GetWindowSize()) }, viewTextureSize{ ProtoConvert::ToGLMVec(ImGui::GetWindowSize()) - 35.f };
 		const float titleBarHeight{ ImGui::GetCurrentWindow()->TitleBarHeight() };
 		
 		SafeDelete(m_pViewWindow);
 		SDL_Texture* pViewTexture{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
-									int(ImGui::GetWindowSize().x - 35), int(ImGui::GetWindowSize().y - 35)) };
+									int(viewTextureSize.x), int(viewTextureSize.y)) };
 		
 		m_pViewWindow = new Texture2D(pViewTexture, "", "");
 		
@@ -532,13 +559,16 @@ void Proto::Editor::DrawViewWindow()
 
 		ProtoScenes.Draw();
 
+		if (m_pCurrentSelected)
+			m_pCurrentSelected->DrawEditorDebug();
+
 		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
 
 		ImVec2 cursorPos;
 		cursorPos.x = (windowSize.x - viewTextureSize.x) * 0.5f;
 		cursorPos.y = (windowSize.y - titleBarHeight - viewTextureSize.y) * 0.5f + titleBarHeight;
 		ImGui::SetCursorPos(cursorPos);
-		ImGui::Image(m_pViewWindow->GetSDLTexture(), { viewTextureSize.x, viewTextureSize.y });
+		ImGui::Image(m_pViewWindow->GetSDLTexture(), ProtoConvert::ToImGuiVec(viewTextureSize));
 	}
 	ImGui::End();
 }
@@ -554,7 +584,7 @@ void Proto::Editor::DrawGameWindow() const
 			ImGui::CaptureMouseFromApp(false);
 		}
 
-		const glm::vec2 windowSize{ ImGui::GetWindowSize().x, ImGui::GetWindowSize().y };
+		const glm::vec2 windowSize{ ProtoConvert::ToGLMVec(ImGui::GetWindowSize()) };
 		const float titleBarHeight{ ImGui::GetCurrentWindow()->TitleBarHeight() };
 		const glm::vec2 gameWindowSize{ ProtoSettings.GetWindowSettings().GameWindowSize };
 		
@@ -585,8 +615,8 @@ void Proto::Editor::DrawGameWindow() const
 		cursorPos.y = (windowSize.y - titleBarHeight - scaleYGameWindowSize.y) * 0.5f + titleBarHeight;
 		ImGui::SetCursorPos(cursorPos);
 
-		ProtoSettings.SetGameMouseOffset({ ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y });
-		ImGui::Image(m_pGameWindow->GetSDLTexture(), { scaleYGameWindowSize.x, scaleYGameWindowSize.y });
+		ProtoSettings.SetGameMouseOffset(ProtoConvert::ToGLMVec(ImGui::GetCursorScreenPos()));
+		ImGui::Image(m_pGameWindow->GetSDLTexture(), ProtoConvert::ToImGuiVec(scaleYGameWindowSize));
 	}
 	ImGui::End();
 }

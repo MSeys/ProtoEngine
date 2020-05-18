@@ -1,11 +1,11 @@
 #pragma once
-#include "BaseComponent.h"
+#include "BaseBehaviour.h"
 
-class CameraComponent final : public BaseComponent
+class Camera final : public BaseBehaviour
 {
 public:
-	CameraComponent(const glm::vec2& position, bool active);
-	~CameraComponent();
+	Camera(ComponentID ID, const glm::vec2& position, bool active);
+	~Camera();
 	
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
@@ -24,13 +24,18 @@ public:
 	
 	bool IsMoving() const { return m_IsMovingBySpeed || m_IsMovingByTime; }
 
-	void SetActive(bool active) { m_IsActive = active; }
+	void Activate();
+	void Deactivate();
+	
 	glm::vec2 GetPosition() const { return m_Position; }
 	
 protected:
 	void Start() override;
 	void Update() override;
 	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
+
+public:
+	void DrawEditorDebug() override;
 	
 private:
 	glm::vec2 m_Position{}, m_Destination{};
@@ -38,5 +43,5 @@ private:
 	float m_CurrTime{}, m_Time{};
 	float m_LerpAlphaX{}, m_LerpAlphaY{};
 	bool m_IsMovingBySpeed{}, m_IsMovingByTime{};
-	bool m_IsActive{};
+	bool m_IsCamActive{};
 };

@@ -1,15 +1,15 @@
 #include "ProtoEnginePCH.h"
 
-#include "FPSComponent.h"
+#include "FPSText.h"
 
 #include "Font.h"
 
-FPSComponent::FPSComponent(Proto::Font* pFont, const TextureData& texData)
-	: TextComponent("FPS", pFont, texData)
+FPSText::FPSText(ComponentID ID, bool isActive, Proto::Font* pFont, const TextureData& texData)
+	: Text(ID, isActive, "FPS", pFont, texData)
 {
 }
 
-void FPSComponent::Update()
+void FPSText::Update()
 {
 	m_Timer += ProtoTime.DeltaTime_Unscaled;
 	if (m_Timer > 0.2f)
@@ -19,20 +19,26 @@ void FPSComponent::Update()
 	}
 }
 
-void FPSComponent::DrawInspectorTitle()
+void FPSText::DrawInspectorTitle()
 {
-	ImGui::Text("FPS Component");
+	DrawActiveCheckbox();
+	ImGui::Text("FPS Text");
 }
 
-void FPSComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void FPSText::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 
-	xml_node<>* pComp = doc.allocate_node(node_element, "FPSComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "FPSBehaviour");
 
+	SaveID(doc, pComp);
+	SaveActive(doc, pComp);
+	
 	// Font related
 	ProtoSaver::XML::SaveString("FontLocation", m_FontRelPath, doc, pComp);
-	ProtoSaver::XML::Save<unsigned int>("FontSize", m_pFont->GetSize(), doc, pComp);
+
+	auto fontSize{ m_pFont ? m_pFont->GetSize() : 13 };
+	ProtoSaver::XML::Save<unsigned int>("FontSize", fontSize, doc, pComp);
 
 	// Texture Data related
 	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);

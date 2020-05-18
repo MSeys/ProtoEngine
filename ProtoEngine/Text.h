@@ -1,17 +1,16 @@
 #pragma once
+#include "BaseBehaviour.h"
 #include <string>
-
-#include "ImageComponent.h"
 
 namespace Proto {
 	class Font;
 }
 
-class TextComponent : public BaseComponent
+class Text : public BaseBehaviour
 {
 public:
-	TextComponent(std::string text, Proto::Font* pFont, const TextureData& texData = { 0, 0 });
-	~TextComponent() override;
+	Text(ComponentID ID, bool isActive, std::string text, Proto::Font* pFont, const TextureData& texData = { 0, 0 });
+	~Text() override;
 
 	void SetText(const std::string& text);
 	void SetFontSize(unsigned size);

@@ -1,16 +1,16 @@
 #pragma once
-#include "BaseComponent.h"
+#include "BaseBehaviour.h"
 
-class TransformComponent final : public BaseComponent
+class Transform final : public BaseBehaviour
 {
 public:
-	TransformComponent() = default;
-	virtual ~TransformComponent() = default;
+	Transform() : BaseBehaviour(0, true) {}
+	virtual ~Transform() = default;
 
-	TransformComponent(const TransformComponent& other) = delete;
-	TransformComponent(TransformComponent&& other) noexcept = delete;
-	TransformComponent& operator=(const TransformComponent& other) = delete;
-	TransformComponent& operator=(TransformComponent&& other) noexcept = delete;
+	Transform(const Transform& other) = delete;
+	Transform(Transform&& other) noexcept = delete;
+	Transform& operator=(const Transform& other) = delete;
+	Transform& operator=(Transform&& other) noexcept = delete;
 	
 	glm::vec2 GetPosition() const;
 	glm::vec2 GetRotCenter() const;

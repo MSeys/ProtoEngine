@@ -1,16 +1,16 @@
 #pragma once
-#include "BaseComponent.h"
+#include "BaseBehaviour.h"
 #include "Structs.h"
 
 namespace Proto {
 	class Texture2D;
 }
 
-class ImageComponent final : public BaseComponent
+class Image final : public BaseBehaviour
 {
 public:
-	ImageComponent(Proto::Texture2D* pTexture, const TextureData& texData);
-	~ImageComponent();
+	Image(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData);
+	~Image();
 
 	void SetTexture(const std::string& path);
 	void SetTextureData(const TextureData& texData);

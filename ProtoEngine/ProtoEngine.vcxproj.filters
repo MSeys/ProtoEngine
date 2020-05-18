@@ -55,6 +55,18 @@
     <Filter Include="RapidXML">
       <UniqueIdentifier>{311f9476-5c14-4615-8895-94c3ffebd04d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\Physics">
+      <UniqueIdentifier>{72945a64-8112-456a-9216-51fe508771c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\Graphics">
+      <UniqueIdentifier>{4711ef54-000e-4635-8e21-9f1234469587}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\Game">
+      <UniqueIdentifier>{263abac6-ff75-45bb-ba0c-da2e17108485}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\General">
+      <UniqueIdentifier>{8a91f761-1396-4bc4-986a-c7120a07f02d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp">
@@ -63,23 +75,11 @@
     <ClCompile Include="Texture2D.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="BaseComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Scenegraph</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Scenegraph</Filter>
-    </ClCompile>
-    <ClCompile Include="FPSComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="TextComponent.cpp">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>Core</Filter>
@@ -129,9 +129,6 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui\Core</Filter>
     </ClCompile>
-    <ClCompile Include="ImageComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="ContentManager.cpp">
       <Filter>Content</Filter>
     </ClCompile>
@@ -153,9 +150,34 @@
     <ClCompile Include="ProtoUtils.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="CameraComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="FPSText.cpp">
+      <Filter>Components\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Components\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Components\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody2D.cpp">
+      <Filter>Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxCollider2D.cpp">
+      <Filter>Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Components\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Components\General</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseBehaviour.cpp">
+      <Filter>Components\General</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -167,15 +189,6 @@
     <ClInclude Include="Texture2D.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="BaseComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Components.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="BaseGame.h">
       <Filter>Scenegraph</Filter>
     </ClInclude>
@@ -184,12 +197,6 @@
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Scenegraph</Filter>
-    </ClInclude>
-    <ClInclude Include="FPSComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="TextComponent.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>Core</Filter>
@@ -278,9 +285,6 @@
     <ClInclude Include="portable-file-dialogs.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="ImageComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="ContentManager.h">
       <Filter>Content</Filter>
     </ClInclude>
@@ -311,8 +315,36 @@
     <ClInclude Include="ProtoUtils.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="CameraComponent.h">
+    <ClInclude Include="FPSText.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxCollider2D.h">
+      <Filter>Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Components\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Components\General</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseBehaviour.h">
+      <Filter>Components\General</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBehaviours.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="RigidBody2D.h">
+      <Filter>Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider2D.h" />
   </ItemGroup>
 </Project>

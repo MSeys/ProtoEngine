@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Scene version="1.0" Name="Test" type="protoscene">
-	<GameObject Name="Background" ID="0" Active="true">
+	<GameObject Name="Background" ID="1" Active="true">
 		<Components>
-			<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<ImageComponent ImageLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="480.000000" TexDataColorR="255" TexDataColorG="254" TexDataColorB="254" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-			<ImageComponent ImageLocation="\logo.png" TexDataX="116.400002" TexDataY="38.799999" TexDataW="210.000000" TexDataH="65.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-		</Components>
-		<GameObject Name="Hagrid" ID="1" Active="true">
-			<Components>
-				<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-				<ImageComponent ImageLocation="\hagrid.png" TexDataX="377.000000" TexDataY="247.000000" TexDataW="120.000000" TexDataH="128.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-			</Components>
-		</GameObject>
-	</GameObject>
-	<GameObject Name="Text" ID="2" Active="true">
-		<Components>
-			<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="8.600000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<TextComponent FontLocation="\Lingua.otf" FontSize="25" TexDataX="178.000000" TexDataY="138.000000" TexDataW="96.000000" TexDataH="26.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" Text="Random" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+			<Transform PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<ImageBehaviour ID="4" Active="true" ImageLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="480.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="FPS Counter" ID="3" Active="true">
+	<GameObject Name="Floor" ID="3" Active="true">
 		<Components>
-			<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="8.600000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<FPSComponent FontLocation="\Kenney Thick.ttf" FontSize="25" TexDataX="163.000000" TexDataY="98.000000" TexDataW="150.000000" TexDataH="29.000000" TexDataColorR="207" TexDataColorG="34" TexDataColorB="34" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+			<Transform PositionX="320.000000" PositionY="456.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" BodyType="0"/>
+			<BoxCollider2D ID="3" Active="true" CollisionSizeX="320.000000" CollisionSizeY="25.700001" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<ImageBehaviour ID="1" Active="true" ImageLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="50.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="Camera" ID="4" Active="true">
+	<GameObject Name="Falling Object" ID="2" Active="true">
 		<Components>
-			<TransformComponent PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<CameraComponent PositionX="24.500000" PositionY="50.000000" Active="true"/>
+			<Transform PositionX="320.000000" PositionY="40.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" BodyType="1"/>
+			<BoxCollider2D ID="3" Active="true" CollisionSizeX="104.500000" CollisionSizeY="35.400002" Density="1.000000" Friction="0.300000" Restitution="0.300000" IsTrigger="false"/>
+			<ImageBehaviour ID="1" Active="true" ImageLocation="\logo.png" TexDataX="0.000000" TexDataY="0.000000" TexDataW="208.000000" TexDataH="65.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		</Components>
+	</GameObject>
+	<GameObject Name="Trigger Object" ID="4" Active="true">
+		<Components>
+			<Transform PositionX="320.000000" PositionY="395.500000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="1" BodyType="0"/>
+			<BoxCollider2D ID="2" Active="true" CollisionSizeX="106.900002" CollisionSizeY="40.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="true"/>
 		</Components>
 	</GameObject>
 </Scene>

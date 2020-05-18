@@ -7,7 +7,7 @@ public:
 	void InitializeControls() override;
 	void InitializeScene() override;
 
-	void DrawAddComponent() override;
+	void DrawAddComponent(GameObject* pCurrentSelected) override;
 	void LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr) override;
 	
 private:

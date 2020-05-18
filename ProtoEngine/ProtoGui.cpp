@@ -267,7 +267,7 @@ void ProtoGui::Presets::EndGroupPanel()
 	ImGui::EndGroup();
 }
 
-void ProtoGui::Presets::BeginComponentPanel(const ImVec2& size, BaseComponent* pCurrComp, BaseComponent** pDelComp)
+void ProtoGui::Presets::BeginComponentPanel(const ImVec2& size, BaseBehaviour* pCurrComp, BaseBehaviour** pDelComp)
 {
 	ImGui::BeginGroup();
 
@@ -293,8 +293,10 @@ void ProtoGui::Presets::BeginComponentPanel(const ImVec2& size, BaseComponent* p
 	ImGui::SameLine(0.0f, 0.0f);
 
 	pCurrComp->DrawInspectorTitle();
-
-	if (!dynamic_cast<TransformComponent*>(pCurrComp))
+	ImGui::SameLine(200);
+	ImGui::Text(std::string("(ID: " + std::to_string(pCurrComp->GetID()) + ")").c_str());
+	
+	if (!dynamic_cast<Transform*>(pCurrComp))
 	{
 		ImGui::SameLine(270);
 

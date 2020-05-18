@@ -1,18 +1,25 @@
 #pragma once
 #include "RapidXML/rapidxml.hpp"
 
-class BaseComponent;
-class TransformComponent;
+struct Collision;
+class BaseBehaviour;
+class Transform;
 class Scene;
 
+namespace Proto
+{
+	class PhysicsListener;
+}
+
 using GameObjectID = unsigned int;
+using ComponentID = unsigned int;
 
 class GameObject final
 {
 public:
 	GameObject(GameObjectID ID, std::string name = "GameObject", bool isActive = true);
 	~GameObject();
-	
+
 	GameObject(const GameObject& other) = delete;
 	GameObject(GameObject&& other) = delete;
 	GameObject& operator=(const GameObject& other) = delete;
@@ -24,25 +31,34 @@ public:
 	void AddChild(GameObject* obj);
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
-	void AddComponent(BaseComponent* pComp);
-	void RemoveComponent(BaseComponent* pComp, bool deleteComp = true);
+	void AddComponent(BaseBehaviour* pComp);
+	void RemoveComponent(BaseBehaviour* pComp, bool deleteComp = true);
 
 	void SwapUpChild(GameObject* obj);
 	void SwapDownChild(GameObject* obj);
 
-	void SwapUpComponent(BaseComponent* pComp);
-	void SwapDownComponent(BaseComponent* pComp);
+	void SwapUpComponent(BaseBehaviour* pComp);
+	void SwapDownComponent(BaseBehaviour* pComp);
 
 	void MakeChild();
 	void MakeParent();
 
+	ComponentID RequestNewID() { return ++m_CurrentID; }
+	ComponentID GetCurrentID() const { return m_CurrentID; }
+	void SetCurrentID(const ComponentID& id) { m_CurrentID = id; }
+
 	GameObject* FindGameObjectWithIDinChildren(GameObjectID id);
+	BaseBehaviour* FindComponentWithID(ComponentID c_id) const;
 	
-	TransformComponent* GetTransform() const { return m_pTransform; }
+	Transform* GetTransform() const { return m_pTransform; }
 	Scene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
 	std::string& GetName() { return m_Name; }
 	GameObjectID GetID() const { return m_ID; }
+
+	bool GetActive() const { return m_IsActive; }
+	void SetActive(bool active) { m_IsActive = active; }
+	
 
 #pragma region
 	template <class T>
@@ -129,12 +145,14 @@ public:
 	std::vector<GameObject*>& GetChildren() { return m_pChildren; }
 	
 	void DrawInspector();
+	void DrawEditorDebug();
 	
 protected:
 	void DrawHierarchy();
 	
 private:
 	friend class Scene;
+	friend class Proto::PhysicsListener;
 	
 	void Start();
 	void Awake();
@@ -142,13 +160,19 @@ private:
 	void FixedUpdate();
 	void Draw();
 
+	void OnTriggerEnter(const Collision& collision);
+	void OnTriggerExit(const Collision& collision);
+	void OnCollisionEnter(const Collision& collision);
+	void OnCollisionExit(const Collision& collision);
+	
 	std::vector<GameObject*> m_pChildren;
-	std::vector<BaseComponent*> m_pComponents;
+	std::vector<BaseBehaviour*> m_pComponents;
 
 	std::string m_Name;
 	GameObjectID m_ID;
+	ComponentID m_CurrentID; // Component ID, used when adding components + saving + Find function
 	bool m_IsInitialized, m_IsActive;
 	Scene* m_pParentScene;
 	GameObject* m_pParentObject;
-	TransformComponent* m_pTransform;
+	Transform* m_pTransform;
 };

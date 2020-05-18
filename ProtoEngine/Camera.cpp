@@ -1,28 +1,28 @@
 #include "ProtoEnginePCH.h"
-#include "CameraComponent.h"
+#include "Camera.h"
 
-CameraComponent::CameraComponent(const glm::vec2& position, bool active)
-	: m_Position(position), m_IsActive(active)
+Camera::Camera(ComponentID ID, const glm::vec2& position, bool active)
+	: BaseBehaviour(ID, true), m_Position(position), m_IsCamActive(active)
 {
 }
 
-CameraComponent::~CameraComponent()
+Camera::~Camera()
 {
 	if (GetGameObject()->GetScene()->m_pActiveCamera == this)
 		GetGameObject()->GetScene()->m_pActiveCamera = nullptr;
 }
 
-void CameraComponent::DrawInspectorTitle()
+void Camera::DrawInspectorTitle()
 {
 	ImGui::Text("Camera");
 }
 
-void CameraComponent::DrawInspector()
+void Camera::DrawInspector()
 {
 	ImGui::Text("Active: ");
 	ImGui::SameLine();
 	
-	if (m_IsActive)
+	if (m_IsCamActive)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0, 1, 0, 1 });
 		ImGui::Text("Active");
@@ -44,7 +44,7 @@ void CameraComponent::DrawInspector()
 	ProtoGui::Presets::Position(m_Position.x, m_Position.y);
 }
 
-void CameraComponent::Move(const glm::vec2& destination, glm::vec2 speed)
+void Camera::Move(const glm::vec2& destination, glm::vec2 speed)
 {
 	Reset();
 	
@@ -53,7 +53,7 @@ void CameraComponent::Move(const glm::vec2& destination, glm::vec2 speed)
 	m_IsMovingBySpeed = true;
 }
 
-void CameraComponent::Move(const glm::vec2& destination, float time)
+void Camera::Move(const glm::vec2& destination, float time)
 {
 	Reset();
 	
@@ -62,12 +62,12 @@ void CameraComponent::Move(const glm::vec2& destination, float time)
 	m_IsMovingByTime = true;
 }
 
-void CameraComponent::Move(const glm::vec2& destination)
+void Camera::Move(const glm::vec2& destination)
 {
 	m_Position = destination;
 }
 
-void CameraComponent::Reset()
+void Camera::Reset()
 {
 	// Does not reset other variables as they will get overwritten and are only used with specific booleans
 	m_CurrTime = 0;
@@ -76,13 +76,24 @@ void CameraComponent::Reset()
 	m_IsMovingBySpeed = false;
 }
 
-void CameraComponent::Start()
+void Camera::Activate()
 {
-	if (m_IsActive)
+	m_IsCamActive = true;
+	ProtoScenes.GetCurrentScene()->SetActiveCamera(this);
+}
+
+void Camera::Deactivate()
+{
+	m_IsCamActive = false;
+}
+
+void Camera::Start()
+{
+	if (m_IsCamActive)
 		GetGameObject()->GetScene()->SetActiveCamera(this);
 }
 
-void CameraComponent::Update()
+void Camera::Update()
 {
 	if(m_IsMovingByTime)
 	{
@@ -109,14 +120,22 @@ void CameraComponent::Update()
 	}
 }
 
-void CameraComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void Camera::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "CameraComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "Camera");
 
+	SaveID(doc, pComp);
+	
 	ProtoSaver::XML::Save<float>("PositionX", m_Position.x, doc, pComp);
 	ProtoSaver::XML::Save<float>("PositionY", m_Position.y, doc, pComp);
-	ProtoSaver::XML::Save<bool>("Active", m_IsActive, doc, pComp);
+	ProtoSaver::XML::Save<bool>("CamActive", m_IsCamActive, doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void Camera::DrawEditorDebug()
+{
+	ProtoRenderer.RenderLineRect({ int(m_Position.x), int(m_Position.y), int(ProtoSettings.GetWindowSettings().GameWindowSize.x), int(ProtoSettings.GetWindowSettings().GameWindowSize.y) }, 
+								{ 255, 255, 255, 255 });
 }

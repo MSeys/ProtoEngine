@@ -61,6 +61,16 @@ void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& 
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, data.angle, &rotPoint, flip);
 }
 
+void Proto::Renderer::RenderLineRect(const SDL_Rect& rect, const SDL_Color& color) const
+{
+	SDL_Rect dst{ rect };
+	CalculateRenderOffset(dst.x, dst.y);
+	
+	SDL_SetRenderDrawColor(GetSDLRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawRect(GetSDLRenderer(), &dst);
+	SDL_SetRenderDrawColor(GetSDLRenderer(), 0, 0, 0, 255);
+}
+
 void Proto::Renderer::CalculateRenderOffset(int& x, int& y) const
 {
 	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
@@ -73,14 +83,14 @@ void Proto::Renderer::CalculateRenderOffset(int& x, int& y) const
 
 		else
 		{
-			x -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().x);
-			y -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().y);
+			x -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().x);
+			y -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().y);
 		}
 	}
 
 	else
 	{
-		x -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().x);
-		y -= int(ProtoScenes.GetActiveScene()->GetActiveCamera().y);
+		x -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().x);
+		y -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().y);
 	}
 }

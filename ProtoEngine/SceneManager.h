@@ -14,17 +14,18 @@ namespace Proto
 		SceneManager& operator=(const SceneManager& other) = delete;
 		SceneManager& operator=(SceneManager&& other) noexcept = delete;
 
-		void AddGameScene(Scene* pScene);
-		void RemoveGameScene(Scene* pScene);
-		void SetActiveGameScene(const std::wstring& sceneName);
+		void Add(Scene* pScene);
+		void Load(const std::wstring& sceneName);
 
-		Scene* GetActiveScene() const { return m_ActiveScene; }
+		// Does not reload the Scene - Use with caution
+		void SetCurrentScene(const std::wstring& sceneName);
+		
+		Scene* GetCurrentScene() const { return m_pCurrentScene; }
 		std::vector<Scene*> GetScenes() const { return m_pScenes; }
 		
-		void Start();
-		void Awake();
-		void Update();
-		void FixedUpdate();
+		void Begin();
+		void Update() const;
+		void FixedUpdate() const;
 		void Draw() const;
 
 		void DrawHierarchy() const;
@@ -36,6 +37,6 @@ namespace Proto
 
 		std::vector<Scene*> m_pScenes;
 		bool m_IsInitialized;
-		Scene* m_ActiveScene;
+		Scene* m_pCurrentScene;
 	};
 }

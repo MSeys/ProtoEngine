@@ -14,6 +14,10 @@
 #define CompStringify(x, y) bool((x) == #y)
 
 // Define Singletons
+
+#include "PhysicsManager.h"
+#define ProtoPhysics Proto::PhysicsManager::GetInstance()
+
 #include "SettingsManager.h"
 #define ProtoSettings Proto::SettingsManager::GetInstance()
 
@@ -57,7 +61,7 @@
 #include "Font.h"
 
 #include "ProtoUtils.h"
-#include "Components.h"
+#include "BaseBehaviour.h"
 #include "Structs.h"
 
 #include "Buttons.h"
@@ -78,3 +82,5 @@
 #include "RapidXML/rapidxml_iterators.hpp"
 #include "RapidXML/rapidxml_print.hpp"
 #include "RapidXML/rapidxml_utils.hpp"
+
+#include "Box2D.h"

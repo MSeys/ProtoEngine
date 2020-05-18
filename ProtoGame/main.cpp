@@ -18,14 +18,16 @@ int main(int, char* [])
 	WindowSettings windowSettings;
 
 #ifndef _DEBUG
+#ifdef _WIN64
 	pGame = pRefGame;
 	windowSettings.Title = "SimpleGame";
+#endif
 #endif
 
 	windowSettings.GameWindowSize = { 640, 480 };
 	windowSettings.FPSState = FPSState::PROTO_CAPPED;
 	windowSettings.FPSRate = FPSRate::PROTO_FPS_VERY_HIGH;
-	
+
 	editorSettings.EditorWindowSize = { 1920, 1080 };
 	
 	const Proto::Engine engine{ pGame, pRefGame, editorSettings, windowSettings };
@@ -35,5 +37,5 @@ int main(int, char* [])
 }
 
 // TODO: List of features to make
-// Collisions + RigidBody
-// SpriteSheet Component + Animations
+// Extra: Sphere Collision + Edge Collision (+- 30min work)
+// SpriteSheet Component + Animations (A day work)

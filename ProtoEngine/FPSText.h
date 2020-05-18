@@ -1,10 +1,10 @@
 #pragma once
-#include "TextComponent.h"
+#include "Text.h"
 
-class FPSComponent final : public TextComponent
+class FPSText final : public Text
 {
 public:
-	FPSComponent(Proto::Font* pFont, const TextureData& texData);
+	FPSText(ComponentID ID, bool isActive, Proto::Font* pFont, const TextureData& texData = { 0, 0 });
 	
 protected:
 	void Update() override;

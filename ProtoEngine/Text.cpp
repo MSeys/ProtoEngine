@@ -1,5 +1,5 @@
 #include "ProtoEnginePCH.h"
-#include "TextComponent.h"
+#include "Text.h"
 
 
 #include <SDL_ttf.h>
@@ -11,8 +11,8 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-TextComponent::TextComponent(std::string text, Proto::Font* pFont, const TextureData& texData)
-	: m_pTexture(nullptr), m_TexData(texData), m_Text(std::move(text)), m_pFont(pFont)
+Text::Text(ComponentID ID, bool isActive, std::string text, Proto::Font* pFont, const TextureData& texData)
+	: BaseBehaviour(ID, isActive), m_pTexture(nullptr), m_TexData(texData), m_Text(std::move(text)), m_pFont(pFont)
 {
 	if(pFont)
 	{
@@ -21,18 +21,18 @@ TextComponent::TextComponent(std::string text, Proto::Font* pFont, const Texture
 	}
 }
 
-TextComponent::~TextComponent()
+Text::~Text()
 {
 	SafeDelete(m_pTexture);
 }
 
-void TextComponent::SetText(const std::string& text)
+void Text::SetText(const std::string& text)
 {
 	m_Text = text;
 	UpdateText();
 }
 
-void TextComponent::SetFontSize(unsigned size)
+void Text::SetFontSize(unsigned size)
 {
 	const std::string relPath{ m_pFont->GetRelativePath() };
 	m_pFont = ProtoContent.GetFont(relPath, size);
@@ -40,13 +40,13 @@ void TextComponent::SetFontSize(unsigned size)
 	UpdateText();
 }
 
-void TextComponent::SetColor(const SDL_Color& color)
+void Text::SetColor(const SDL_Color& color)
 {
 	m_TexData.color = color;
 	UpdateText();
 }
 
-void TextComponent::SetFont(const std::string& path)
+void Text::SetFont(const std::string& path)
 {
 	unsigned int size{ 25 };
 	if(m_pFont)
@@ -58,23 +58,24 @@ void TextComponent::SetFont(const std::string& path)
 	UpdateText();
 }
 
-void TextComponent::SetTextureData(const TextureData& texData)
+void Text::SetTextureData(const TextureData& texData)
 {
 	m_TexData = texData;
 }
 
-void TextComponent::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
+void Text::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
 {
 	m_HorAlignment = horAlignment;
 	m_VerAlignment = verAlignment;
 }
 
-void TextComponent::DrawInspectorTitle()
+void Text::DrawInspectorTitle()
 {
+	DrawActiveCheckbox();
 	ImGui::Text("Text");
 }
 
-void TextComponent::DrawInspector()
+void Text::DrawInspector()
 {
 	/* Font Path */ {
 		ImGui::Text("Font");
@@ -157,7 +158,7 @@ void TextComponent::DrawInspector()
 	}
 }
 
-void TextComponent::Draw()
+void Text::Draw()
 {
 	if (!m_pTexture)
 		return;
@@ -202,7 +203,7 @@ void TextComponent::Draw()
 	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
 
-void TextComponent::UpdateText()
+void Text::UpdateText()
 {
 	if (!m_pFont)
 		return;
@@ -232,15 +233,20 @@ void TextComponent::UpdateText()
 	m_TexData.height = float(height);
 }
 
-void TextComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void Text::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 	
-	xml_node<>* pComp = doc.allocate_node(node_element, "TextComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "TextBehaviour");
 
+	SaveID(doc, pComp);
+	SaveActive(doc, pComp);
+	
 	// Font related
 	ProtoSaver::XML::SaveString("FontLocation", m_FontRelPath, doc, pComp);
-	ProtoSaver::XML::Save<unsigned int>("FontSize", m_pFont->GetSize(), doc, pComp);
+	
+	auto fontSize{ m_pFont ? m_pFont->GetSize() : 13 };
+	ProtoSaver::XML::Save<unsigned int>("FontSize", fontSize, doc, pComp);
 
 	// Texture Data related
 	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);

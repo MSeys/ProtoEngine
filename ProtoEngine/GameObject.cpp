@@ -4,12 +4,12 @@
 #include <utility>
 
 #include "Scene.h"
-#include "BaseComponent.h"
-#include "TransformComponent.h"
+#include "BaseBehaviour.h"
+#include "Transform.h"
 
 GameObject::GameObject(GameObjectID ID, std::string name, bool isActive)
 	: m_pChildren(std::vector<GameObject*>())
-	, m_pComponents(std::vector<BaseComponent*>())
+	, m_pComponents(std::vector<BaseBehaviour*>())
 	, m_Name(std::move(name))
 	, m_ID(ID)
 	, m_IsInitialized(false)
@@ -18,13 +18,13 @@ GameObject::GameObject(GameObjectID ID, std::string name, bool isActive)
 	, m_pParentObject(nullptr)
 	, m_pTransform(nullptr)
 {
-	m_pTransform = new TransformComponent();
+	m_pTransform = new Transform();
 	AddComponent(m_pTransform);
 }
 
 GameObject::~GameObject()
 {
-	for (BaseComponent* pComp : m_pComponents)
+	for (BaseBehaviour* pComp : m_pComponents)
 		SafeDelete(pComp);
 	
 	for (GameObject* pChild : m_pChildren)
@@ -44,7 +44,7 @@ void GameObject::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPare
 
 	xml_node<>* thisComponents = doc.allocate_node(node_element, "Components");
 	
-	for(BaseComponent* pComp : m_pComponents)
+	for(BaseBehaviour* pComp : m_pComponents)
 		pComp->Save(doc, thisComponents);
 	
 	thisGO->append_node(thisComponents);
@@ -132,10 +132,10 @@ void GameObject::RemoveChild(GameObject* obj, bool deleteObject)
 #pragma endregion Add / Remove Child
 
 #pragma region Add / Remove Component
-void GameObject::AddComponent(BaseComponent* pComp)
+void GameObject::AddComponent(BaseBehaviour* pComp)
 {
 #if _DEBUG
-	if (typeid(*pComp) == typeid(TransformComponent) && HasComponent<TransformComponent>())
+	if (typeid(*pComp) == typeid(Transform) && HasComponent<Transform>())
 	{
 		std::cout << "GameObject::AddComponent > GameObject can contain only one TransformComponent!" << std::endl;
 		return;
@@ -151,6 +151,8 @@ void GameObject::AddComponent(BaseComponent* pComp)
 	}
 #endif
 
+	if (GetCurrentID() < pComp->GetID())
+		SetCurrentID(pComp->GetID());
 	m_pComponents.push_back(pComp);
 	pComp->m_pGameObject = this;
 
@@ -158,7 +160,7 @@ void GameObject::AddComponent(BaseComponent* pComp)
 		pComp->Start();
 }
 
-void GameObject::RemoveComponent(BaseComponent* pComp, bool deleteComp)
+void GameObject::RemoveComponent(BaseBehaviour* pComp, bool deleteComp)
 {
 	auto it = find(m_pComponents.begin(), m_pComponents.end(), pComp);
 
@@ -169,7 +171,7 @@ void GameObject::RemoveComponent(BaseComponent* pComp, bool deleteComp)
 		return;
 	}
 
-	if (typeid(*pComp) == typeid(TransformComponent))
+	if (typeid(*pComp) == typeid(Transform))
 	{
 		std::cout << "GameObject::RemoveComponent > TransformComponent can't be removed!" << std::endl;
 		return;
@@ -179,12 +181,7 @@ void GameObject::RemoveComponent(BaseComponent* pComp, bool deleteComp)
 	m_pComponents.erase(it);
 
 	if (deleteComp)
-	{
-		if (dynamic_cast<CameraComponent*>(pComp) == GetScene()->m_pActiveCamera)
-			GetScene()->SetActiveCamera(nullptr);
-		
 		SafeDelete(pComp);
-	}
 	else
 		pComp->m_pGameObject = nullptr;
 }
@@ -208,7 +205,7 @@ void GameObject::SwapDownChild(GameObject* obj)
 	}
 }
 
-void GameObject::SwapUpComponent(BaseComponent* pComp)
+void GameObject::SwapUpComponent(BaseBehaviour* pComp)
 {
 	const auto it{ std::find(m_pComponents.begin(), m_pComponents.end(), pComp) };
 	if (it != m_pComponents.begin() + 1)
@@ -217,7 +214,7 @@ void GameObject::SwapUpComponent(BaseComponent* pComp)
 	}
 }
 
-void GameObject::SwapDownComponent(BaseComponent* pComp)
+void GameObject::SwapDownComponent(BaseBehaviour* pComp)
 {
 	const auto it{ std::find(m_pComponents.begin(), m_pComponents.end(), pComp) };
 	if (it != m_pComponents.end() - 1)
@@ -285,6 +282,15 @@ GameObject* GameObject::FindGameObjectWithIDinChildren(GameObjectID id)
 		if (pFoundInChildren)
 			return pFoundInChildren;
 	}
+
+	return nullptr;
+}
+
+BaseBehaviour* GameObject::FindComponentWithID(ComponentID c_id) const
+{
+	BaseBehaviour* pFoundComp = *std::find_if(m_pComponents.cbegin(), m_pComponents.cend(), [c_id](BaseBehaviour* pComp) { return pComp->GetID() == c_id; });
+	if (pFoundComp)
+		return pFoundComp;
 
 	return nullptr;
 }
@@ -371,7 +377,7 @@ void GameObject::DrawHierarchy()
 void GameObject::DrawInspector()
 {
 	std::string labelText;
-	BaseComponent* pDelComp{};
+	BaseBehaviour* pDelComp{};
 	
 	m_Name.resize(50);
 
@@ -389,7 +395,7 @@ void GameObject::DrawInspector()
 			ImGui::Text(("ID: " + std::to_string(m_ID)).c_str());
 		}
 
-		for (BaseComponent* pComp : m_pComponents)
+		for (BaseBehaviour* pComp : m_pComponents)
 		{
 			ImGui::PushID(pComp);
 			ProtoGui::Presets::BeginComponentPanel(ImVec2{ -1, 0 }, pComp, &pDelComp);
@@ -413,6 +419,17 @@ void GameObject::DrawInspector()
 	ImGui::PopID();
 }
 
+void GameObject::DrawEditorDebug()
+{
+	// Components DrawEditorDebug
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->DrawEditorDebug();
+
+	// Children DrawEditorDebug
+	for (GameObject* pChild : m_pChildren)
+		pChild->DrawEditorDebug();
+}
+
 void GameObject::Start()
 {
 	if (m_IsInitialized)
@@ -422,16 +439,12 @@ void GameObject::Start()
 		GetScene()->SetCurrentID(m_ID);
 
 	// Components Start
-	for (BaseComponent* pComp : m_pComponents)
-	{
+	for (BaseBehaviour* pComp : m_pComponents)
 		pComp->Start();
-	}
 
 	// Children Start
 	for (GameObject* pChild : m_pChildren)
-	{
 		pChild->Start();
-	}
 
 	m_IsInitialized = true;
 }
@@ -439,16 +452,12 @@ void GameObject::Start()
 void GameObject::Awake()
 {
 	// Components Awake
-	for (BaseComponent* pComp : m_pComponents)
-	{
+	for (BaseBehaviour* pComp : m_pComponents)
 		pComp->Awake();
-	}
 
 	// Children Awake
 	for (GameObject* pChild : m_pChildren)
-	{
 		pChild->Awake();
-	}
 }
 
 void GameObject::Update()
@@ -457,16 +466,15 @@ void GameObject::Update()
 		return;
 
 	// Components Update
-	for (BaseComponent* pComp : m_pComponents)
+	for (BaseBehaviour* pComp : m_pComponents)
 	{
-		pComp->Update();
+		if(pComp->GetActive())
+			pComp->Update();
 	}
 
 	// Children Update
 	for (GameObject* pChild : m_pChildren)
-	{
 		pChild->Update();
-	}
 }
 
 void GameObject::FixedUpdate()
@@ -475,16 +483,15 @@ void GameObject::FixedUpdate()
 		return;
 
 	//Component Update
-	for (BaseComponent* pComp : m_pComponents)
+	for (BaseBehaviour* pComp : m_pComponents)
 	{
-		pComp->FixedUpdate();
+		if(pComp->GetActive())
+			pComp->FixedUpdate();
 	}
 
 	// Children FixedUpdate
 	for (GameObject* pChild : m_pChildren)
-	{
 		pChild->FixedUpdate();
-	}
 }
 
 void GameObject::Draw()
@@ -493,16 +500,39 @@ void GameObject::Draw()
 		return;
 
 	//Components Draw
-	for (BaseComponent* pComp : m_pComponents)
+	for (BaseBehaviour* pComp : m_pComponents)
 	{
-		pComp->Draw();
+		if(pComp->GetActive())
+			pComp->Draw();
 	}
 
 	// Children Draw
 	for (GameObject* pChild : m_pChildren)
-	{
 		pChild->Draw();
-	}
+}
+
+void GameObject::OnTriggerEnter(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->OnTriggerEnter(collision);
+}
+
+void GameObject::OnTriggerExit(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->OnTriggerExit(collision);
+}
+
+void GameObject::OnCollisionEnter(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->OnCollisionEnter(collision);
+}
+
+void GameObject::OnCollisionExit(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->OnCollisionExit(collision);
 }
 #pragma endregion Root Functions
 

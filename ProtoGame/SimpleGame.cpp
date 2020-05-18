@@ -68,11 +68,15 @@ void SimpleGame::InitializeScene()
 	ProtoMessenger.Notify(nullptr, E_GAME_STARTED);
 	ProtoLogger.AddLog(LogLevel::Info, "Testing Logging.");
 
-	ProtoScenes.AddGameScene(new Scene("\\Scenes\\test.protoscene"));
+	ProtoPhysics.SetPixelsPerMeter(100);
+	ProtoScenes.Add(new Scene("\\Scenes\\test.protoscene"));
+	ProtoScenes.SetCurrentScene(L"Test");
 }
 
-void SimpleGame::DrawAddComponent()
+void SimpleGame::DrawAddComponent(GameObject* pCurrentSelected)
 {
+	UNREFERENCED_PARAMETER(pCurrentSelected);
+	
 	ImGui::Text("SimpleGame Comp 1");
 	ImGui::Text("SimpleGame Comp 2");
 }

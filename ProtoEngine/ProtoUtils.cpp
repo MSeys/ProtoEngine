@@ -3,14 +3,21 @@
 
 using namespace rapidxml;
 
+void ProtoSaver::XML::SaveString(const char* name, std::string& value, xml_document<>& doc, xml_node<>* pComp)
+{
+	pComp->append_attribute(doc.allocate_attribute(name, doc.allocate_string(value.c_str())));
+}
+
 void ProtoParser::XML::LoadComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
 	Helper::LoadTransformComponent(pComponents, pCurr);
+	Helper::LoadRigidBody2DComponent(pComponents, pCurr);
+	Helper::LoadBoxCollider2DComponents(pComponents, pCurr);
 	Helper::LoadCameraComponent(pComponents, pCurr);
 	Helper::LoadImageComponents(pComponents, pCurr);
 	Helper::LoadTextComponents(pComponents, pCurr);
 	Helper::LoadFPSComponents(pComponents, pCurr);
-		
+	
 	if (ProtoSettings.GetRenderMode() == RenderMode::GAME)
 		ProtoSettings.GetGame()->LoadComponents(pComponents, pCurr);
 
@@ -20,12 +27,20 @@ void ProtoParser::XML::LoadComponents(xml_node<>* pComponents, GameObject* pCurr
 
 std::string ProtoParser::XML::ParseString(xml_node<>* pComp, const std::string& name)
 {
-	return std::string(pComp->first_attribute(name.c_str())->value());
+	const auto attribute = pComp->first_attribute(name.c_str());
+	if (!attribute)
+		return "";
+	
+	const auto value = attribute->value();
+	if (!value)
+		return "";
+
+	return std::string(value);
 }
 
 void ProtoParser::XML::Helper::LoadTransformComponent(xml_node<>* pComponents, GameObject* pCurr)
 {
-	xml_node<>* pTransformNode{ pComponents->first_node("TransformComponent") };
+	xml_node<>* pTransformNode{ pComponents->first_node("Transform") };
 	auto* pTransformComp{ pCurr->GetTransform() };
 
 	glm::vec2 position;
@@ -48,10 +63,44 @@ void ProtoParser::XML::Helper::LoadTransformComponent(xml_node<>* pComponents, G
 	pTransformComp->SetScale(scale.x, scale.y);
 }
 
+void ProtoParser::XML::Helper::LoadRigidBody2DComponent(xml_node<>* pComponents, GameObject* pCurr)
+{
+	xml_node<>* pComp{ pComponents->first_node("RigidBody2D") };
+
+	if (!pComp)
+		return;
+	
+	const auto id{ Parse<unsigned int>(pComp, "ID") };
+	const auto bodyType{ Parse<int>(pComp, "BodyType") };
+
+	pCurr->AddComponent(new RigidBody2D(id, static_cast<RigidBodyType>(bodyType)));
+}
+
+void ProtoParser::XML::Helper::LoadBoxCollider2DComponents(xml_node<>* pComponents, GameObject* pCurr)
+{
+	for (xml_node<>* pComp = pComponents->first_node("BoxCollider2D"); pComp; pComp = pComp->next_sibling("BoxCollider2D"))
+	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+
+		const glm::vec2 collisionSize{ Parse<float>(pComp, "CollisionSizeX"), Parse<float>(pComp, "CollisionSizeY") };
+		const auto density{ Parse<float>(pComp, "Density") };
+		const auto friction{ Parse<float>(pComp, "Friction") };
+		const auto restitution{ Parse<float>(pComp, "Restitution") };
+		const auto isTrigger{ Parse<bool>(pComp, "IsTrigger") };
+
+		const auto pBoxCollider = new BoxCollider2D(id, isActive, collisionSize, density, friction, restitution, isTrigger);
+		pCurr->AddComponent(pBoxCollider);
+	}
+}
+
 void ProtoParser::XML::Helper::LoadImageComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pComp = pComponents->first_node("ImageComponent"); pComp; pComp = pComp->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("ImageBehaviour"); pComp; pComp = pComp->next_sibling("ImageBehaviour"))
 	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+		
 		const std::string imageLocation{ ParseString(pComp, "ImageLocation") };
 		TextureData texData;
 		LoadTexData(pComp, texData);
@@ -60,7 +109,7 @@ void ProtoParser::XML::Helper::LoadImageComponents(xml_node<>* pComponents, Game
 		VAlignment verAlignment;
 		LoadAlignments(pComp, horAlignment, verAlignment);
 
-		auto pImageComp = new ImageComponent(ProtoContent.GetTexture(imageLocation), texData);
+		auto pImageComp = new Image(id, isActive, ProtoContent.GetTexture(imageLocation), texData);
 		pCurr->AddComponent(pImageComp);
 		pImageComp->SetAlignment(horAlignment, verAlignment);
 		pImageComp->SetTextureData(texData);
@@ -69,21 +118,25 @@ void ProtoParser::XML::Helper::LoadImageComponents(xml_node<>* pComponents, Game
 
 void ProtoParser::XML::Helper::LoadTextComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pComp = pComponents->first_node("TextComponent"); pComp; pComp = pComp->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("TextBehaviour"); pComp; pComp = pComp->next_sibling("TextBehaviour"))
 	{
-		const std::string fontLocation{ ParseString(pComp, "FontLocation") };
-		const int fontSize{ Parse<int>(pComp, "FontSize") };
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+		
+		const auto fontLocation{ ParseString(pComp, "FontLocation") };
+		const auto fontSize{ Parse<int>(pComp, "FontSize") };
 
 		TextureData texData;
 		LoadTexData(pComp, texData);
 
-		const std::string text{ ParseString(pComp, "Text") };
+		const auto text{ ParseString(pComp, "Text") };
 
 		HAlignment horAlignment;
 		VAlignment verAlignment;
 		LoadAlignments(pComp, horAlignment, verAlignment);
 
-		auto pTextComp = new TextComponent(text, ProtoContent.GetFont(fontLocation, fontSize), texData);
+		const auto pFont = !fontLocation.empty() ? ProtoContent.GetFont(fontLocation, fontSize) : nullptr;
+		auto pTextComp = new Text(id, isActive, text, pFont, texData);
 		pCurr->AddComponent(pTextComp);
 		pTextComp->SetAlignment(horAlignment, verAlignment);
 		pTextComp->SetTextureData(texData);
@@ -92,8 +145,11 @@ void ProtoParser::XML::Helper::LoadTextComponents(xml_node<>* pComponents, GameO
 
 void ProtoParser::XML::Helper::LoadFPSComponents(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pComp = pComponents->first_node("FPSComponent"); pComp; pComp = pComp->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("FPSBehaviour"); pComp; pComp = pComp->next_sibling("FPSBehaviour"))
 	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+		
 		const std::string fontLocation{ ParseString(pComp, "FontLocation") };
 		const int fontSize{ Parse<int>(pComp, "FontSize") };
 
@@ -104,7 +160,8 @@ void ProtoParser::XML::Helper::LoadFPSComponents(xml_node<>* pComponents, GameOb
 		VAlignment verAlignment;
 		LoadAlignments(pComp, horAlignment, verAlignment);
 
-		auto pFPSComp = new FPSComponent(ProtoContent.GetFont(fontLocation, fontSize), texData);
+		const auto pFont = !fontLocation.empty() ? ProtoContent.GetFont(fontLocation, fontSize) : nullptr;
+		auto pFPSComp = new FPSText(id, isActive, pFont, texData);
 		pCurr->AddComponent(pFPSComp);
 		pFPSComp->SetAlignment(horAlignment, verAlignment);
 		pFPSComp->SetTextureData(texData);
@@ -113,15 +170,17 @@ void ProtoParser::XML::Helper::LoadFPSComponents(xml_node<>* pComponents, GameOb
 
 void ProtoParser::XML::Helper::LoadCameraComponent(xml_node<>* pComponents, GameObject* pCurr)
 {
-	for (xml_node<>* pComp = pComponents->first_node("CameraComponent"); pComp; pComp = pComp->next_sibling())
+	for (xml_node<>* pComp = pComponents->first_node("CameraBehaviour"); pComp; pComp = pComp->next_sibling("CameraBehaviour"))
 	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+
 		glm::vec2 position;
 		position.x = Parse<float>(pComp, "PositionX");
 		position.y = Parse<float>(pComp, "PositionY");
 
-		const bool active{ Parse<bool>(pComp, "Active") };
+		const auto active{ Parse<bool>(pComp, "CamActive") };
 
-		pCurr->AddComponent(new CameraComponent(position, active));
+		pCurr->AddComponent(new Camera(id, position, active));
 	}
 }
 
@@ -168,21 +227,76 @@ float MicroSecondsToSeconds(float microSeconds)
 	return microSeconds / 1'000'000;
 }
 
-std::string WStringToString(const std::wstring& wstring)
+std::string ProtoConvert::ToString(const std::wstring& wstring)
 {
 	using convert_type = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_type, wchar_t> converter;
 	return converter.to_bytes(wstring);
 }
 
-std::wstring StringToWString(const std::string& string)
+std::wstring ProtoConvert::ToWString(const std::string& string)
 {
 	using convert_type = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_type, wchar_t> converter;
 	return converter.from_bytes(string);
 }
 
-void ProtoSaver::XML::SaveString(const char* name, std::string& value, xml_document<>& doc, xml_node<>* pComp)
+b2Vec2 ProtoConvert::ToBox2DVec(const glm::vec2& vec)
 {
-	pComp->append_attribute(doc.allocate_attribute(name, doc.allocate_string(value.c_str())));
+	return b2Vec2{ float(vec.x), float(vec.y) };
+}
+
+b2Vec2 ProtoConvert::ToBox2DVec(const ImVec2& vec)
+{
+	return b2Vec2{ float(vec.x), float(vec.y) };
+}
+
+b2Vec3 ProtoConvert::ToBox2DVec(const glm::vec3& vec)
+{
+	return b2Vec3{ float(vec.x), float(vec.y), float(vec.z) };
+}
+
+ImVec2 ProtoConvert::ToImGuiVec(const glm::vec2& vec)
+{
+	return ImVec2{ float(vec.x), float(vec.y) };
+}
+
+ImVec2 ProtoConvert::ToImGuiVec(const b2Vec2& vec)
+{
+	return ImVec2{ float(vec.x), float(vec.y) };
+}
+
+ImVec4 ProtoConvert::ToImGuiVec(const glm::vec4& vec)
+{
+	return ImVec4{ float(vec.x), float(vec.y), float(vec.z), float(vec.w) };
+}
+
+glm::vec2 ProtoConvert::ToGLMVec(const b2Vec2& vec)
+{
+	return glm::vec2{ float(vec.x), float(vec.y) };
+}
+
+glm::vec2 ProtoConvert::ToGLMVec(const ImVec2& vec)
+{
+	return glm::vec2{ float(vec.x), float(vec.y) };
+}
+
+glm::vec3 ProtoConvert::ToGLMVec(const b2Vec3& vec)
+{
+	return glm::vec3{ float(vec.x), float(vec.y), float(vec.z) };
+}
+
+glm::vec4 ProtoConvert::ToGLMVec(const ImVec4& vec)
+{
+	return glm::vec4{ float(vec.x), float(vec.y), float(vec.z), float(vec.w) };
+}
+
+float ProtoConvert::ToDegrees(float radians)
+{
+	return glm::degrees(radians);
+}
+
+float ProtoConvert::ToRadians(float degrees)
+{
+	return glm::radians(degrees);
 }

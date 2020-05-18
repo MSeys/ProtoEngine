@@ -38,6 +38,7 @@ enum class EditorMode
 
 struct EditorSettings
 {
+	bool FullWindowMode = false;
 	glm::vec2 EditorWindowSize{ 0, 0 };
 };
 

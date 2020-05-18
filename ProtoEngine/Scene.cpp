@@ -7,25 +7,52 @@
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
+#include <utility>
 namespace fs = std::experimental::filesystem;
 
 Scene::Scene(const std::string& filePath)
 	: m_pChildren(std::vector<GameObject*>())
 	, m_IsInitialized(false)
 {
-	if (!filePath.empty())
-		Load(filePath);
+	m_FilePath = filePath;
+	
+	m_FileFolderStructure = m_FilePath.substr(0, m_FilePath.rfind('\\'));
+	m_FileName = m_FilePath.substr(m_FileFolderStructure.size() + 1);
+	m_FileName = m_FileName.substr(0, m_FileName.rfind('.'));
+
+	/* Read Scene Name for Editor and other purposes */ {
+		using namespace rapidxml;
+
+		xml_document<> doc;
+		const std::string path{ ProtoContent.GetDataPath() + m_FilePath };
+		std::ifstream file(path);
+
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		std::string content(buffer.str());
+
+		doc.parse<0>(&content[0]);
+
+		xml_node<>* scene = doc.first_node("Scene");
+		m_SceneName = ProtoConvert::ToWString(ProtoParser::XML::ParseString(scene, "Name"));
+	}
+}
+
+Scene::Scene(std::wstring sceneName, std::string folderStructure, std::string fileName)
+	: m_IsInitialized(false)
+	, m_SceneName(std::move(sceneName).c_str()) // NOLINT(readability-redundant-string-cstr)
+	, m_FileFolderStructure(std::move(folderStructure).c_str()) // NOLINT(readability-redundant-string-cstr)
+	, m_FileName(std::move(fileName).c_str()) // NOLINT(readability-redundant-string-cstr)
+{
+	m_FilePath = m_FileFolderStructure.c_str() + std::string("\\") + m_FileName.c_str() + ".protoscene"; // NOLINT(readability-redundant-string-cstr)
 }
 
 Scene::~Scene()
 {
-	for (auto pChild : m_pChildren)
-	{
-		SafeDelete(pChild);
-	}
+	Reset();
 }
 
-void Scene::Save(const std::string& filePath, const std::string& fileName)
+void Scene::Save()
 {
 	using namespace rapidxml;
 
@@ -40,7 +67,7 @@ void Scene::Save(const std::string& filePath, const std::string& fileName)
 	xml_node<>* scene = doc.allocate_node(node_element, "Scene");
 	scene->append_attribute(doc.allocate_attribute("version", "1.0"));
 
-	const std::string convertedSceneName{ WStringToString(m_SceneName.c_str()) };  // NOLINT(readability-redundant-string-cstr)
+	const std::string convertedSceneName{ ProtoConvert::ToString(m_SceneName.c_str()) };  // NOLINT(readability-redundant-string-cstr)
 	scene->append_attribute(doc.allocate_attribute("Name", convertedSceneName.c_str()));
 	scene->append_attribute(doc.allocate_attribute("type", "protoscene"));
 	
@@ -51,27 +78,32 @@ void Scene::Save(const std::string& filePath, const std::string& fileName)
 
 	doc.append_node(scene);
 
-	const std::string path{ ProtoContent.GetDataPath() + filePath.c_str() + "\\" + fileName.c_str() + ".protoscene" };  // NOLINT(readability-redundant-string-cstr)
+	const std::string path{ ProtoContent.GetDataPath() + m_FileFolderStructure.c_str() + "\\" + m_FileName.c_str() + ".protoscene" };  // NOLINT(readability-redundant-string-cstr)
 																														// c_str() is necessary as strings have reserved space (filled with '\0')
-	fs::create_directory(ProtoContent.GetDataPath() + filePath.c_str());  // NOLINT(readability-redundant-string-cstr)
+	fs::create_directory(ProtoContent.GetDataPath() + m_FileFolderStructure.c_str());  // NOLINT(readability-redundant-string-cstr)
 	std::ofstream fileStored(path);
 	fileStored << doc;
 	fileStored.close();
 	doc.clear();
 }
 
-void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::string* pFileName)
+void Scene::Reset()
 {
-	m_FilePath = filePath.substr(0, filePath.rfind('\\'));
-	m_FileName = filePath.substr(m_FilePath.size() + 1);
-	m_FileName = m_FileName.substr(0, m_FileName.rfind('.'));
+	ProtoPhysics.ClearWorld();
 	
-	if(pFolderPath && pFileName)
-	{
-		*pFolderPath = m_FilePath;
-		*pFileName = m_FileName;
-	}
-	
+	for (auto pChild : m_pChildren)
+		SafeDelete(pChild);
+
+	m_pChildren.clear();
+}
+
+void Scene::Load()
+{
+	LoadAs(m_FilePath);
+}
+
+void Scene::LoadAs(const std::string& filePath)
+{
 	using namespace rapidxml;
 
 	xml_document<> doc;
@@ -85,17 +117,16 @@ void Scene::Load(const std::string& filePath, std::string* pFolderPath, std::str
 	doc.parse<0>(&content[0]);
 
 	xml_node<>* scene = doc.first_node("Scene");
-	m_SceneName = StringToWString(ProtoParser::XML::ParseString(scene,"Name"));
-	
-	for(xml_node<>* gameObjectNode = scene->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
+
+	for (xml_node<>* gameObjectNode = scene->first_node("GameObject"); gameObjectNode; gameObjectNode = gameObjectNode->next_sibling())
 	{
 		const std::string goName{ ProtoParser::XML::ParseString(gameObjectNode, "Name") };
 		const GameObjectID id{ ProtoParser::XML::Parse<unsigned int>(gameObjectNode, "ID") };
 		const bool goActive{ ProtoParser::XML::Parse<bool>(gameObjectNode, "Active") };
-		
+
 		auto pNew = new GameObject(id, goName, goActive);
 		AddChild(pNew);
-		
+
 		pNew->Load(gameObjectNode);
 	}
 }
@@ -187,13 +218,12 @@ GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 	return nullptr;
 }
 
-void Scene::SetActiveCamera(CameraComponent* pCamera)
+void Scene::SetActiveCamera(Camera* pCamera)
 {
 	if (m_pActiveCamera)
-		m_pActiveCamera->SetActive(false);
+		m_pActiveCamera->Deactivate();
 
 	m_pActiveCamera = pCamera;
-	m_pActiveCamera->SetActive(true);
 }
 
 glm::vec2 Scene::GetActiveCamera() const
@@ -206,13 +236,8 @@ glm::vec2 Scene::GetActiveCamera() const
 
 void Scene::Start()
 {
-	if (m_IsInitialized)
-		return;
-
 	for (auto pChild : m_pChildren)
 		pChild->Start();
-
-	m_IsInitialized = true;
 }
 
 void Scene::Awake()

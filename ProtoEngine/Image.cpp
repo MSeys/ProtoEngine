@@ -1,5 +1,5 @@
 #include "ProtoEnginePCH.h"
-#include "ImageComponent.h"
+#include "Image.h"
 
 #include "Texture2D.h"
 
@@ -7,8 +7,8 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-ImageComponent::ImageComponent(Proto::Texture2D* pTexture, const TextureData& texData)
-	: m_pTexture(pTexture), m_TexData(texData)
+Image::Image(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData)
+	: BaseBehaviour(ID, isActive), m_pTexture(pTexture), m_TexData(texData)
 {
 	if (m_pTexture)
 	{
@@ -21,12 +21,12 @@ ImageComponent::ImageComponent(Proto::Texture2D* pTexture, const TextureData& te
 	}
 }
 
-ImageComponent::~ImageComponent()
+Image::~Image()
 {
 	
 }
 
-void ImageComponent::SetTexture(const std::string& path)
+void Image::SetTexture(const std::string& path)
 {
 	m_pTexture = ProtoContent.GetTexture(path);
 	m_TexRelPath = path;
@@ -37,18 +37,18 @@ void ImageComponent::SetTexture(const std::string& path)
 	m_TexData.height = float(height);
 }
 
-void ImageComponent::SetTextureData(const TextureData& texData)
+void Image::SetTextureData(const TextureData& texData)
 {
 	m_TexData = texData;
 }
 
-void ImageComponent::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
+void Image::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
 {
 	m_HorAlignment = horAlignment;
 	m_VerAlignment = verAlignment;
 }
 
-void ImageComponent::Draw()
+void Image::Draw()
 {
 	if (!m_pTexture)
 		return;
@@ -93,12 +93,13 @@ void ImageComponent::Draw()
 	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
 
-void ImageComponent::DrawInspectorTitle()
+void Image::DrawInspectorTitle()
 {
+	DrawActiveCheckbox();
 	ImGui::Text("Image");
 }
 
-void ImageComponent::DrawInspector()
+void Image::DrawInspector()
 {
 	/* Image */ {
 		ImGui::Text("Image");
@@ -142,12 +143,15 @@ void ImageComponent::DrawInspector()
 	ProtoGui::Presets::Color("Color", m_TexData, m_TexData.color);
 }
 
-void ImageComponent::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void Image::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 
-	xml_node<>* pComp = doc.allocate_node(node_element, "ImageComponent");
+	xml_node<>* pComp = doc.allocate_node(node_element, "ImageBehaviour");
 
+	SaveID(doc, pComp);
+	SaveActive(doc, pComp);
+	
 	// Image
 	ProtoSaver::XML::SaveString("ImageLocation", m_TexRelPath, doc, pComp);
 
