@@ -178,6 +178,8 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Collider2D.cpp" />
+    <ClCompile Include="SphereCollider2D.cpp" />
+    <ClCompile Include="LineCollider2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -346,5 +348,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Collider2D.h" />
+    <ClInclude Include="SphereCollider2D.h" />
+    <ClInclude Include="LineCollider2D.h" />
   </ItemGroup>
 </Project>

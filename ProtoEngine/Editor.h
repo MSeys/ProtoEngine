@@ -44,7 +44,8 @@ namespace Proto
 		void DrawGameWindow() const;
 		
 		GameObject* m_pCurrentSelected{};
-
+		GameObjectID m_CurrentSelectedID{ 0 };
+		
 		bool m_OpenNewPopup{ false };
 		bool m_OpenSaveAsPopup{ false };
 		

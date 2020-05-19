@@ -51,7 +51,7 @@ namespace ProtoGui
 	
 	namespace Presets
 	{
-		void Position(float& x, float& y, int id = 0);
+		void Position(float& x, float& y, int id = 0, const std::string& extraText = "");
 		void Size(float& w, float& h, int id = 0);
 		void Alignment(HAlignment& hAlignment, VAlignment& vAlignment, int id = 0);
 		void Color(const std::string& text, const TextureData& texData, SDL_Color& color, int id = 0);

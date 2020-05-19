@@ -10,16 +10,12 @@ BoxCollider2D::BoxCollider2D(ComponentID ID, bool isActive, const glm::vec2& col
 void BoxCollider2D::DrawInspectorTitle()
 {
 	DrawActiveCheckbox();
-	ImGui::Text("Box Collider");
+	ImGui::Text("Box Collider 2D");
 }
 
 void BoxCollider2D::DrawInspector()
 {
-	const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
-	const ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.1f" };
-	
 	ProtoGui::Presets::Size(m_CollisionSize.x, m_CollisionSize.y);
-
 	Collider2D::DrawInspector();
 }
 

@@ -7,14 +7,14 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 
-void ProtoGui::Presets::Position(float& x, float& y, int id)
+void ProtoGui::Presets::Position(float& x, float& y, int id, const std::string& extraText)
 {
 	ImGui::PushID(id);
 	
 	ProtoGuiData pgData{ true, 0, -1, true, 70 };
 	const DragData dragData{ 0.1f, 0, 0, "%.1f" };
 	
-	ImGui::Text("Position");
+	ImGui::Text(std::string("Position" + extraText).c_str());
 	ImGui::SameLine(100);
 
 	pgData.sameLineOffset = 115;

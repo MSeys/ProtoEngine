@@ -374,7 +374,17 @@ void Proto::Editor::DrawEditorModeMenu()
 		if (ImGui::Button("Play", { 150, 30 }))
 		{
 			newMode = EditorMode::PLAY;
+
+			m_CurrentSelectedID = 0;
+			if (m_pCurrentSelected)
+				m_CurrentSelectedID = m_pCurrentSelected->GetID();
+
 			ProtoScenes.GetCurrentScene()->Save();
+			ProtoScenes.GetCurrentScene()->Reset();
+			ProtoScenes.GetCurrentScene()->Load();
+
+			if (m_CurrentSelectedID != 0)
+				m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(m_CurrentSelectedID);
 
 			ProtoTime.TimeScale = 1;
 
@@ -400,15 +410,11 @@ void Proto::Editor::DrawEditorModeMenu()
 		{
 			newMode = EditorMode::EDIT;
 
-			GameObjectID currentSelectedID{ 0 };
-			if (m_pCurrentSelected)
-				currentSelectedID = m_pCurrentSelected->GetID();
-
 			ProtoScenes.GetCurrentScene()->Reset();
 			ProtoScenes.GetCurrentScene()->Load();
 
-			if (currentSelectedID != 0)
-				m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(currentSelectedID);
+			if (m_CurrentSelectedID != 0)
+				m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(m_CurrentSelectedID);
 
 			ProtoTime.TimeScale = 0;
 		}
@@ -536,6 +542,11 @@ void Proto::Editor::DrawAddComponentsList() const
 	if (ImGui::Selectable("BoxCollider2D"))
 		m_pCurrentSelected->AddComponent(new BoxCollider2D(m_pCurrentSelected->RequestNewID(), true));
 
+	if (ImGui::Selectable("SphereCollider2D"))
+		m_pCurrentSelected->AddComponent(new SphereCollider2D(m_pCurrentSelected->RequestNewID(), true));
+
+	if (ImGui::Selectable("LineCollider2D"))
+		m_pCurrentSelected->AddComponent(new LineCollider2D(m_pCurrentSelected->RequestNewID(), true));
 }
 
 void Proto::Editor::DrawViewWindow()

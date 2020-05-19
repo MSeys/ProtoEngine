@@ -13,6 +13,9 @@ void ProtoParser::XML::LoadComponents(xml_node<>* pComponents, GameObject* pCurr
 	Helper::LoadTransformComponent(pComponents, pCurr);
 	Helper::LoadRigidBody2DComponent(pComponents, pCurr);
 	Helper::LoadBoxCollider2DComponents(pComponents, pCurr);
+	Helper::LoadSphereCollider2DComponents(pComponents, pCurr);
+	Helper::LoadLineCollider2DComponents(pComponents, pCurr);
+	
 	Helper::LoadCameraComponent(pComponents, pCurr);
 	Helper::LoadImageComponents(pComponents, pCurr);
 	Helper::LoadTextComponents(pComponents, pCurr);
@@ -84,6 +87,7 @@ void ProtoParser::XML::Helper::LoadBoxCollider2DComponents(xml_node<>* pComponen
 		const auto isActive{ Parse<bool>(pComp, "Active") };
 
 		const glm::vec2 collisionSize{ Parse<float>(pComp, "CollisionSizeX"), Parse<float>(pComp, "CollisionSizeY") };
+
 		const auto density{ Parse<float>(pComp, "Density") };
 		const auto friction{ Parse<float>(pComp, "Friction") };
 		const auto restitution{ Parse<float>(pComp, "Restitution") };
@@ -91,6 +95,46 @@ void ProtoParser::XML::Helper::LoadBoxCollider2DComponents(xml_node<>* pComponen
 
 		const auto pBoxCollider = new BoxCollider2D(id, isActive, collisionSize, density, friction, restitution, isTrigger);
 		pCurr->AddComponent(pBoxCollider);
+	}
+}
+
+void ProtoParser::XML::Helper::LoadSphereCollider2DComponents(xml_node<>* pComponents, GameObject* pCurr)
+{
+	for (xml_node<>* pComp = pComponents->first_node("SphereCollider2D"); pComp; pComp = pComp->next_sibling("SphereCollider2D"))
+	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+
+		const glm::vec2 position{ Parse<float>(pComp, "PositionX"), Parse<float>(pComp, "PositionY") };
+		const auto radius{ Parse<float>(pComp, "Radius") };
+		
+		const auto density{ Parse<float>(pComp, "Density") };
+		const auto friction{ Parse<float>(pComp, "Friction") };
+		const auto restitution{ Parse<float>(pComp, "Restitution") };
+		const auto isTrigger{ Parse<bool>(pComp, "IsTrigger") };
+
+		const auto pSphereCollider = new SphereCollider2D(id, isActive, position, radius, density, friction, restitution, isTrigger);
+		pCurr->AddComponent(pSphereCollider);
+	}
+}
+
+void ProtoParser::XML::Helper::LoadLineCollider2DComponents(xml_node<>* pComponents, GameObject* pCurr)
+{
+	for (xml_node<>* pComp = pComponents->first_node("LineCollider2D"); pComp; pComp = pComp->next_sibling("LineCollider2D"))
+	{
+		const auto id{ Parse<unsigned int>(pComp, "ID") };
+		const auto isActive{ Parse<bool>(pComp, "Active") };
+
+		const glm::vec2 posA{ Parse<float>(pComp, "PointAX"), Parse<float>(pComp, "PointAY") };
+		const glm::vec2 posB{ Parse<float>(pComp, "PointBX"), Parse<float>(pComp, "PointBY") };
+		
+		const auto density{ Parse<float>(pComp, "Density") };
+		const auto friction{ Parse<float>(pComp, "Friction") };
+		const auto restitution{ Parse<float>(pComp, "Restitution") };
+		const auto isTrigger{ Parse<bool>(pComp, "IsTrigger") };
+
+		const auto pLineCollider = new LineCollider2D(id, isActive, posA, posB, density, friction, restitution, isTrigger);
+		pCurr->AddComponent(pLineCollider);
 	}
 }
 
@@ -299,4 +343,19 @@ float ProtoConvert::ToDegrees(float radians)
 float ProtoConvert::ToRadians(float degrees)
 {
 	return glm::radians(degrees);
+}
+
+Uint32 ProtoConvert::ColorToUint(int R, int G, int B)
+{
+	return static_cast<Uint32>((R << 16) + (G << 8) + (B << 0));
+}
+
+SDL_Color ProtoConvert::UintToColor(Uint32 color)
+{
+	SDL_Color tempcol;
+	tempcol.a = 255;
+	tempcol.r = (color >> 16) & 0xFF;
+	tempcol.g = (color >> 8) & 0xFF;
+	tempcol.b = color & 0xFF;
+	return tempcol;
 }

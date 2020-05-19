@@ -8,7 +8,7 @@ RigidBody2D::RigidBody2D(ComponentID ID, RigidBodyType bodyType)
 
 void RigidBody2D::DrawInspectorTitle()
 {
-	ImGui::Text("Rigid Body");
+	ImGui::Text("Rigid Body 2D");
 }
 
 void RigidBody2D::DrawInspector()

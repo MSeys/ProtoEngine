@@ -29,5 +29,12 @@
 			<BoxCollider2D ID="2" Active="true" CollisionSizeX="106.900002" CollisionSizeY="40.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="true"/>
 		</Components>
 	</GameObject>
+	<GameObject Name="Line Object" ID="5" Active="true">
+		<Components>
+			<Transform PositionX="400.000000" PositionY="200.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" BodyType="0"/>
+			<LineCollider2D ID="1" Active="true" PointAX="-61.099998" PointAY="0.000000" PointBX="134.899994" PointBY="0.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+		</Components>
+	</GameObject>
 </Scene>
 

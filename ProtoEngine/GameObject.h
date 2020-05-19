@@ -56,7 +56,13 @@ public:
 	std::string& GetName() { return m_Name; }
 	GameObjectID GetID() const { return m_ID; }
 
-	bool GetActive() const { return m_IsActive; }
+	bool GetActive() const
+	{
+		if (m_pParentObject)
+			return m_pParentObject->GetActive() && m_IsActive;
+		
+		return m_IsActive;
+	}
 	void SetActive(bool active) { m_IsActive = active; }
 	
 

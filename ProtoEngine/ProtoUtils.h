@@ -102,6 +102,9 @@ namespace ProtoParser
 			void LoadTransformComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadRigidBody2DComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadBoxCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+			void LoadSphereCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+			void LoadLineCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
+
 			void LoadImageComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadTextComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
 			void LoadFPSComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
@@ -133,4 +136,7 @@ namespace ProtoConvert
 
 	float ToDegrees(float radians);
 	float ToRadians(float degrees);
+
+	Uint32 ColorToUint(int R, int G, int B);
+	SDL_Color UintToColor(Uint32 color);
 }

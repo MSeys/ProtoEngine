@@ -15,3 +15,5 @@
 // Physics
 #include "RigidBody2D.h"
 #include "BoxCollider2D.h"
+#include "SphereCollider2D.h"
+#include "LineCollider2D.h"
