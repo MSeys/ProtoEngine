@@ -2,38 +2,48 @@
 <Scene version="1.0" Name="Test" type="protoscene">
 	<GameObject Name="Background" ID="1" Active="true">
 		<Components>
-			<Transform PositionX="0.000000" PositionY="0.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<ImageBehaviour ID="4" Active="true" ImageLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="480.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<Sprite ID="4" OrderID="1" Active="true" SpriteLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="480.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Floor" ID="3" Active="true">
 		<Components>
-			<Transform PositionX="320.000000" PositionY="456.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<RigidBody2D ID="2" BodyType="0"/>
-			<BoxCollider2D ID="3" Active="true" CollisionSizeX="320.000000" CollisionSizeY="25.700001" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<ImageBehaviour ID="1" Active="true" ImageLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="50.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Transform ID="0" OrderID="0" PositionX="320.000000" PositionY="456.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
+			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="320.000000" CollisionSizeY="25.700001" CollisionRotation="0.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<Sprite ID="1" OrderID="3" Active="true" SpriteLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="50.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Text ID="4" OrderID="4" Active="true" FontLocation="\Lingua.otf" FontSize="25" TexDataX="0.000000" TexDataY="-7.500000" TexDataW="243.000000" TexDataH="26.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" Text="I am a floor herp derp" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Falling Object" ID="2" Active="true">
 		<Components>
-			<Transform PositionX="320.000000" PositionY="40.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<RigidBody2D ID="2" BodyType="1"/>
-			<BoxCollider2D ID="3" Active="true" CollisionSizeX="104.500000" CollisionSizeY="35.400002" Density="1.000000" Friction="0.300000" Restitution="0.300000" IsTrigger="false"/>
-			<ImageBehaviour ID="1" Active="true" ImageLocation="\logo.png" TexDataX="0.000000" TexDataY="0.000000" TexDataW="208.000000" TexDataH="65.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<Transform ID="0" OrderID="0" PositionX="389.700012" PositionY="25.500000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" OrderID="1" BodyType="1" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
+			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="113.300003" CollisionSizeY="33.500000" CollisionRotation="0.000000" Density="1.000000" Friction="0.100000" Restitution="0.300000" IsTrigger="false"/>
+			<Sprite ID="1" OrderID="3" Active="true" SpriteLocation="\logo.png" TexDataX="0.000000" TexDataY="0.000000" TexDataW="208.000000" TexDataH="65.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Trigger Object" ID="4" Active="true">
 		<Components>
-			<Transform PositionX="320.000000" PositionY="395.500000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<RigidBody2D ID="1" BodyType="0"/>
-			<BoxCollider2D ID="2" Active="true" CollisionSizeX="106.900002" CollisionSizeY="40.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="true"/>
+			<Transform ID="0" OrderID="0" PositionX="320.000000" PositionY="395.500000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="1" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
+			<BoxCollider2D ID="2" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="106.900002" CollisionSizeY="40.000000" CollisionRotation="0.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="true"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Line Object" ID="5" Active="true">
 		<Components>
-			<Transform PositionX="400.000000" PositionY="200.000000" RotCenterX="0.000000" RotCenterY="0.000000" RotAngle="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<RigidBody2D ID="2" BodyType="0"/>
-			<LineCollider2D ID="1" Active="true" PointAX="-61.099998" PointAY="0.000000" PointBX="134.899994" PointBY="0.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<Transform ID="0" OrderID="0" PositionX="400.000000" PositionY="200.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<RigidBody2D ID="2" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
+			<LineCollider2D ID="1" OrderID="2" Active="true" PointAX="-85.500000" PointAY="-39.000000" PointBX="160.600006" PointBY="-78.400002" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<LineCollider2D ID="3" OrderID="3" Active="true" PointAX="-400.000000" PointAY="-200.000000" PointBX="-400.000000" PointBY="233.500000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<LineCollider2D ID="4" OrderID="4" Active="true" PointAX="-347.799988" PointAY="50.000000" PointBX="-167.399994" PointBY="109.500000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<LineCollider2D ID="5" OrderID="5" Active="true" PointAX="240.000000" PointAY="-200.000000" PointBX="240.000000" PointBY="240.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+		</Components>
+	</GameObject>
+	<GameObject Name="CamObject" ID="6" Active="true">
+		<Components>
+			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<Camera ID="1" OrderID="1" PositionX="0.000000" PositionY="0.000000" CamActive="true"/>
 		</Components>
 	</GameObject>
 </Scene>

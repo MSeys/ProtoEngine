@@ -12,6 +12,10 @@ protected:
 	void DrawInspectorTitle() override;
 
 	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
+	
 private:
 	float m_Timer{ 0.21f };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

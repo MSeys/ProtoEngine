@@ -44,4 +44,7 @@ private:
 	float m_LerpAlphaX{}, m_LerpAlphaY{};
 	bool m_IsMovingBySpeed{}, m_IsMovingByTime{};
 	bool m_IsCamActive{};
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

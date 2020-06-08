@@ -20,6 +20,7 @@ namespace Proto
 
 		void RenderTexture(const Texture2D& texture, const RenderData& data) const;
 		void RenderLineRect(const SDL_Rect& rect, const SDL_Color& color) const;
+		void RenderLinePolygon(const std::vector<glm::vec2>& polygon, const SDL_Color& color) const;
 		void RenderLineCircle(const glm::vec2& center, float radius, const SDL_Color& color) const;
 		void RenderFilledCircle(const glm::vec2& center, float radius, const SDL_Color& color) const;
 		void RenderLine(const glm::vec2& pointA, const glm::vec2& pointB, const SDL_Color& color) const;
@@ -30,6 +31,7 @@ namespace Proto
 		SDL_Renderer* m_Renderer{};
 
 		void CalculateRenderOffset(int& x, int& y) const;
+		void CalculateRenderOffset(float& x, float& y) const;
 		void SetPixel(int x, int y, const SDL_Color& color) const;
 
 		// For Rendering of Circles, I've looked at https://gist.github.com/derofim/912cfc9161269336f722

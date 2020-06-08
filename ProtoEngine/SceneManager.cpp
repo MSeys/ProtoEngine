@@ -85,6 +85,7 @@ void Proto::SceneManager::Begin()
 	if(m_pCurrentScene != nullptr)
 	{
 		m_pCurrentScene->Load();
+		
 		m_pCurrentScene->Start();
 		m_pCurrentScene->Awake();
 	}

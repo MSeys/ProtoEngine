@@ -168,8 +168,8 @@ void Text::Draw()
 	data.position.y = m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y;
 	data.size.x = m_pGameObject->GetTransform()->GetScale().x * m_TexData.width;
 	data.size.y = m_pGameObject->GetTransform()->GetScale().y * m_TexData.height;
-	data.rotationCenter = m_pGameObject->GetTransform()->GetRotCenter();
-	data.angle = m_pGameObject->GetTransform()->GetRotAngle();
+	data.rotationCenter = m_pGameObject->GetTransform()->GetPosition();
+	data.angle = m_pGameObject->GetTransform()->GetRotation();
 	data.color = { 255, 255, 255, m_TexData.color.a };
 	
 	switch (m_HorAlignment)
@@ -237,7 +237,7 @@ void Text::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 	
-	xml_node<>* pComp = doc.allocate_node(node_element, "TextBehaviour");
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<Text>().c_str()));
 
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
@@ -284,4 +284,28 @@ void Text::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
 	
 	pParent->append_node(pComp);
+}
+
+void Text::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const auto fontLocation{ ProtoParser::XML::ParseString(pComp, "FontLocation") };
+	const auto fontSize{ ProtoParser::XML::Parse<int>(pComp, "FontSize") };
+
+	TextureData texData;
+	ProtoParser::XML::Helper::LoadTexData(pComp, texData);
+
+	const auto text{ ProtoParser::XML::ParseString(pComp, "Text") };
+
+	HAlignment horAlignment;
+	VAlignment verAlignment;
+	ProtoParser::XML::Helper::LoadAlignments(pComp, horAlignment, verAlignment);
+
+	const auto pFont = !fontLocation.empty() ? ProtoContent.GetFont(fontLocation, fontSize) : nullptr;
+	auto pTextComp = new Text(id, isActive, text, pFont, texData);
+	pCurr->AddComponent(pTextComp);
+	pTextComp->SetAlignment(horAlignment, verAlignment);
+	pTextComp->SetTextureData(texData);
 }

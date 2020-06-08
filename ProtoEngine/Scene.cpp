@@ -153,7 +153,8 @@ void Scene::AddChild(GameObject* obj)
 #endif
 
 	obj->m_pParentScene = this;
-	obj->Start();
+	if(m_IsInitialized)
+		obj->Start();
 	m_pChildren.push_back(obj);
 }
 

@@ -11,24 +11,14 @@ glm::vec2 Transform::GetPosition() const
 	return m_Position;
 }
 
-glm::vec2 Transform::GetRotCenter() const
+float Transform::GetRotation() const
 {
 	if (GetGameObject()->GetParent())
 	{
-		return GetGameObject()->GetParent()->GetTransform()->GetRotCenter() + m_RotCenter;
+		return GetGameObject()->GetParent()->GetTransform()->GetRotation() + m_Rotation;
 	}
 
-	return m_RotCenter;
-}
-
-float Transform::GetRotAngle() const
-{
-	if (GetGameObject()->GetParent())
-	{
-		return GetGameObject()->GetParent()->GetTransform()->GetRotAngle() + m_RotAngle;
-	}
-
-	return m_RotAngle;
+	return m_Rotation;
 }
 
 glm::vec2 Transform::GetScale() const
@@ -46,14 +36,9 @@ void Transform::SetPosition(const float x, const float y)
 	m_Position = { x, y };
 }
 
-void Transform::SetRotCenter(float x, float y)
+void Transform::SetRotation(float angle)
 {
-	m_RotCenter = { x, y };
-}
-
-void Transform::SetRotAngle(float angle)
-{
-	m_RotAngle = angle;
+	m_Rotation = angle;
 }
 
 void Transform::SetScale(float x, float y)
@@ -84,22 +69,12 @@ void Transform::DrawInspector()
 	}
 
 	/* Rotation */ {
-		ImGui::Text("Rot. Center");
-		ImGui::SameLine(100);
-
-		pgData.sameLineOffset = 115;
-		ProtoGui::Drag<float>("X", pgData, "##TRANSFORM_ROT_POS_X", m_RotCenter.x, dragData);
-		ImGui::SameLine(200);
-
-		pgData.sameLineOffset = 215;
-		ProtoGui::Drag<float>("Y", pgData, "##TRANSFORM_ROT_POS_Y", m_RotCenter.y, dragData);
-
-		ImGui::Text("Rot. Angle");
+		ImGui::Text("Rotation");
 		
 		ImGui::SameLine(115);
 
 		pgData.sameLineOffset = 115;
-		ProtoGui::Drag<float>("", pgData, "##TRANSFORM_ROT_ANGLE", m_RotAngle, dragData);
+		ProtoGui::Drag<float>("", pgData, "##TRANSFORM_ROT_ANGLE", m_Rotation, dragData);
 	}
 
 	/* Scale */ {
@@ -121,17 +96,39 @@ void Transform::DrawInspector()
 void Transform::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "Transform");
+	
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<Transform>().c_str()));
+
+	SaveID(doc, pComp);
 	
 	ProtoSaver::XML::Save<float>("PositionX", m_Position.x, doc, pComp);
 	ProtoSaver::XML::Save<float>("PositionY", m_Position.y, doc, pComp);
 	
-	ProtoSaver::XML::Save<float>("RotCenterX", m_RotCenter.x, doc, pComp);
-	ProtoSaver::XML::Save<float>("RotCenterY", m_RotCenter.y, doc, pComp);
-	ProtoSaver::XML::Save<float>("RotAngle", m_RotAngle, doc, pComp);
+	ProtoSaver::XML::Save<float>("Rotation", m_Rotation, doc, pComp);
 	
 	ProtoSaver::XML::Save<float>("ScaleX", m_Scale.x, doc, pComp);
 	ProtoSaver::XML::Save<float>("ScaleY", m_Scale.y, doc, pComp);
 	
 	pParent->append_node(pComp);
+}
+
+void Transform::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	using namespace rapidxml;
+	
+	auto* pTransformComp{ pCurr->GetTransform() };
+
+	glm::vec2 position;
+	position.x = ProtoParser::XML::Parse<float>(pComp, "PositionX");
+	position.y = ProtoParser::XML::Parse<float>(pComp, "PositionY");
+
+	const float rotation{ProtoParser::XML::Parse<float>(pComp, "Rotation") };
+
+	glm::vec2 scale;
+	scale.x = ProtoParser::XML::Parse<float>(pComp, "ScaleX");
+	scale.y = ProtoParser::XML::Parse<float>(pComp, "ScaleY");
+
+	pTransformComp->SetPosition(position.x, position.y);
+	pTransformComp->SetRotation(rotation);
+	pTransformComp->SetScale(scale.x, scale.y);
 }

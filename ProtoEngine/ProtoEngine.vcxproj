@@ -261,7 +261,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="ProtoUtils.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
@@ -311,7 +311,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll" "$(OutputPath)" /R /Y</Com
     <ClInclude Include="Observer.h" />
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="ProtoEnginePCH.h" />
-    <ClInclude Include="Image.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="ProtoUtils.h" />
     <ClInclude Include="RapidXML\rapidxml.hpp" />
     <ClInclude Include="RapidXML\rapidxml_iterators.hpp" />

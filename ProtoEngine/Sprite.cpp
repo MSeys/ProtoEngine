@@ -1,5 +1,5 @@
 #include "ProtoEnginePCH.h"
-#include "Image.h"
+#include "Sprite.h"
 
 #include "Texture2D.h"
 
@@ -7,7 +7,7 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-Image::Image(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData)
+Sprite::Sprite(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData)
 	: BaseBehaviour(ID, isActive), m_pTexture(pTexture), m_TexData(texData)
 {
 	if (m_pTexture)
@@ -21,12 +21,12 @@ Image::Image(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const Te
 	}
 }
 
-Image::~Image()
+Sprite::~Sprite()
 {
 	
 }
 
-void Image::SetTexture(const std::string& path)
+void Sprite::SetTexture(const std::string& path)
 {
 	m_pTexture = ProtoContent.GetTexture(path);
 	m_TexRelPath = path;
@@ -37,18 +37,18 @@ void Image::SetTexture(const std::string& path)
 	m_TexData.height = float(height);
 }
 
-void Image::SetTextureData(const TextureData& texData)
+void Sprite::SetTextureData(const TextureData& texData)
 {
 	m_TexData = texData;
 }
 
-void Image::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
+void Sprite::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
 {
 	m_HorAlignment = horAlignment;
 	m_VerAlignment = verAlignment;
 }
 
-void Image::Draw()
+void Sprite::Draw()
 {
 	if (!m_pTexture)
 		return;
@@ -58,8 +58,8 @@ void Image::Draw()
 	data.position.y = m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y;
 	data.size.x = m_pGameObject->GetTransform()->GetScale().x * m_TexData.width;
 	data.size.y = m_pGameObject->GetTransform()->GetScale().y * m_TexData.height;
-	data.rotationCenter = m_pGameObject->GetTransform()->GetRotCenter();
-	data.angle = m_pGameObject->GetTransform()->GetRotAngle();
+	data.rotationCenter = m_pGameObject->GetTransform()->GetPosition();
+	data.angle = m_pGameObject->GetTransform()->GetRotation();
 	data.color = m_TexData.color;
 
 	switch(m_HorAlignment)
@@ -93,16 +93,16 @@ void Image::Draw()
 	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
 
-void Image::DrawInspectorTitle()
+void Sprite::DrawInspectorTitle()
 {
 	DrawActiveCheckbox();
-	ImGui::Text("Image");
+	ImGui::Text("Sprite");
 }
 
-void Image::DrawInspector()
+void Sprite::DrawInspector()
 {
-	/* Image */ {
-		ImGui::Text("Image");
+	/* Sprite */ {
+		ImGui::Text("Sprite");
 		ImGui::SameLine(100);
 
 		ImGui::PushItemWidth(175);
@@ -113,7 +113,7 @@ void Image::DrawInspector()
 		if (ImGui::Button("...##RENDER_COMP_FILE_PATH_BUTTON"))
 		{
 			const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
-			const auto selection = pfd::open_file("Select an Image", fullPath, { "Image Files", "*.png *.jpg *.jpeg *.PNG" }).result();
+			const auto selection = pfd::open_file("Select an Sprite", fullPath, { "Sprite Files", "*.png *.jpg *.jpeg *.PNG" }).result();
 			if (!selection.empty())
 			{
 				const std::string relPath{ selection[0].substr(fullPath.size()) };
@@ -143,17 +143,16 @@ void Image::DrawInspector()
 	ProtoGui::Presets::Color("Color", m_TexData, m_TexData.color);
 }
 
-void Image::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+void Sprite::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 
-	xml_node<>* pComp = doc.allocate_node(node_element, "ImageBehaviour");
-
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<Sprite>().c_str()));
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
 	
-	// Image
-	ProtoSaver::XML::SaveString("ImageLocation", m_TexRelPath, doc, pComp);
+	// Sprite
+	ProtoSaver::XML::SaveString("SpriteLocation", m_TexRelPath, doc, pComp);
 
 	// Texture Data related
 	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);
@@ -188,4 +187,23 @@ void Image::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void Sprite::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const std::string SpriteLocation{ ProtoParser::XML::ParseString(pComp, "SpriteLocation") };
+	TextureData texData;
+	ProtoParser::XML::Helper::LoadTexData(pComp, texData);
+
+	HAlignment horAlignment;
+	VAlignment verAlignment;
+	ProtoParser::XML::Helper::LoadAlignments(pComp, horAlignment, verAlignment);
+
+	auto pSpriteComp = new Sprite(id, isActive, ProtoContent.GetTexture(SpriteLocation), texData);
+	pCurr->AddComponent(pSpriteComp);
+	pSpriteComp->SetAlignment(horAlignment, verAlignment);
+	pSpriteComp->SetTextureData(texData);
 }

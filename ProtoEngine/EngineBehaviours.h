@@ -8,7 +8,7 @@
 #include "Camera.h"
 
 // Graphics
-#include "Image.h"
+#include "Sprite.h"
 #include "Text.h"
 #include "FPSText.h"
 

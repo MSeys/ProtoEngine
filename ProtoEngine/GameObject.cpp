@@ -44,8 +44,11 @@ void GameObject::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pPare
 
 	xml_node<>* thisComponents = doc.allocate_node(node_element, "Components");
 	
-	for(BaseBehaviour* pComp : m_pComponents)
-		pComp->Save(doc, thisComponents);
+	for (size_t i{}; i < m_pComponents.size(); i++)
+	{
+		m_pComponents[i]->SetOrderID(unsigned(i));
+		m_pComponents[i]->Save(doc, thisComponents);
+	}
 	
 	thisGO->append_node(thisComponents);
 
@@ -73,6 +76,8 @@ void GameObject::Load(rapidxml::xml_node<>* pNode)
 
 		pNew->Load(gameObjectNode);
 	}
+
+	SortComponentsByOrder();
 }
 
 void GameObject::AddChild(GameObject* obj)
@@ -157,7 +162,10 @@ void GameObject::AddComponent(BaseBehaviour* pComp)
 	pComp->m_pGameObject = this;
 
 	if (m_IsInitialized)
+	{
 		pComp->Start();
+		pComp->Awake();
+	}
 }
 
 void GameObject::RemoveComponent(BaseBehaviour* pComp, bool deleteComp)
@@ -535,6 +543,14 @@ void GameObject::OnCollisionExit(const Collision& collision)
 		pComp->OnCollisionExit(collision);
 }
 #pragma endregion Root Functions
+
+void GameObject::SortComponentsByOrder()
+{
+	std::sort(m_pComponents.begin(), m_pComponents.end(), [](BaseBehaviour* left, BaseBehaviour* right)
+	{
+		return left->GetOrderID() < right->GetOrderID();
+	});
+}
 
 Scene* GameObject::GetScene() const
 {

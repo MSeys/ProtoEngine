@@ -61,9 +61,6 @@
     <Filter Include="Components\Graphics">
       <UniqueIdentifier>{4711ef54-000e-4635-8e21-9f1234469587}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Components\Game">
-      <UniqueIdentifier>{263abac6-ff75-45bb-ba0c-da2e17108485}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Components\General">
       <UniqueIdentifier>{8a91f761-1396-4bc4-986a-c7120a07f02d}</UniqueIdentifier>
     </Filter>
@@ -153,9 +150,6 @@
     <ClCompile Include="FPSText.cpp">
       <Filter>Components\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>Components\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Components\Graphics</Filter>
     </ClCompile>
@@ -164,9 +158,6 @@
     </ClCompile>
     <ClCompile Include="BoxCollider2D.cpp">
       <Filter>Components\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Components\Game</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Components\General</Filter>
@@ -177,9 +168,21 @@
     <ClCompile Include="PhysicsManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Collider2D.cpp" />
-    <ClCompile Include="SphereCollider2D.cpp" />
-    <ClCompile Include="LineCollider2D.cpp" />
+    <ClCompile Include="Collider2D.cpp">
+      <Filter>Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="LineCollider2D.cpp">
+      <Filter>Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereCollider2D.cpp">
+      <Filter>Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Components\General</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Components\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -320,17 +323,11 @@
     <ClInclude Include="FPSText.h">
       <Filter>Components\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>Components\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Text.h">
       <Filter>Components\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="BoxCollider2D.h">
       <Filter>Components\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Components\Game</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Components\General</Filter>
@@ -347,8 +344,20 @@
     <ClInclude Include="PhysicsManager.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Collider2D.h" />
-    <ClInclude Include="SphereCollider2D.h" />
-    <ClInclude Include="LineCollider2D.h" />
+    <ClInclude Include="SphereCollider2D.h">
+      <Filter>Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider2D.h">
+      <Filter>Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="LineCollider2D.h">
+      <Filter>Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Components\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

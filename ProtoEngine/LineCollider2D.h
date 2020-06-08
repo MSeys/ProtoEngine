@@ -17,4 +17,7 @@ protected:
 private:
 	glm::vec2 m_PosA{ -20, 0 };
 	glm::vec2 m_PosB{ 20, 0 };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

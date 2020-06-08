@@ -50,13 +50,15 @@ void LineCollider2D::Start()
 	def.restitution = m_Restitution;
 	def.isSensor = m_IsTrigger;
 	def.userData = this;
+	
 	m_pCollision = pRigidBody->GetBody()->CreateFixture(&def);
 }
 
 void LineCollider2D::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "LineCollider2D");
+
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<LineCollider2D>().c_str()));
 
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
@@ -69,4 +71,21 @@ void LineCollider2D::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* p
 	Collider2D::Save(doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void LineCollider2D::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const glm::vec2 posA{ ProtoParser::XML::Parse<float>(pComp, "PointAX"),  ProtoParser::XML::Parse<float>(pComp, "PointAY") };
+	const glm::vec2 posB{ ProtoParser::XML::Parse<float>(pComp, "PointBX"),  ProtoParser::XML::Parse<float>(pComp, "PointBY") };
+
+	const auto density{ ProtoParser::XML::Parse<float>(pComp, "Density") };
+	const auto friction{ ProtoParser::XML::Parse<float>(pComp, "Friction") };
+	const auto restitution{ ProtoParser::XML::Parse<float>(pComp, "Restitution") };
+	const auto isTrigger{ ProtoParser::XML::Parse<bool>(pComp, "IsTrigger") };
+
+	const auto pLineCollider = new LineCollider2D(id, isActive, posA, posB, density, friction, restitution, isTrigger);
+	pCurr->AddComponent(pLineCollider);
 }

@@ -17,4 +17,8 @@ protected:
 private:
 	glm::vec2 m_Position{ 0, 0 };
 	float m_Radius{ 25.f };
+	bool m_HasStarted{ false };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

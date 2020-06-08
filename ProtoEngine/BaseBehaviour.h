@@ -32,12 +32,21 @@ public:
 	Transform* GetTransform() const;
 
 	GameObjectID GetID() const { return m_ID; }
-	bool GetActive() const { return m_IsActive; }
+	bool GetActive() const
+	{
+		if(m_pGameObject)
+			return m_pGameObject->GetActive() && m_IsActive;
+
+		return m_IsActive;
+	}
 	void SetActive(bool active) { m_IsActive = active; }
 
 	virtual void DrawInspectorTitle() {}
 	virtual void DrawInspector() = 0;
 	virtual void DrawEditorDebug() {}
+
+	ComponentID GetOrderID() const { return m_OrderID; }
+	void SetOrderID(const ComponentID id) { m_OrderID = id; }
 	
 protected:
 	virtual void Start() {}
@@ -86,7 +95,7 @@ protected:
 	GameObject* m_pGameObject{};
 
 private:
-	ComponentID m_ID;
+	ComponentID m_ID, m_OrderID;
 	bool m_IsActive{ true };
 };
 

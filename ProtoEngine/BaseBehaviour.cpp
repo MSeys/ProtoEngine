@@ -24,6 +24,7 @@ Transform* BaseBehaviour::GetTransform() const
 void BaseBehaviour::SaveID(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	ProtoSaver::XML::Save<unsigned int>("ID", m_ID, doc, pParent);
+	ProtoSaver::XML::Save<unsigned int>("OrderID", m_OrderID, doc, pParent);
 }
 
 void BaseBehaviour::SaveActive(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)

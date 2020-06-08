@@ -1,9 +1,9 @@
 #include "ProtoEnginePCH.h"
 #include "BoxCollider2D.h"
 
-BoxCollider2D::BoxCollider2D(ComponentID ID, bool isActive, const glm::vec2& collisionSize, float density, float friction, float restitution, bool isTrigger)
+BoxCollider2D::BoxCollider2D(ComponentID ID, bool isActive, const glm::vec2& collisionPos, const glm::vec2& collisionSize, float rotation, float density, float friction, float restitution, bool isTrigger)
 	: Collider2D(ID, isActive, density, friction, restitution, isTrigger)
-	, m_CollisionSize(collisionSize)
+	, m_CollisionPos(collisionPos), m_CollisionSize(collisionSize), m_Rotation(rotation)
 {
 }
 
@@ -15,18 +15,56 @@ void BoxCollider2D::DrawInspectorTitle()
 
 void BoxCollider2D::DrawInspector()
 {
+	ProtoGui::Presets::Position(m_CollisionPos.x, m_CollisionPos.y);
 	ProtoGui::Presets::Size(m_CollisionSize.x, m_CollisionSize.y);
+
+	const ProtoGui::ProtoGuiData pgData{ true, 120, -1, true, 70 };
+	const ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.2f" };
+	ProtoGui::Drag<float>("Rotation", pgData, "##BoxColliderRotation", m_Rotation, dragData);
 	Collider2D::DrawInspector();
 }
 
 void BoxCollider2D::DrawEditorDebug()
 {
-	SDL_Rect rect;
-	rect.x = int(GetTransform()->GetPosition().x - m_CollisionSize.x);
-	rect.y = int(GetTransform()->GetPosition().y - m_CollisionSize.y);
-	rect.w = int(m_CollisionSize.x * 2);
-	rect.h = int(m_CollisionSize.y * 2);
-	ProtoRenderer.RenderLineRect(rect, { 0, 255, 0, 255 });
+	if(m_HasStarted)
+	{
+		b2PolygonShape* pCollisionShape{ dynamic_cast<b2PolygonShape*>(m_pCollision->GetShape()) };
+
+		std::vector<glm::vec2> vertices;
+		vertices.reserve(4);
+
+		for (size_t i{}; i < 4; i++)
+		{
+			const b2Vec2 worldPoint{ m_pCollision->GetBody()->GetWorldPoint(pCollisionShape->m_vertices[i]) };
+			vertices.push_back(ProtoConvert::Box2DToPixels(ProtoConvert::ToGLMVec(worldPoint)));
+		}
+
+		ProtoRenderer.RenderLinePolygon(vertices, { 0, 255, 0, 255 });
+	}
+
+	else
+	{
+		b2PolygonShape boxShape;
+
+		const glm::vec2 collisionPos{ ProtoConvert::PixelsToBox2D(m_CollisionPos) };
+		const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize) };
+		
+		boxShape.SetAsBox(collisionSize.x, collisionSize.y,  ProtoConvert::ToBox2DVec(collisionPos), ProtoConvert::ToRadians(m_Rotation));
+		
+		std::vector<glm::vec2> vertices;
+		vertices.reserve(4);
+
+		for (size_t i{}; i < 4; i++)
+		{
+			// gameobject translation (same as the rigidbody)
+			const glm::vec2 worldPoint{ GetTransform()->GetPosition() + ProtoConvert::Box2DToPixels(ProtoConvert::ToGLMVec(boxShape.m_vertices[i])) };
+
+			// gameobject rotation  (same as the rigidbody)
+			vertices.push_back(ProtoConvert::RotatePoint(worldPoint, GetTransform()->GetPosition(), ProtoConvert::ToRadians(GetTransform()->GetRotation())));
+		}
+
+		ProtoRenderer.RenderLinePolygon(vertices, { 0, 255, 0, 255 });
+	}
 }
 
 void BoxCollider2D::Start()
@@ -44,8 +82,12 @@ void BoxCollider2D::Start()
 		pRigidBody->ReadyFromCollision();
 
 	b2PolygonShape boxShape;
-	boxShape.SetAsBox(float(m_CollisionSize.x) / float(ProtoPhysics.GetPPM()), float(m_CollisionSize.y) / float(ProtoPhysics.GetPPM()));
 
+	const glm::vec2 collisionPos{ ProtoConvert::PixelsToBox2D(m_CollisionPos) };
+	const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize) };
+
+	boxShape.SetAsBox(collisionSize.x, collisionSize.y, ProtoConvert::ToBox2DVec(collisionPos), ProtoConvert::ToRadians(m_Rotation));
+	
 	b2FixtureDef def;
 	def.shape = &boxShape;
 	def.density = m_Density;
@@ -54,20 +96,54 @@ void BoxCollider2D::Start()
 	def.isSensor = m_IsTrigger;
 	def.userData = this;
 	m_pCollision = pRigidBody->GetBody()->CreateFixture(&def);
+
+	m_HasStarted = true;
 }
 
 void BoxCollider2D::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "BoxCollider2D");
+
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<BoxCollider2D>().c_str()));
 
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
-	
+
+	ProtoSaver::XML::Save<float>("CollisionPosX", m_CollisionPos.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("CollisionPosY", m_CollisionPos.y, doc, pComp);
 	ProtoSaver::XML::Save<float>("CollisionSizeX", m_CollisionSize.x, doc, pComp);
 	ProtoSaver::XML::Save<float>("CollisionSizeY", m_CollisionSize.y, doc, pComp);
+	ProtoSaver::XML::Save<float>("CollisionRotation", m_Rotation, doc, pComp);
 
 	Collider2D::Save(doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void BoxCollider2D::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const glm::vec2 collisionPos
+	{
+		ProtoParser::XML::Parse<float>(pComp, "CollisionPosX"),
+		ProtoParser::XML::Parse<float>(pComp, "CollisionPosY")
+	};
+	
+	const glm::vec2 collisionSize
+	{
+		ProtoParser::XML::Parse<float>(pComp, "CollisionSizeX"),
+		ProtoParser::XML::Parse<float>(pComp, "CollisionSizeY")
+	};
+
+	const auto rotation{ ProtoParser::XML::Parse<float>(pComp, "CollisionRotation") };
+	
+	const auto density{ ProtoParser::XML::Parse<float>(pComp, "Density") };
+	const auto friction{ ProtoParser::XML::Parse<float>(pComp, "Friction") };
+	const auto restitution{ ProtoParser::XML::Parse<float>(pComp, "Restitution") };
+	const auto isTrigger{ ProtoParser::XML::Parse<bool>(pComp, "IsTrigger") };
+
+	const auto pBoxCollider = new BoxCollider2D(id, isActive, collisionPos, collisionSize, rotation, density, friction, restitution, isTrigger);
+	pCurr->AddComponent(pBoxCollider);
 }

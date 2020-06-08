@@ -41,7 +41,41 @@ T Lerp(const T& x, const T& y, const float& s)
 float SecondsToMicroSeconds(float seconds);
 float MicroSecondsToSeconds(float microSeconds);
 
+namespace ProtoConvert
+{
+	std::string ToString(const std::wstring& wstring);
+	std::wstring ToWString(const std::string& string);
 
+	template<typename T>
+	std::string ToString()
+	{
+		const std::string compName{ typeid(T).name() };
+		return compName.substr(compName.find_last_of(' ') + 1);
+	}
+
+	b2Vec2 ToBox2DVec(const glm::vec2& vec);
+	b2Vec2 ToBox2DVec(const ImVec2& vec);
+	b2Vec3 ToBox2DVec(const glm::vec3& vec);
+
+	ImVec2 ToImGuiVec(const glm::vec2& vec);
+	ImVec2 ToImGuiVec(const b2Vec2& vec);
+	ImVec4 ToImGuiVec(const glm::vec4& vec);
+
+	glm::vec2 ToGLMVec(const b2Vec2& vec);
+	glm::vec2 ToGLMVec(const ImVec2& vec);
+	glm::vec3 ToGLMVec(const b2Vec3& vec);
+	glm::vec4 ToGLMVec(const ImVec4& vec);
+
+	float ToDegrees(float radians);
+	float ToRadians(float degrees);
+
+	Uint32 ColorToUint(int R, int G, int B);
+	SDL_Color UintToColor(Uint32 color);
+
+	glm::vec2 PixelsToBox2D(const glm::vec2& point);
+	glm::vec2 Box2DToPixels(const glm::vec2& point);
+	glm::vec2 RotatePoint(const glm::vec2& point, const glm::vec2& center, float angle);
+}
 
 namespace ProtoSaver
 {
@@ -96,47 +130,38 @@ namespace ProtoParser
 
 			return T();
 		}
+
+		template<typename T = BaseBehaviour>
+		void Load(rapidxml::xml_node<>* pComponents, GameObject* pCurr, bool multiple = true)
+		{
+			using namespace rapidxml;
+			
+			if(multiple)
+			{
+				for (xml_node<>* pComp = pComponents->first_node(ProtoConvert::ToString<T>().c_str()); pComp; pComp = pComp->next_sibling(ProtoConvert::ToString<T>().c_str()))
+				{
+					const ComponentID orderID{ Parse<unsigned int>(pComp, "OrderID") };
+					T::Load(pComp, pCurr);
+					pCurr->GetComponents().back()->SetOrderID(orderID);
+				}
+			}
+
+			else
+			{
+				xml_node<>* pNode{ pComponents->first_node(ProtoConvert::ToString<T>().c_str()) };
+				if (pNode)
+				{
+					const ComponentID orderID{ Parse<unsigned int>(pNode, "OrderID") };
+					T::Load(pNode, pCurr);
+					pCurr->GetComponents().back()->SetOrderID(orderID);
+				}
+			}
+		}
 		
 		namespace Helper
 		{
-			void LoadTransformComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadRigidBody2DComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadBoxCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadSphereCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadLineCollider2DComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-
-			void LoadImageComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadTextComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadFPSComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			void LoadCameraComponent(rapidxml::xml_node<>* pComponents, GameObject* pCurr);
-			
 			void LoadTexData(rapidxml::xml_node<>* pComp, TextureData& texData);
 			void LoadAlignments(rapidxml::xml_node<>* pComp, HAlignment& horAlignment, VAlignment& verAlignment);
 		}
 	}
-}
-
-namespace ProtoConvert
-{
-	std::string ToString(const std::wstring& wstring);
-	std::wstring ToWString(const std::string& string);
-
-	b2Vec2 ToBox2DVec(const glm::vec2& vec);
-	b2Vec2 ToBox2DVec(const ImVec2& vec);
-	b2Vec3 ToBox2DVec(const glm::vec3& vec);
-	
-	ImVec2 ToImGuiVec(const glm::vec2& vec);
-	ImVec2 ToImGuiVec(const b2Vec2& vec);
-	ImVec4 ToImGuiVec(const glm::vec4& vec);
-
-	glm::vec2 ToGLMVec(const b2Vec2& vec);
-	glm::vec2 ToGLMVec(const ImVec2& vec);
-	glm::vec3 ToGLMVec(const b2Vec3& vec);
-	glm::vec4 ToGLMVec(const ImVec4& vec);
-
-	float ToDegrees(float radians);
-	float ToRadians(float degrees);
-
-	Uint32 ColorToUint(int R, int G, int B);
-	SDL_Color UintToColor(Uint32 color);
 }

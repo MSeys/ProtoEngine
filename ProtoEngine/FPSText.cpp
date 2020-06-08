@@ -29,7 +29,7 @@ void FPSText::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
 
-	xml_node<>* pComp = doc.allocate_node(node_element, "FPSBehaviour");
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<FPSText>().c_str()));
 
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
@@ -73,4 +73,26 @@ void FPSText::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void FPSText::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const std::string fontLocation{ ProtoParser::XML::ParseString(pComp, "FontLocation") };
+	const int fontSize{ ProtoParser::XML::Parse<int>(pComp, "FontSize") };
+
+	TextureData texData;
+	ProtoParser::XML::Helper::LoadTexData(pComp, texData);
+
+	HAlignment horAlignment;
+	VAlignment verAlignment;
+	ProtoParser::XML::Helper::LoadAlignments(pComp, horAlignment, verAlignment);
+
+	const auto pFont = !fontLocation.empty() ? ProtoContent.GetFont(fontLocation, fontSize) : nullptr;
+	auto pFPSComp = new FPSText(id, isActive, pFont, texData);
+	pCurr->AddComponent(pFPSComp);
+	pFPSComp->SetAlignment(horAlignment, verAlignment);
+	pFPSComp->SetTextureData(texData);
 }

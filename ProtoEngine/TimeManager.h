@@ -19,7 +19,7 @@ namespace Proto
 		
 		void UpdateTime()
 		{
-			FPS = int(1.f / DeltaTime);
+			DeltaTime == 0.f ? FPS = 0 : FPS = int(1.f / DeltaTime);
 			FPS_Unscaled = int(1.f / DeltaTime_Unscaled);
 			
 			DeltaTime = std::chrono::duration<float>(m_CurrTime - m_StartTime).count();
@@ -40,11 +40,11 @@ namespace Proto
 
 		const float FixedDeltaTime{ 0.02f };
 		float DeltaTime{};
-		int FPS{};
+		unsigned int FPS{};
 		float TimeScale{ 1 };
 
 		float DeltaTime_Unscaled;
-		int FPS_Unscaled;
+		unsigned int FPS_Unscaled;
 
 	private:
 		TimePoint m_StartTime;

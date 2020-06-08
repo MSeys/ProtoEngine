@@ -17,7 +17,7 @@ void Collider2D::DrawInspector()
 	ProtoGui::Drag<float>("Restitution", pgData, "##BOX_COL_RESTITUTION", m_Restitution, dragData);
 
 	ImGui::Text("Is Trigger:");
-	ImGui::SameLine();
+	ImGui::SameLine(100);
 	ImGui::Checkbox("##BOX_COL_TRIGGER", &m_IsTrigger);
 }
 

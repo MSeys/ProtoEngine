@@ -31,11 +31,10 @@ int main(int, char* [])
 	editorSettings.EditorWindowSize = { 1920, 1080 };
 	
 	const Proto::Engine engine{ pGame, pRefGame, editorSettings, windowSettings };
-	
+
 	engine.Run();
 	return 0;
 }
 
 // TODO: List of features to make
-// Extra: Sphere Collision + Edge Collision (+- 30min work)
 // SpriteSheet Component + Animations (A day work)

@@ -6,8 +6,6 @@
 #include <thread>
 #include <SDL.h>
 
-#include <utility>
-
 #include "BaseGame.h"
 
 Proto::Engine::Engine(BaseGame* pGame, BaseGame* pRefGame, const EditorSettings& editorSettings, const WindowSettings& windowSettings, RenderMode renderMode)

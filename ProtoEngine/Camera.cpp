@@ -38,8 +38,20 @@ void Camera::DrawInspector()
 	
 	ImGui::Spacing();
 	ImGui::SameLine(75);
-	if (ImGui::Button("Set Active", { 250, 25 }))
-		GetGameObject()->GetScene()->SetActiveCamera(this);
+	if (m_IsCamActive)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		ImGui::Button("Set Active", { 250, 25 });
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+	}
+
+	else
+	{
+		if (ImGui::Button("Set Active", { 250, 25 }))
+			Activate();
+	}
 
 	ProtoGui::Presets::Position(m_Position.x, m_Position.y);
 }
@@ -123,7 +135,8 @@ void Camera::Update()
 void Camera::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "Camera");
+
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<Camera>().c_str()));
 
 	SaveID(doc, pComp);
 	
@@ -138,4 +151,17 @@ void Camera::DrawEditorDebug()
 {
 	ProtoRenderer.RenderLineRect({ int(m_Position.x), int(m_Position.y), int(ProtoSettings.GetWindowSettings().GameWindowSize.x), int(ProtoSettings.GetWindowSettings().GameWindowSize.y) }, 
 								{ 255, 255, 255, 255 });
+}
+
+void Camera::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+
+	glm::vec2 position;
+	position.x = ProtoParser::XML::Parse<float>(pComp, "PositionX");
+	position.y = ProtoParser::XML::Parse<float>(pComp, "PositionY");
+
+	const auto active{ ProtoParser::XML::Parse<bool>(pComp, "CamActive") };
+
+	pCurr->AddComponent(new Camera(id, position, active));
 }

@@ -505,13 +505,10 @@ void Proto::Editor::DrawAddComponent() const
 	if (ImGui::Button("Add Component", { 300, 25 }))
 		ImGui::OpenPopup("AddComponentPopup");
 
-	if (ImGui::BeginPopup("AddComponentPopup"))
+	ImGui::SetNextWindowContentSize(ImVec2(250, 0.0f));
+	if (ImGui::BeginPopup("AddComponentPopup", ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("Component");
-		ImGui::Separator();
-
 		DrawAddComponentsList();
-		ProtoSettings.GetRefGame()->DrawAddComponent(m_pCurrentSelected);
 		
 		ImGui::EndPopup();
 	}
@@ -519,34 +516,62 @@ void Proto::Editor::DrawAddComponent() const
 
 void Proto::Editor::DrawAddComponentsList() const
 {
-	if (ImGui::Selectable("Camera"))
-		m_pCurrentSelected->AddComponent(new Camera(m_pCurrentSelected->RequestNewID(), {}, false));
-
-	if (ImGui::Selectable("Image"))
-		m_pCurrentSelected->AddComponent(new Image(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
-
-	if (ImGui::Selectable("Text"))
-		m_pCurrentSelected->AddComponent(new Text(m_pCurrentSelected->RequestNewID(), true, "", nullptr, {}));
-
-	if (ImGui::Selectable("FPS Text"))
-		m_pCurrentSelected->AddComponent(new FPSText(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
-
-	if (ImGui::Selectable("RigidBody2D"))
+	if (ImGui::BeginTabBar("##AddComponentsTabs", ImGuiTabBarFlags_None))
 	{
-		if (!m_pCurrentSelected->HasComponent<RigidBody2D>())
-			m_pCurrentSelected->AddComponent(new RigidBody2D(m_pCurrentSelected->RequestNewID(), RigidBodyType::STATIC));
-		else
-			ProtoLogger.AddLog(LogLevel::Warning, "RigidBody2D found on GameObject \'" + m_pCurrentSelected->GetName() + "\'. Only ONE allowed.");
+		if (ImGui::BeginTabItem("General"))
+		{
+			if (ImGui::Selectable("Camera"))
+				m_pCurrentSelected->AddComponent(new Camera(m_pCurrentSelected->RequestNewID(), {}, false));
+			
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Graphics"))
+		{
+			if (ImGui::Selectable("Sprite"))
+				m_pCurrentSelected->AddComponent(new Sprite(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
+
+			if (ImGui::Selectable("Text"))
+				m_pCurrentSelected->AddComponent(new Text(m_pCurrentSelected->RequestNewID(), true, "", nullptr, {}));
+
+			if (ImGui::Selectable("FPS Text"))
+				m_pCurrentSelected->AddComponent(new FPSText(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
+
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Physics"))
+		{
+			if (ImGui::Selectable("RigidBody2D"))
+			{
+				if (!m_pCurrentSelected->HasComponent<RigidBody2D>())
+					m_pCurrentSelected->AddComponent(new RigidBody2D(m_pCurrentSelected->RequestNewID(), RigidBodyType::STATIC));
+				else
+					ProtoLogger.AddLog(LogLevel::Warning, "RigidBody2D found on GameObject \'" + m_pCurrentSelected->GetName() + "\'. Only ONE allowed.");
+			}
+
+			if (ImGui::Selectable("BoxCollider2D"))
+				m_pCurrentSelected->AddComponent(new BoxCollider2D(m_pCurrentSelected->RequestNewID(), true));
+
+			if (ImGui::Selectable("SphereCollider2D"))
+				m_pCurrentSelected->AddComponent(new SphereCollider2D(m_pCurrentSelected->RequestNewID(), true));
+
+			if (ImGui::Selectable("LineCollider2D"))
+				m_pCurrentSelected->AddComponent(new LineCollider2D(m_pCurrentSelected->RequestNewID(), true));
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Game"))
+		{
+			ProtoSettings.GetRefGame()->DrawAddComponent(m_pCurrentSelected);
+
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
 	}
-
-	if (ImGui::Selectable("BoxCollider2D"))
-		m_pCurrentSelected->AddComponent(new BoxCollider2D(m_pCurrentSelected->RequestNewID(), true));
-
-	if (ImGui::Selectable("SphereCollider2D"))
-		m_pCurrentSelected->AddComponent(new SphereCollider2D(m_pCurrentSelected->RequestNewID(), true));
-
-	if (ImGui::Selectable("LineCollider2D"))
-		m_pCurrentSelected->AddComponent(new LineCollider2D(m_pCurrentSelected->RequestNewID(), true));
 }
 
 void Proto::Editor::DrawViewWindow()

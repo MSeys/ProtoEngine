@@ -5,7 +5,7 @@ class Collider2D : public BaseBehaviour
 {
 public:
 	Collider2D(ComponentID ID, bool isActive, float density = 1, float friction = 0.3f, float restitution = 0, bool isTrigger = false);
-	
+
 	void DrawInspectorTitle() override = 0;
 	void DrawInspector() override;
 	void DrawEditorDebug() override = 0;

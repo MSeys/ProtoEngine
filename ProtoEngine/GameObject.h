@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+
 #include "RapidXML/rapidxml.hpp"
 
 struct Collision;
@@ -64,7 +66,6 @@ public:
 		return m_IsActive;
 	}
 	void SetActive(bool active) { m_IsActive = active; }
-	
 
 #pragma region
 	template <class T>
@@ -149,6 +150,7 @@ public:
 #pragma endregion Template Methods
 
 	std::vector<GameObject*>& GetChildren() { return m_pChildren; }
+	std::vector<BaseBehaviour*>& GetComponents() { return m_pComponents; }
 	
 	void DrawInspector();
 	void DrawEditorDebug();
@@ -170,13 +172,15 @@ private:
 	void OnTriggerExit(const Collision& collision);
 	void OnCollisionEnter(const Collision& collision);
 	void OnCollisionExit(const Collision& collision);
+
+	void SortComponentsByOrder();
 	
 	std::vector<GameObject*> m_pChildren;
 	std::vector<BaseBehaviour*> m_pComponents;
 
 	std::string m_Name;
 	GameObjectID m_ID;
-	ComponentID m_CurrentID; // Component ID, used when adding components + saving + Find function
+	ComponentID m_CurrentID{}; // Component ID, used when adding components + saving + Find function
 	bool m_IsInitialized, m_IsActive;
 	Scene* m_pParentScene;
 	GameObject* m_pParentObject;

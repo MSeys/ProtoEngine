@@ -9,7 +9,7 @@ enum class RigidBodyType
 class RigidBody2D final : public BaseBehaviour
 {
 public:
-	RigidBody2D(ComponentID ID, RigidBodyType bodyType);
+	RigidBody2D(ComponentID ID, RigidBodyType bodyType, float gravityScale = 1.f, bool fixedRotation = false, bool isBullet = false);
 	
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
@@ -27,6 +27,9 @@ protected:
 private:
 	b2Body* m_pBody{};
 	RigidBodyType m_BodyType{ RigidBodyType::STATIC };
-	const bool m_FixedRotation{ true };
-	bool m_IsReady{ false };
+	bool m_IsReady{ false }, m_IsBullet{ false }, m_FixedRotation{ false };
+	float m_GravityScale{ 1.f };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

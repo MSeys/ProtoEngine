@@ -25,8 +25,19 @@ void SphereCollider2D::DrawInspector()
 
 void SphereCollider2D::DrawEditorDebug()
 {
-	const glm::vec2 circlePos = GetTransform()->GetPosition() + m_Position;
-	ProtoRenderer.RenderLineCircle(circlePos, m_Radius, { 0, 255, 0, 255 });
+	if(m_HasStarted)
+	{
+		const b2Vec2 worldPoint{ m_pCollision->GetBody()->GetWorldPoint(dynamic_cast<b2CircleShape*>(m_pCollision->GetShape())->m_p) };
+		const glm::vec2 circlePos = ProtoConvert::Box2DToPixels(ProtoConvert::ToGLMVec(worldPoint));
+		ProtoRenderer.RenderLineCircle(circlePos, m_Radius, { 0, 255, 0, 255 });
+	}
+
+	else
+	{
+		glm::vec2 circlePos{ GetTransform()->GetPosition() + m_Position };
+		circlePos = ProtoConvert::RotatePoint(circlePos, GetTransform()->GetPosition(), ProtoConvert::ToRadians(GetTransform()->GetRotation()));
+		ProtoRenderer.RenderLineCircle(circlePos, m_Radius, { 0, 255, 0, 255 });
+	}
 }
 
 void SphereCollider2D::Start()
@@ -55,12 +66,15 @@ void SphereCollider2D::Start()
 	def.isSensor = m_IsTrigger;
 	def.userData = this;
 	m_pCollision = pRigidBody->GetBody()->CreateFixture(&def);
+
+	m_HasStarted = true;
 }
 
 void SphereCollider2D::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 {
 	using namespace rapidxml;
-	xml_node<>* pComp = doc.allocate_node(node_element, "SphereCollider2D");
+
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<SphereCollider2D>().c_str()));
 
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
@@ -72,4 +86,24 @@ void SphereCollider2D::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>*
 	Collider2D::Save(doc, pComp);
 
 	pParent->append_node(pComp);
+}
+
+void SphereCollider2D::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const glm::vec2 position{
+		ProtoParser::XML::Parse<float>(pComp, "PositionX"),
+		ProtoParser::XML::Parse<float>(pComp, "PositionY")
+	};
+	const auto radius{ ProtoParser::XML::Parse<float>(pComp, "Radius") };
+
+	const auto density{ ProtoParser::XML::Parse<float>(pComp, "Density") };
+	const auto friction{ ProtoParser::XML::Parse<float>(pComp, "Friction") };
+	const auto restitution{ ProtoParser::XML::Parse<float>(pComp, "Restitution") };
+	const auto isTrigger{ ProtoParser::XML::Parse<bool>(pComp, "IsTrigger") };
+
+	const auto pSphereCollider = new SphereCollider2D(id, isActive, position, radius, density, friction, restitution, isTrigger);
+	pCurr->AddComponent(pSphereCollider);
 }

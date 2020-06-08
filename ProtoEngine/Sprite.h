@@ -6,11 +6,11 @@ namespace Proto {
 	class Texture2D;
 }
 
-class Image final : public BaseBehaviour
+class Sprite final : public BaseBehaviour
 {
 public:
-	Image(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData);
-	~Image();
+	Sprite(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData);
+	~Sprite();
 
 	void SetTexture(const std::string& path);
 	void SetTextureData(const TextureData& texData);
@@ -31,4 +31,7 @@ protected:
 
 	HAlignment m_HorAlignment{ HAlignment::LEFT };
 	VAlignment m_VerAlignment{ VAlignment::BOTTOM };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

@@ -71,6 +71,18 @@ void Proto::Renderer::RenderLineRect(const SDL_Rect& rect, const SDL_Color& colo
 	SDL_SetRenderDrawColor(GetSDLRenderer(), 0, 0, 0, 255);
 }
 
+void Proto::Renderer::RenderLinePolygon(const std::vector<glm::vec2>& polygon, const SDL_Color& color) const
+{
+	for (size_t i{}; i < polygon.size(); i++)
+	{
+		if(i + 1 == polygon.size())
+			RenderLine(polygon[i], polygon[0], color);
+
+		else
+			RenderLine(polygon[i], polygon[i + 1], color);
+	}
+}
+
 void Proto::Renderer::RenderLineCircle(const glm::vec2& center, float radius, const SDL_Color& color) const
 {
 	// if the first pixel in the screen is represented by (0,0) (which is in sdl)
@@ -80,8 +92,10 @@ void Proto::Renderer::RenderLineCircle(const glm::vec2& center, float radius, co
 	auto error = double(-radius);
 	auto x = double(radius) - 0.5;
 	auto y = double(0.5);
-	const auto cx = float(center.x) - 0.5;
-	const auto cy = float(center.y) - 0.5;
+	float cx = float(center.x) - 0.5f;
+	float cy = float(center.y) - 0.5f;
+
+	CalculateRenderOffset(cx, cy);
 
 	while (x >= y)
 	{
@@ -123,7 +137,10 @@ void Proto::Renderer::RenderFilledCircle(const glm::vec2& center, float radius, 
 {
 	for (double dy = 1; dy <= radius; dy += 1.0)
 	{
-		const int cx{ int(center.x) }, cy{ int(center.y) };
+		int cx{ int(center.x) }, cy{ int(center.y) };
+
+		CalculateRenderOffset(cx, cy);
+		
 		const double dx = floor(sqrt(2.0 * radius * dy - dy * dy));
 		SDL_SetRenderDrawColor(GetSDLRenderer(), color.r, color.g, color.b, color.a);
 		SDL_RenderDrawLine(GetSDLRenderer(), int(cx - dx), int(cy + dy - radius), int(cx + dx), int(cy + dy - radius));
@@ -133,8 +150,12 @@ void Proto::Renderer::RenderFilledCircle(const glm::vec2& center, float radius, 
 
 void Proto::Renderer::RenderLine(const glm::vec2& pointA, const glm::vec2& pointB, const SDL_Color& color) const
 {
+	glm::vec2 p1{ pointA }, p2{ pointB };
+	CalculateRenderOffset(p1.x, p1.y);
+	CalculateRenderOffset(p2.x, p2.y);
+	
 	SDL_SetRenderDrawColor(GetSDLRenderer(), color.r, color.g, color.b, color.a);
-	SDL_RenderDrawLine(GetSDLRenderer(), int(pointA.x), int(pointA.y), int(pointB.x), int(pointB.y));
+	SDL_RenderDrawLine(GetSDLRenderer(), int(p1.x), int(p1.y), int(p2.x), int(p2.y));
 	SDL_SetRenderDrawColor(GetSDLRenderer(), 0, 0, 0, 255);
 }
 
@@ -159,6 +180,30 @@ void Proto::Renderer::CalculateRenderOffset(int& x, int& y) const
 	{
 		x -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().x);
 		y -= int(ProtoScenes.GetCurrentScene()->GetActiveCamera().y);
+	}
+}
+
+void Proto::Renderer::CalculateRenderOffset(float& x, float& y) const
+{
+	if (ProtoSettings.GetRenderMode() == RenderMode::EDITOR)
+	{
+		if (ProtoSettings.GetEditorRenderMode() == RenderMode::EDITOR)
+		{
+			x += float(ProtoSettings.GetEditorCamera().x);
+			y += float(ProtoSettings.GetEditorCamera().y);
+		}
+
+		else
+		{
+			x -= float(ProtoScenes.GetCurrentScene()->GetActiveCamera().x);
+			y -= float(ProtoScenes.GetCurrentScene()->GetActiveCamera().y);
+		}
+	}
+
+	else
+	{
+		x -= float(ProtoScenes.GetCurrentScene()->GetActiveCamera().x);
+		y -= float(ProtoScenes.GetCurrentScene()->GetActiveCamera().y);
 	}
 }
 

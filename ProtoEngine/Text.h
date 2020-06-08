@@ -38,5 +38,8 @@ protected:
 
 	HAlignment m_HorAlignment{ HAlignment::LEFT };
 	VAlignment m_VerAlignment{ VAlignment::BOTTOM };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };
 
