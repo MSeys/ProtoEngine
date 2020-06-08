@@ -163,5 +163,9 @@ void Camera::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
 
 	const auto active{ ProtoParser::XML::Parse<bool>(pComp, "CamActive") };
 
-	pCurr->AddComponent(new Camera(id, position, active));
+	Camera* pCam = new Camera(id, position, active);
+	pCurr->AddComponent(pCam);
+	if (active)
+		pCurr->GetScene()->m_pActiveCamera = pCam;
+
 }

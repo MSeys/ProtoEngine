@@ -222,7 +222,12 @@ GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 void Scene::SetActiveCamera(Camera* pCamera)
 {
 	if (m_pActiveCamera)
+	{
+		if (m_pActiveCamera == pCamera)
+			return;
+		
 		m_pActiveCamera->Deactivate();
+	}
 
 	m_pActiveCamera = pCamera;
 }

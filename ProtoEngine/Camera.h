@@ -23,7 +23,8 @@ public:
 	void Reset();
 	
 	bool IsMoving() const { return m_IsMovingBySpeed || m_IsMovingByTime; }
-
+	bool IsActive() const { return m_IsCamActive; }
+	
 	void Activate();
 	void Deactivate();
 	
