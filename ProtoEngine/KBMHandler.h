@@ -9,14 +9,14 @@ public:
 	void UpdateInPoll(const SDL_Event& e);
 	void Process();
 
-	bool AddInput(int SDLKey, const std::string& stringifiedSDLKey);
+	bool AddInput(SDL_Keycode keyCode);
 
-	Key& GetInput(int SDLKey, bool doesCreate = true);
-	MouseButton& GetInput(const StickState& mouseState) const noexcept;
-	Mouse& GetInput() const noexcept;
+	Key& GetInput(SDL_Keycode keyCode);
+	MouseButton& GetMouseButton(const MouseState& mouseState) const noexcept;
+	Mouse& GetMouse() const noexcept;
 
 private:
-	std::unordered_map<int, Key*> m_Keys;
+	std::unordered_map<SDL_Keycode, Key*> m_Keys{};
 
 	std::array<MouseButton*, 2> m_pMouseButtons{};
 	Mouse* m_pMouse{};

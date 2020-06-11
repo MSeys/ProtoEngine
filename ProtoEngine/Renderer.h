@@ -19,6 +19,7 @@ namespace Proto
 		void Destroy();
 
 		void RenderTexture(const Texture2D& texture, const RenderData& data) const;
+		void RenderSprite(const Texture2D& texture, const FrameRenderData& data) const;
 		void RenderLineRect(const SDL_Rect& rect, const SDL_Color& color) const;
 		void RenderLinePolygon(const std::vector<glm::vec2>& polygon, const SDL_Color& color) const;
 		void RenderLineCircle(const glm::vec2& center, float radius, const SDL_Color& color) const;

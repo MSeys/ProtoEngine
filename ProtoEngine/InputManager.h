@@ -32,15 +32,15 @@ namespace Proto
 		void Update();
 		void Process();
 
-		bool AddControllerButton(int index, int XInput, const std::string& stringifiedXInput = "UNDEFINED");
-		bool AddKey(int SDLKey, const std::string& stringifiedSDLKey = "UNDEFINED");
+		bool AddInput(int index, XINPUT_Keycode keyCode);
+		bool AddInput(SDL_Keycode keyCode);
 
-		ControllerButton& GetControllerButton(int index, int XInput);
-		ControllerJoystick& GetControllerJoystick(int index, const StickState& stickState) const noexcept;
-		ControllerTrigger& GetControllerTrigger(int index, const TriggerPosState& triggerPosState) const noexcept;
+		ControllerButton& GetInput(int index, XINPUT_Keycode keyCode);
+		ControllerJoystick& GetInput(int index, const StickState& stickState) const noexcept;
+		ControllerTrigger& GetInput(int index, const TriggerPosState& triggerPosState) const noexcept;
 
-		Key& GetKey(int SDLKey, bool doesCreate = true);
-		MouseButton& GetMouseButton(const StickState& mouseState) const;
+		Key& GetInput(SDL_Keycode keyCode);
+		MouseButton& GetMouseButton(const MouseState& mouseState) const;
 		Mouse& GetMouse() const;
 
 	private:

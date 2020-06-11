@@ -48,6 +48,7 @@ namespace Proto
 		
 		bool m_OpenNewPopup{ false };
 		bool m_OpenSaveAsPopup{ false };
+		bool m_DrawDebugAllObjects{ false };
 		
 		std::string m_SceneName{};
 		std::string m_SaveFileFolderStructure{};

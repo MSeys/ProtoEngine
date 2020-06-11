@@ -7,7 +7,7 @@ void KBMHandler::Init()
 	m_pMouseButtons[1] = new MouseButton();
 	m_pMouse = new Mouse();
 
-	m_pDefaultKey = new Key("UNDEFINED");
+	m_pDefaultKey = new Key(-1);
 }
 
 void KBMHandler::Destroy()
@@ -32,11 +32,9 @@ void KBMHandler::UpdateOutPoll()
 	}
 
 	for (auto& pMouseButton : m_pMouseButtons)
-	{
 		pMouseButton->UpdateOutPoll();
-	}
 
-	GetInput().UpdateOutPoll();
+	GetMouse().UpdateOutPoll();
 }
 
 void KBMHandler::UpdateInPoll(const SDL_Event& e)
@@ -44,22 +42,20 @@ void KBMHandler::UpdateInPoll(const SDL_Event& e)
 	// Necessary to check for NO Key repeat or it'll be sending the KEYDOWN event over and over after a delay
 	// https://stackoverflow.com/questions/22156815/how-to-disable-key-repeat-in-sdl2
 	if ((e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) && e.key.repeat == 0)
-	{
-		GetInput(e.key.keysym.sym, false).UpdateInPoll(e);
-	}
+		GetInput(e.key.keysym.sym).UpdateInPoll(e);
 
 	if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
 	{
 		if (e.button.button == SDL_BUTTON_LEFT)
-			GetInput(StickState::Left).UpdateInPoll(e);
+			GetMouseButton(MouseState::Left).UpdateInPoll(e);
 
 		else if (e.button.button == SDL_BUTTON_RIGHT)
-			GetInput(StickState::Right).UpdateInPoll(e);
+			GetMouseButton(StickState::Right).UpdateInPoll(e);
 	}
 
 	if (e.type == SDL_MOUSEMOTION)
 	{
-		GetInput().UpdateInPoll(e);
+		GetMouse().UpdateInPoll(e);
 	}
 }
 
@@ -72,57 +68,48 @@ void KBMHandler::Process()
 	}
 
 	for (auto& pMouseButton : m_pMouseButtons)
-	{
 		pMouseButton->Process();
-	}
 
-	GetInput().Process();
+	GetMouse().Process();
 }
 
-bool KBMHandler::AddInput(int SDLKey, const std::string& stringifiedSDLKey)
+bool KBMHandler::AddInput(SDL_Keycode keyCode)
 {
-	if (m_Keys.find(SDLKey) != m_Keys.end())
+	if (m_Keys.find(keyCode) != m_Keys.end())
 	{
 		ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::AddInput failed > Key was already added.");
 		return false;
 	}
 
-	m_Keys[SDLKey] = new Key(stringifiedSDLKey);
+	m_Keys[keyCode] = new Key(keyCode);
 	return true;
 }
 
-Key& KBMHandler::GetInput(int SDLKey, bool doesCreate)
+Key& KBMHandler::GetInput(SDL_Keycode keyCode)
 {
 	try
 	{
-		return *m_Keys.at(SDLKey);
+		return *m_Keys.at(keyCode);
 	}
 
 	catch (const std::out_of_range & exception)
 	{
 		UNREFERENCED_PARAMETER(exception);
-		if (doesCreate)
-		{
-			AddInput(SDLKey, "UNDEFINED");
-			ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::GetInput failed > Key was not found, but has been created. Use AddKey first on the desired key.");
-
-			return GetInput(SDLKey);
-		}
 
 		ProtoLogger.AddLog(LogLevel::Warning, "KBMHandler::GetInput failed > Key was not found, default key has been returned.");
 		return *m_pDefaultKey;
 	}
 }
 
-MouseButton& KBMHandler::GetInput(const StickState& mouseState) const noexcept
+MouseButton& KBMHandler::GetMouseButton(const MouseState& mouseState) const noexcept
 {
-	if (mouseState == StickState::Left)
+	if (mouseState == MouseState::Left)
 		return *m_pMouseButtons[0];
 
 	return *m_pMouseButtons[1];
 }
 
-Mouse& KBMHandler::GetInput() const noexcept
+Mouse& KBMHandler::GetMouse() const noexcept
 {
 	return *m_pMouse;
 }

@@ -9,7 +9,8 @@ enum class CommandOrigin
 struct InputData
 {
 	CommandOrigin Origin{ CommandOrigin::NONE };
-	std::string StringCode = "NONE";
+	SDL_Keycode SDLKeycode{ -1 };
+	XINPUT_Keycode XINPUTKeycode{ XINPUT_Keycode(-1) };
 	void* Data = nullptr;
 };
 
@@ -19,14 +20,14 @@ class Command
 public:
 	virtual ~Command() = default;
 	virtual void Execute() = 0;
-	virtual void SetExecuteData(void* pData)
+	void SetExecuteData(void* pData)
 	{
 		EData = pData;
 	}
 
-	virtual void SetInputData(const CommandOrigin& origin, const std::string& code, void* pData)
+	void SetInputData(const CommandOrigin& origin, SDL_Keycode sdlKeycode, XINPUT_Keycode xinputKeycode, void* pData)
 	{
-		IData = { origin, code, pData };
+		IData = { origin, sdlKeycode, xinputKeycode, pData };
 	}
 
 protected:
@@ -44,7 +45,8 @@ protected:
 	 * Input Data (IData) is used to store input information given by the Input Manager. \n
 	 * Input Data contains:
 	 * - Origin (CommandOrigin Enum Class)
-	 * - StringCode (std::string, SDL / XInput code in string form. E.g. SDLK_a / XINPUT_GAMEPAD_A)
+	 * - SDL_Keycode (SDLK_xxx)
+	 * * XINPUT_Keycode (XINPUT_GAMEPAD_xxx)
 	 * - Data (void* containing specific data. E.g. Position of Joystick or more info for Mouse)
 	 */
 	InputData IData;

@@ -18,7 +18,7 @@ void SphereCollider2D::DrawInspector()
 	const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
 	const ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.1f" };
 
-	ProtoGui::Presets::Position(m_Position.x, m_Position.y);
+	ProtoGui::Presets::InputXY({ "Position", "X", "Y" }, m_Position.x, m_Position.y, { 1.f, 0, 0, "%.0f" }, 0);
 	ProtoGui::Drag<float>("Radius", pgData, "##RADIUS", m_Radius, dragData);
 	Collider2D::DrawInspector();
 }

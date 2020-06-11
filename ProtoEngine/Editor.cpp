@@ -46,7 +46,7 @@ void Proto::Editor::DrawDocks()
 	const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
 	const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
 
-
+	
 
 	ImGui::SetNextWindowPos({ 0, 20 }, ImGuiCond_Always);
 	ImGui::SetNextWindowSize({ 350, ProtoSettings.GetEditorSettings().EditorWindowSize.y - 20 }, ImGuiCond_Always);
@@ -116,6 +116,9 @@ void Proto::Editor::DrawMenu()
 			if (ImGui::MenuItem("Reset Selected"))
 				m_pCurrentSelected = nullptr;
 
+			if (ImGui::MenuItem("Toggle Draw Debug Selected / All"))
+				m_DrawDebugAllObjects = !m_DrawDebugAllObjects;
+			
 			if (ImGui::MenuItem("Exit"))
 				ProtoCommands.ForceExit();
 
@@ -528,15 +531,16 @@ void Proto::Editor::DrawAddComponentsList() const
 
 		if (ImGui::BeginTabItem("Graphics"))
 		{
-			if (ImGui::Selectable("Sprite"))
-				m_pCurrentSelected->AddComponent(new Sprite(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
+			if (ImGui::Selectable("Image"))
+				m_pCurrentSelected->AddComponent(new Image(m_pCurrentSelected->RequestNewID(), true, nullptr));
 
 			if (ImGui::Selectable("Text"))
-				m_pCurrentSelected->AddComponent(new Text(m_pCurrentSelected->RequestNewID(), true, "", nullptr, {}));
+				m_pCurrentSelected->AddComponent(new Text(m_pCurrentSelected->RequestNewID(), true, "", nullptr));
 
-			if (ImGui::Selectable("FPS Text"))
-				m_pCurrentSelected->AddComponent(new FPSText(m_pCurrentSelected->RequestNewID(), true, nullptr, {}));
-
+			if (ImGui::Selectable("Sprite"))
+				m_pCurrentSelected->AddComponent(new Sprite(m_pCurrentSelected->RequestNewID(), true, nullptr));
+			if (ImGui::Selectable("Animated Sprite"))
+				m_pCurrentSelected->AddComponent(new AnimatedSprite(m_pCurrentSelected->RequestNewID(), true, 0, nullptr));
 
 			ImGui::EndTabItem();
 		}
@@ -595,7 +599,10 @@ void Proto::Editor::DrawViewWindow()
 
 		ProtoScenes.Draw();
 
-		if (m_pCurrentSelected)
+		if (m_DrawDebugAllObjects)
+			ProtoScenes.GetCurrentScene()->DrawDebug();
+		
+		else if (m_pCurrentSelected)
 			m_pCurrentSelected->DrawEditorDebug();
 
 		SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);

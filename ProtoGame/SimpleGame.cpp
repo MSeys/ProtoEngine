@@ -28,37 +28,36 @@ void SimpleGame::InitializeCommands()
 
 void SimpleGame::InitializeControls()
 {
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_A, STRINGIFY(XINPUT_GAMEPAD_A));
-	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_A).SetCommand(ButtonState::Pressed, "Jump");
+	ProtoInput.AddInput(0, XINPUT_GAMEPAD_A);
+	ProtoInput.GetInput(0, XINPUT_GAMEPAD_A).SetCommand(ButtonState::Pressed, "Jump");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_B, STRINGIFY(XINPUT_GAMEPAD_B));
-	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_B).SetCommand(ButtonState::Pressed, "Fire");
+	ProtoInput.AddInput(0, XINPUT_GAMEPAD_B);
+	ProtoInput.GetInput(0, XINPUT_GAMEPAD_B).SetCommand(ButtonState::Pressed, "Fire");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_Y, STRINGIFY(XINPUT_GAMEPAD_Y));
-	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_Y).SetCommand(ButtonState::Pressed, "Duck");
+	ProtoInput.AddInput(0, XINPUT_GAMEPAD_Y);
+	ProtoInput.GetInput(0, XINPUT_GAMEPAD_Y).SetCommand(ButtonState::Pressed, "Duck");
 
-	ProtoInput.AddControllerButton(0, XINPUT_GAMEPAD_X, STRINGIFY(XINPUT_GAMEPAD_X));
-	ProtoInput.GetControllerButton(0, XINPUT_GAMEPAD_X).SetCommand(ButtonState::Pressed, "Fart");
+	ProtoInput.AddInput(0, XINPUT_GAMEPAD_X);
+	ProtoInput.GetInput(0, XINPUT_GAMEPAD_X).SetCommand(ButtonState::Pressed, "Fart");
 
-	ProtoInput.AddKey(SDLK_t, STRINGIFY(SDLK_t));
-	ProtoInput.GetKey(SDLK_t).SetCommand(ButtonState::Pressed, "SwitchAudioService");
+	ProtoInput.AddInput(SDLK_t);
+	ProtoInput.GetInput(SDLK_t).SetCommand(ButtonState::Pressed, "SwitchAudioService");
 
 	/* Extra Inputs */
 	//ProtoInput.GetControllerJoystick(0, StickState::Left).SetCommand(JoystickState::Moving, "Joystick"); // Using old separate command
 	//ProtoInput.GetMouse().SetCommand(JoystickState::Moving, "Mouse"); // Using old separate command
-	ProtoInput.GetControllerJoystick(0, StickState::Left).SetCommand(JoystickState::Moving, "Motion");
+	ProtoInput.GetInput(0, StickState::Left).SetCommand(JoystickState::Moving, "Motion");
 	ProtoInput.GetMouse().SetCommand(JoystickState::Moving, "Motion");
 
-	ProtoInput.GetControllerTrigger(0, TriggerPosState::Left).SetCommand(TriggerState::Held, "Trigger");
-
+	ProtoInput.GetInput(0, TriggerPosState::Left).SetCommand(TriggerState::Held, "Trigger");
 
 	/* Key Held Test */
-	ProtoInput.AddKey(SDLK_a, STRINGIFY(SDLK_a));
-	ProtoInput.GetKey(SDLK_a).SetCommand(ButtonState::Pressed, "Jump");
-	ProtoInput.GetKey(SDLK_a).SetCommand(ButtonState::Released, "Fart");
+	ProtoInput.AddInput(SDLK_a);
+	ProtoInput.GetInput(SDLK_a).SetCommand(ButtonState::Pressed, "Jump");
+	ProtoInput.GetInput(SDLK_a).SetCommand(ButtonState::Released, "Fart");
 
-	ProtoInput.GetMouseButton(StickState::Left).SetCommand(ButtonState::Pressed, "Jump");
-	ProtoInput.GetMouseButton(StickState::Left).SetCommand(ButtonState::Released, "Duck");
+	ProtoInput.GetMouseButton(MouseState::Left).SetCommand(ButtonState::Pressed, "Jump");
+	ProtoInput.GetMouseButton(MouseState::Left).SetCommand(ButtonState::Released, "Duck");
 }
 
 void SimpleGame::InitializeScene()

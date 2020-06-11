@@ -33,32 +33,70 @@ void Proto::Renderer::Destroy()
 
 void Proto::Renderer::RenderTexture(const Texture2D& texture, const RenderData& data) const
 {
-	SDL_Rect dst;
-	dst.x = static_cast<int>(data.position.x);
-	dst.y = static_cast<int>(data.position.y);
+	const SDL_RendererFlip flip{ SDL_FLIP_NONE };
 
-	CalculateRenderOffset(dst.x, dst.y);
+	glm::vec2 totalPosition{ data.originPosition + data.position };
+	const glm::vec2 totalScale{ data.originScale * data.scale };
 
-	dst.w = static_cast<int>(abs(data.size.x));
-	dst.h = static_cast<int>(abs(data.size.y));
-
-	SDL_Point rotPoint{ int(data.rotationCenter.x - data.position.x), int(data.rotationCenter.y - data.position.y) };
-	SDL_RendererFlip flip{ SDL_FLIP_NONE };
-
-	if (data.size.x < 0)
-		flip = SDL_FLIP_HORIZONTAL;
-
-	if (data.size.y < 0)
-		flip = SDL_FLIP_VERTICAL;
-
-	if (data.size.x < 0 && data.size.y < 0)
-		flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
-	
 	SDL_SetTextureBlendMode(texture.GetSDLTexture(), SDL_BLENDMODE_BLEND);
 	SDL_SetTextureColorMod(texture.GetSDLTexture(), data.color.r, data.color.g, data.color.b);
 	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), data.color.a);
+
+	// Offset based on pivot (accounting for scale)
+	totalPosition -= data.pivot * data.size * totalScale;
+
+	SDL_Point rotPoint{ int(data.originPosition.x - totalPosition.x), int(data.originPosition.y - totalPosition.y) };
+	CalculateRenderOffset(totalPosition.x, totalPosition.y);
 	
-	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, data.angle, &rotPoint, flip);
+	SDL_Rect dst;
+	dst.x = int(totalPosition.x);
+	dst.y = int(totalPosition.y);
+	dst.w = int(data.size.x * totalScale.x);
+	dst.h = int(data.size.y * totalScale.y);
+
+	// flip using destination rect instead (+ small cheat to see flipped version)
+	float angle{ data.originAngle };
+	if (dst.w < 0 || dst.h < 0)
+		angle += 0.00001f;
+	
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, angle, &rotPoint, flip);
+}
+
+void Proto::Renderer::RenderSprite(const Texture2D& texture, const FrameRenderData& data) const
+{
+	const SDL_RendererFlip flip{ SDL_FLIP_NONE };
+
+	glm::vec2 totalPosition{ data.originPosition + data.frame.dstPosition };
+	const glm::vec2 totalScale{ data.originScale * data.frame.scale };
+
+	SDL_SetTextureBlendMode(texture.GetSDLTexture(), SDL_BLENDMODE_BLEND);
+	SDL_SetTextureColorMod(texture.GetSDLTexture(), data.frame.color.r, data.frame.color.g, data.frame.color.b);
+	SDL_SetTextureAlphaMod(texture.GetSDLTexture(), data.frame.color.a);
+
+	// Offset based on pivot (accounting for scale)
+	totalPosition -= data.frame.pivot * data.frame.dstSize * totalScale;
+
+	SDL_Point rotPoint{ int(data.originPosition.x - totalPosition.x), int(data.originPosition.y - totalPosition.y) };
+	CalculateRenderOffset(totalPosition.x, totalPosition.y);
+
+	SDL_Rect dst;
+	dst.x = int(totalPosition.x);
+	dst.y = int(totalPosition.y);
+	dst.w = int(data.frame.dstSize.x * totalScale.x);
+	dst.h = int(data.frame.dstSize.y * totalScale.y);
+
+	SDL_Rect src;
+	src.x = int(data.frame.srcPosition.x);
+	src.y = int(data.frame.srcPosition.y);
+	src.w = int(data.frame.srcSize.x);
+	src.h = int(data.frame.srcSize.y);
+
+	// flip using destination rect instead (+ small cheat to see flipped version)
+	float angle{ data.originAngle };
+	if (dst.w < 0 || dst.h < 0)
+		angle += 0.00001f;
+	
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &rotPoint, flip);
 }
 
 void Proto::Renderer::RenderLineRect(const SDL_Rect& rect, const SDL_Color& color) const
@@ -145,6 +183,7 @@ void Proto::Renderer::RenderFilledCircle(const glm::vec2& center, float radius, 
 		SDL_SetRenderDrawColor(GetSDLRenderer(), color.r, color.g, color.b, color.a);
 		SDL_RenderDrawLine(GetSDLRenderer(), int(cx - dx), int(cy + dy - radius), int(cx + dx), int(cy + dy - radius));
 		SDL_RenderDrawLine(GetSDLRenderer(), int(cx - dx), int(cy - dy + radius), int(cx + dx), int(cy - dy + radius));
+		SDL_SetRenderDrawColor(GetSDLRenderer(), 0, 0, 0, 255);
 	}
 }
 

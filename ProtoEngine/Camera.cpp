@@ -53,7 +53,7 @@ void Camera::DrawInspector()
 			Activate();
 	}
 
-	ProtoGui::Presets::Position(m_Position.x, m_Position.y);
+	ProtoGui::Presets::InputXY({ "Position", "X", "Y" }, m_Position.x, m_Position.y, { 1.f, 0, 0, "%.0f" }, 0);
 }
 
 void Camera::Move(const glm::vec2& destination, glm::vec2 speed)

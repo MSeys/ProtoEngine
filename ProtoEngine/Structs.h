@@ -1,30 +1,42 @@
 #pragma once
 #include <SDL.h>
 
-struct TextureData
+struct TextureFrame
 {
-	float x = 0;
-	float y = 0;
-	float width = -1;
-	float height = -1;
-	SDL_Color color = { 255, 255, 255, 255 };
+	glm::vec2 dstPosition;
+	glm::vec2 dstSize;
+
+	glm::vec2 srcPosition;
+	glm::vec2 srcSize;
+
+	glm::vec2 scale;
+	glm::vec2 pivot;
+
+	SDL_Color color;
+
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent);
+	static TextureFrame Load(rapidxml::xml_node<>* pComp);
 };
 
 struct RenderData
 {
+	glm::vec2 originPosition;
+	glm::vec2 originScale;
+	float originAngle;
+	
 	glm::vec2 position;
+	glm::vec2 scale;
+	glm::vec2 pivot;
+	
 	glm::vec2 size;
-	glm::vec2 rotationCenter;
-	float angle;
 	SDL_Color color;
 };
 
-enum class HAlignment
+struct FrameRenderData
 {
-	LEFT, CENTER, RIGHT
-};
+	glm::vec2 originPosition;
+	glm::vec2 originScale;
+	float originAngle;
 
-enum class VAlignment
-{
-	TOP, CENTER, BOTTOM
+	TextureFrame frame;
 };

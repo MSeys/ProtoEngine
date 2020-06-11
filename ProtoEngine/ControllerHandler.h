@@ -17,8 +17,8 @@ namespace Proto
 		void Update();
 		void Process();
 
-		bool AddInput(int index, int XInput, const std::string& stringifiedXInput);
-		ControllerButton& GetInput(int index, int XInput);
+		bool AddInput(int index, XINPUT_Keycode keyCode);
+		ControllerButton& GetInput(int index, XINPUT_Keycode keyCode);
 		ControllerJoystick& GetInput(int index, const StickState& stickState) const;
 		ControllerTrigger& GetInput(int index, const TriggerPosState& triggerPosState) const;
 
@@ -26,7 +26,7 @@ namespace Proto
 		std::array<XINPUT_STATE, 4> m_CurrentStates{};
 		std::array<XINPUT_STATE, 4> m_OldStates{};
 
-		std::unordered_map<int, std::unordered_map<int, ControllerButton*>> m_ControllerButtons;
+		std::unordered_map<int, std::unordered_map<XINPUT_Keycode, ControllerButton*>> m_ControllerButtons;
 		std::array<ControllerJoystick*, 4> m_pLeftJoysticks{};
 		std::array<ControllerJoystick*, 4> m_pRightJoysticks{};
 

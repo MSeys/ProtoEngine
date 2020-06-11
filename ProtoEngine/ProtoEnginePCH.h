@@ -13,6 +13,10 @@
 #define STRINGIFY(x) #x
 #define CompStringify(x, y) bool((x) == #y)
 
+enum class StickState;
+typedef WORD XINPUT_Keycode;
+typedef StickState MouseState;
+
 // Define Singletons
 
 #include "PhysicsManager.h"

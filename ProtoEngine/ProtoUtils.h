@@ -157,11 +157,5 @@ namespace ProtoParser
 				}
 			}
 		}
-		
-		namespace Helper
-		{
-			void LoadTexData(rapidxml::xml_node<>* pComp, TextureData& texData);
-			void LoadAlignments(rapidxml::xml_node<>* pComp, HAlignment& horAlignment, VAlignment& verAlignment);
-		}
 	}
 }

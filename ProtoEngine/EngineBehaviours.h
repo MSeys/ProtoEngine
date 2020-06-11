@@ -8,9 +8,10 @@
 #include "Camera.h"
 
 // Graphics
-#include "Sprite.h"
+#include "Image.h"
 #include "Text.h"
-#include "FPSText.h"
+#include "Sprite.h"
+#include "AnimatedSprite.h"
 
 // Physics
 #include "RigidBody2D.h"

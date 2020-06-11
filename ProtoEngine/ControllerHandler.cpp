@@ -93,7 +93,7 @@ void Proto::ControllerHandler::Process()
 	}
 }
 
-bool Proto::ControllerHandler::AddInput(int index, int XInput, const std::string& stringifiedXInput)
+bool Proto::ControllerHandler::AddInput(int index, XINPUT_Keycode keyCode)
 {
 	if (index > XINPUT_CONTROLLER_MAX_INDEX || index < XINPUT_CONTROLLER_MIN_INDEX)
 	{
@@ -101,31 +101,31 @@ bool Proto::ControllerHandler::AddInput(int index, int XInput, const std::string
 		return false;
 	}
 
-	if (m_ControllerButtons[index].find(XInput) != m_ControllerButtons[index].end()) // if map does not exist yet with index, it'll make inner map
+	if (m_ControllerButtons[index].find(keyCode) != m_ControllerButtons[index].end()) // if map does not exist yet with index, it'll make inner map
 	{
 		ProtoLogger.AddLog(LogLevel::Warning, "ControllerHandler::AddInput failed > Controller Button was already added.");
 		return false;
 	}
 
-	m_ControllerButtons[index][XInput] = new ControllerButton{ XInput, stringifiedXInput };
+	m_ControllerButtons[index][keyCode] = new ControllerButton{ keyCode };
 	return true;
 }
 
-ControllerButton& Proto::ControllerHandler::GetInput(int index, int XInput)
+ControllerButton& Proto::ControllerHandler::GetInput(int index, XINPUT_Keycode keyCode)
 {
 	try
 	{
-		return *m_ControllerButtons[index].at(XInput);
+		return *m_ControllerButtons[index].at(keyCode);
 	}
 
 	catch (const std::out_of_range & exception)
 	{
 		UNREFERENCED_PARAMETER(exception);
 
-		AddInput(index, XInput, "UNDEFINED");
+		AddInput(index, keyCode);
 		ProtoLogger.AddLog(LogLevel::Warning, "ControllerHandler::GetInput failed > Controller Button not found, but AddInput was called for safety.");
 
-		return GetInput(index, XInput);
+		return GetInput(index, keyCode);
 	}
 }
 

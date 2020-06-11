@@ -1,7 +1,6 @@
 #include "ProtoEnginePCH.h"
 #include "Text.h"
 
-
 #include <SDL_ttf.h>
 #include <utility>
 #include "Font.h"
@@ -11,14 +10,15 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-Text::Text(ComponentID ID, bool isActive, std::string text, Proto::Font* pFont, const TextureData& texData)
-	: BaseBehaviour(ID, isActive), m_pTexture(nullptr), m_TexData(texData), m_Text(std::move(text)), m_pFont(pFont)
+Text::Text(ComponentID ID, bool isActive, std::string text, Proto::Font* pFont, const glm::vec2& position, const glm::vec2& scale, const glm::vec2& pivot, SDL_Color color)
+	: BaseBehaviour(ID, isActive), m_pFont(pFont), m_Text(std::move(text))
+	, m_Position(position), m_Scale(scale), m_Pivot(pivot), m_Color(color)
 {
-	if(pFont)
-	{
-		m_FontRelPath = pFont->GetRelativePath();
-		UpdateText();
-	}
+	if (!pFont)
+		return;
+	
+	m_FontRelPath = pFont->GetRelativePath();
+	UpdateText();
 }
 
 Text::~Text()
@@ -40,12 +40,6 @@ void Text::SetFontSize(unsigned size)
 	UpdateText();
 }
 
-void Text::SetColor(const SDL_Color& color)
-{
-	m_TexData.color = color;
-	UpdateText();
-}
-
 void Text::SetFont(const std::string& path)
 {
 	unsigned int size{ 25 };
@@ -58,17 +52,6 @@ void Text::SetFont(const std::string& path)
 	UpdateText();
 }
 
-void Text::SetTextureData(const TextureData& texData)
-{
-	m_TexData = texData;
-}
-
-void Text::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
-{
-	m_HorAlignment = horAlignment;
-	m_VerAlignment = verAlignment;
-}
-
 void Text::DrawInspectorTitle()
 {
 	DrawActiveCheckbox();
@@ -77,40 +60,29 @@ void Text::DrawInspectorTitle()
 
 void Text::DrawInspector()
 {
-	/* Font Path */ {
-		ImGui::Text("Font");
-		ImGui::SameLine(100);
+	const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
+	const auto selection = ProtoGui::Presets::Path("Font", 100, m_FontRelPath, "Select a Font", fullPath, { "Font Files", "*.ttf *.otf" });
 
-		ImGui::PushItemWidth(175);
-		ImGui::InputText("##TEXT_COMP_FILE_PATH", &m_FontRelPath[0], 300, ImGuiInputTextFlags_ReadOnly);
-		ImGui::PopItemWidth();
+	if (!selection.empty())
+	{
+		const std::string relPath{ selection[0].substr(fullPath.size()) };
 		
-		ImGui::SameLine(285);
-		if (ImGui::Button("...##TEXT_COMP_FILE_PATH_BUTTON"))
+		if (m_pFont)
 		{
-			const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
-			const auto selection = pfd::open_file("Select a Font", fullPath, { "Font Files", "*.ttf *.otf" }).result();
-			if (!selection.empty())
-			{
-				const std::string relPath{ selection[0].substr(fullPath.size()) };
-				
-				if (m_pFont)
-				{
-					if (relPath != m_pFont->GetRelativePath())
-						SetFont(relPath);
-				}
-
-				else
-					SetFont(relPath);
-			}
+			if (relPath != m_pFont->GetRelativePath())
+				SetFont(relPath);
 		}
+
+		else
+			SetFont(relPath);
 	}
 
 	if (!m_pFont)
 		return;
 
-	ProtoGui::Presets::Position(m_TexData.x, m_TexData.y);
-	ProtoGui::Presets::Size(m_TexData.width, m_TexData.height);
+	ProtoGui::Presets::InputXY({ "Position", "X", "Y" }, m_Position.x, m_Position.y, { 1.f, 0, 0, "%.0f" }, 0);
+	ProtoGui::Presets::InputXY({ "Scale", "X", "Y" }, m_Scale.x, m_Scale.y, { 0.01f, 0, 0, "%.2f" }, 1);
+	ProtoGui::Presets::InputXY({ "Pivot", "X", "Y" }, m_Pivot.x, m_Pivot.y, { 0.1f, 0, 1, "%.1f" }, 2);
 	
 	/* Font Size */ {
 		ImGui::Text("Font Size");
@@ -135,7 +107,7 @@ void Text::DrawInspector()
 		std::string newText{ m_Text };
 		newText.resize(m_Text.size());
 		
-		ImGui::PushItemWidth(250);
+		ImGui::PushItemWidth(225);
 		ImGui::InputText("##TEXT_COMP_TEXT", &newText[0], 200);
 		ImGui::PopItemWidth();
 
@@ -145,17 +117,12 @@ void Text::DrawInspector()
 		}
 	}
 
-	ImGui::PushID(this);
-	ProtoGui::Presets::Alignment(m_HorAlignment, m_VerAlignment);
-	ImGui::PopID();
-	
-	/* Text Color */ {
-		SDL_Color newColor{};
-		ProtoGui::Presets::Color("Text Color", m_TexData, newColor);
+	ImGui::SameLine();
+	SDL_Color newColor{};
+	ProtoGui::Presets::Color(m_Color, newColor);
 
-		if (newColor.r != m_TexData.color.r || newColor.g != m_TexData.color.g || newColor.b != m_TexData.color.b || newColor.a != m_TexData.color.a)
-			SetColor(newColor);
-	}
+	if (newColor.r != m_Color.r || newColor.g != m_Color.g || newColor.b != m_Color.b || newColor.a != m_Color.a)
+		SetColor(newColor);
 }
 
 void Text::Draw()
@@ -164,41 +131,16 @@ void Text::Draw()
 		return;
 
 	RenderData data;
-	data.position.x = m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x;
-	data.position.y = m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y;
-	data.size.x = m_pGameObject->GetTransform()->GetScale().x * m_TexData.width;
-	data.size.y = m_pGameObject->GetTransform()->GetScale().y * m_TexData.height;
-	data.rotationCenter = m_pGameObject->GetTransform()->GetPosition();
-	data.angle = m_pGameObject->GetTransform()->GetRotation();
-	data.color = { 255, 255, 255, m_TexData.color.a };
-	
-	switch (m_HorAlignment)
-	{
-	case HAlignment::LEFT:
-		break;
-	case HAlignment::CENTER:
-		data.position.x -= m_TexData.width / 2.f;
-		break;
-	case HAlignment::RIGHT:
-		data.position.x -= m_TexData.width;
-		break;
-	default:
-		break;
-	}
+	data.originPosition = m_pGameObject->GetTransform()->GetPosition();
+	data.originScale = m_pGameObject->GetTransform()->GetScale();
+	data.originAngle = m_pGameObject->GetTransform()->GetRotation();
 
-	switch (m_VerAlignment)
-	{
-	case VAlignment::TOP:
-		data.position.y -= m_TexData.height;
-		break;
-	case VAlignment::CENTER:
-		data.position.y -= m_TexData.height / 2.f;
-		break;
-	case VAlignment::BOTTOM:
-		break;
-	default:
-		break;
-	}
+	data.position = m_Position;
+	data.scale = m_Scale;
+	data.pivot = m_Pivot;
+
+	data.size = m_TextureSize;
+	data.color = { 255, 255, 255, m_Color.a };
 
 	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
@@ -212,9 +154,9 @@ void Text::UpdateText()
 	SDL_Surface* surf{};
 
 	if (m_Text[0] != '\0')
-		surf = TTF_RenderText_Blended(m_pFont->GetFont(), m_Text.c_str(), m_TexData.color);
+		surf = TTF_RenderText_Blended(m_pFont->GetFont(), m_Text.c_str(), m_Color);
 	else
-		surf = TTF_RenderText_Blended(m_pFont->GetFont(), " ", m_TexData.color);
+		surf = TTF_RenderText_Blended(m_pFont->GetFont(), " ", m_Color);
 
 	if (!surf)
 		throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
@@ -229,8 +171,8 @@ void Text::UpdateText()
 
 	int width, height;
 	SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
-	m_TexData.width = float(width);
-	m_TexData.height = float(height);
+	m_TextureSize.x = float(width);
+	m_TextureSize.y = float(height);
 }
 
 void Text::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
@@ -248,41 +190,22 @@ void Text::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 	auto fontSize{ m_pFont ? m_pFont->GetSize() : 13 };
 	ProtoSaver::XML::Save<unsigned int>("FontSize", fontSize, doc, pComp);
 
-	// Texture Data related
-	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataY", m_TexData.y, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataW", m_TexData.width, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataH", m_TexData.height, doc, pComp);
+	ProtoSaver::XML::Save<float>("PositionX", m_Position.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("PositionY", m_Position.y, doc, pComp);
 
-	ProtoSaver::XML::Save<Uint8>("TexDataColorR", m_TexData.color.r, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorG", m_TexData.color.g, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorB", m_TexData.color.b, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorA", m_TexData.color.a, doc, pComp);
+	ProtoSaver::XML::Save<float>("ScaleX", m_Scale.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("ScaleY", m_Scale.y, doc, pComp);
 
-	// Text
+	ProtoSaver::XML::Save<float>("PivotX", m_Pivot.x, doc, pComp);
+	ProtoSaver::XML::Save<float>("PivotY", m_Pivot.y, doc, pComp);
+
+	ProtoSaver::XML::Save<Uint8>("ColorR", m_Color.r, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("ColorG", m_Color.g, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("ColorB", m_Color.b, doc, pComp);
+	ProtoSaver::XML::Save<Uint8>("ColorA", m_Color.a, doc, pComp);
+	
 	ProtoSaver::XML::SaveString("Text", m_Text, doc, pComp);
 
-	// Alignment related
-	std::string hAlignmentStr, vAlignmentStr;
-	switch (m_HorAlignment)
-	{
-	case HAlignment::LEFT:		hAlignmentStr = "Left"; break;
-	case HAlignment::CENTER:	hAlignmentStr = "Center"; break;
-	case HAlignment::RIGHT:		hAlignmentStr = "Right"; break;
-	default:;
-	}
-
-	switch (m_VerAlignment)
-	{
-	case VAlignment::TOP:		vAlignmentStr = "Top"; break;
-	case VAlignment::CENTER:	vAlignmentStr = "Center"; break;
-	case VAlignment::BOTTOM:	vAlignmentStr = "Bottom"; break;
-	default:;
-	}
-
-	ProtoSaver::XML::SaveString("HorizontalAlignment", hAlignmentStr, doc, pComp);
-	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
-	
 	pParent->append_node(pComp);
 }
 
@@ -294,18 +217,35 @@ void Text::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
 	const auto fontLocation{ ProtoParser::XML::ParseString(pComp, "FontLocation") };
 	const auto fontSize{ ProtoParser::XML::Parse<int>(pComp, "FontSize") };
 
-	TextureData texData;
-	ProtoParser::XML::Helper::LoadTexData(pComp, texData);
-
 	const auto text{ ProtoParser::XML::ParseString(pComp, "Text") };
 
-	HAlignment horAlignment;
-	VAlignment verAlignment;
-	ProtoParser::XML::Helper::LoadAlignments(pComp, horAlignment, verAlignment);
+	const glm::vec2 position
+	{
+		ProtoParser::XML::Parse<float>(pComp, "PositionX"),
+		ProtoParser::XML::Parse<float>(pComp, "PositionY")
+	};
 
-	const auto pFont = !fontLocation.empty() ? ProtoContent.GetFont(fontLocation, fontSize) : nullptr;
-	auto pTextComp = new Text(id, isActive, text, pFont, texData);
+	const glm::vec2 scale
+	{
+		ProtoParser::XML::Parse<float>(pComp, "ScaleX"),
+		ProtoParser::XML::Parse<float>(pComp, "ScaleY")
+	};
+
+	const glm::vec2 pivot
+	{
+		ProtoParser::XML::Parse<float>(pComp, "PivotX"),
+		ProtoParser::XML::Parse<float>(pComp, "PivotY")
+	};
+
+	const SDL_Color color
+	{
+		ProtoParser::XML::Parse<Uint8>(pComp, "ColorR"),
+		ProtoParser::XML::Parse<Uint8>(pComp, "ColorG"),
+		ProtoParser::XML::Parse<Uint8>(pComp, "ColorB"),
+		ProtoParser::XML::Parse<Uint8>(pComp, "ColorA")
+	};
+
+	Proto::Font* pFont{ fontLocation.empty() ? nullptr : ProtoContent.GetFont(fontLocation, fontSize) };
+	const auto pTextComp = new Text(id, isActive, text, pFont, position, scale, pivot, color);
 	pCurr->AddComponent(pTextComp);
-	pTextComp->SetAlignment(horAlignment, verAlignment);
-	pTextComp->SetTextureData(texData);
 }

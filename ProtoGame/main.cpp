@@ -17,11 +17,9 @@ int main(int, char* [])
 	EditorSettings editorSettings;
 	WindowSettings windowSettings;
 
-#ifndef _DEBUG
 #ifdef _WIN64
 	pGame = pRefGame;
 	windowSettings.Title = "SimpleGame";
-#endif
 #endif
 
 	windowSettings.GameWindowSize = { 640, 480 };

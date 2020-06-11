@@ -203,6 +203,12 @@ void Scene::DrawHierarchy()
 	}
 }
 
+void Scene::DrawDebug()
+{
+	for (auto pChild : m_pChildren)
+		pChild->DrawEditorDebug();
+}
+
 GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 {
 	GameObject* pFoundHere = *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return unsigned(pObject->GetID()) == unsigned(id); });

@@ -13,9 +13,6 @@
     <Filter Include="Helpers">
       <UniqueIdentifier>{0042c303-102b-4b46-9da2-6fa9580f74c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Prefabs">
-      <UniqueIdentifier>{7fa21d62-4261-4cf4-96da-19368d816117}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scenegraph">
       <UniqueIdentifier>{121cbf75-873e-461f-af2e-26e5d19f4fde}</UniqueIdentifier>
     </Filter>
@@ -40,9 +37,6 @@
     <Filter Include="Core\Achievement">
       <UniqueIdentifier>{b7e6a1ab-9d1b-4dcd-971f-6672165e24fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Input Handling\Handlers">
-      <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{132cfe5c-95be-4c94-ad36-bc5e34cee2d0}</UniqueIdentifier>
     </Filter>
@@ -63,6 +57,9 @@
     </Filter>
     <Filter Include="Components\General">
       <UniqueIdentifier>{8a91f761-1396-4bc4-986a-c7120a07f02d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input Handling\Handlers">
+      <UniqueIdentifier>{1a89dcc2-8633-4f42-9969-fb988bf7b012}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -147,9 +144,6 @@
     <ClCompile Include="ProtoUtils.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="FPSText.cpp">
-      <Filter>Components\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Components\Graphics</Filter>
     </ClCompile>
@@ -180,7 +174,16 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Components\General</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Components\Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Sprite.cpp">
+      <Filter>Components\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Structs.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimatedSprite.cpp">
       <Filter>Components\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -320,9 +323,6 @@
     <ClInclude Include="ProtoUtils.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="FPSText.h">
-      <Filter>Components\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Text.h">
       <Filter>Components\Graphics</Filter>
     </ClInclude>
@@ -356,7 +356,13 @@
     <ClInclude Include="Camera.h">
       <Filter>Components\General</Filter>
     </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Sprite.h">
+      <Filter>Components\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedSprite.h">
       <Filter>Components\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

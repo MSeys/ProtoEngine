@@ -7,23 +7,33 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-Sprite::Sprite(ComponentID ID, bool isActive, Proto::Texture2D* pTexture, const TextureData& texData)
-	: BaseBehaviour(ID, isActive), m_pTexture(pTexture), m_TexData(texData)
+Sprite::Sprite(ComponentID ID, bool isActive, Proto::Texture2D* pTexture)
+	: BaseBehaviour(ID, isActive), m_pTexture(pTexture)
 {
-	if (m_pTexture)
-	{
-		m_TexRelPath = pTexture->GetRelativePath();
+	SDL_Texture* pSpritePreview{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+										475, 375) };
+	m_pSpritePreview = new Proto::Texture2D(pSpritePreview, "", "");
+	
+	if (!m_pTexture)
+		return;
 
-		int width, height;
-		SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
-		m_TexData.width = float(width);
-		m_TexData.height = float(height);
-	}
+	m_TexRelPath = m_pTexture->GetRelativePath();
+
+	int width, height;
+	SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
+	m_TextureSize.x = float(width);
+	m_TextureSize.y = float(height);
+
+	SDL_Texture* pTexturePreview{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+										width, height) };
+
+	m_pTexturePreview = new Proto::Texture2D(pTexturePreview, "", "");
 }
 
 Sprite::~Sprite()
 {
-	
+	SafeDelete(m_pTexturePreview);
+	SafeDelete(m_pSpritePreview);
 }
 
 void Sprite::SetTexture(const std::string& path)
@@ -33,19 +43,19 @@ void Sprite::SetTexture(const std::string& path)
 
 	int width, height;
 	SDL_QueryTexture(m_pTexture->GetSDLTexture(), nullptr, nullptr, &width, &height);
-	m_TexData.width = float(width);
-	m_TexData.height = float(height);
+	m_TextureSize.x = float(width);
+	m_TextureSize.y = float(height);
+
+	SafeDelete(m_pTexturePreview);
+	SDL_Texture* pTexturePreview{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+										width, height) };
+
+	m_pTexturePreview = new Proto::Texture2D(pTexturePreview, "", "");
 }
 
-void Sprite::SetTextureData(const TextureData& texData)
+void Sprite::AddFrame(const TextureFrame& frame)
 {
-	m_TexData = texData;
-}
-
-void Sprite::SetAlignment(const HAlignment& horAlignment, const VAlignment& verAlignment)
-{
-	m_HorAlignment = horAlignment;
-	m_VerAlignment = verAlignment;
+	m_Frames.push_back(frame);
 }
 
 void Sprite::Draw()
@@ -53,44 +63,16 @@ void Sprite::Draw()
 	if (!m_pTexture)
 		return;
 
-	RenderData data;
-	data.position.x = m_pGameObject->GetTransform()->GetPosition().x + m_TexData.x;
-	data.position.y = m_pGameObject->GetTransform()->GetPosition().y + m_TexData.y;
-	data.size.x = m_pGameObject->GetTransform()->GetScale().x * m_TexData.width;
-	data.size.y = m_pGameObject->GetTransform()->GetScale().y * m_TexData.height;
-	data.rotationCenter = m_pGameObject->GetTransform()->GetPosition();
-	data.angle = m_pGameObject->GetTransform()->GetRotation();
-	data.color = m_TexData.color;
-
-	switch(m_HorAlignment)
+	for(auto frame : m_Frames)
 	{
-	case HAlignment::LEFT:
-		break;
-	case HAlignment::CENTER:
-		data.position.x -= m_TexData.width / 2.f;
-		break;
-	case HAlignment::RIGHT:
-		data.position.x -= m_TexData.width;
-		break;
-	default:
-		break;
+		FrameRenderData data;
+		data.originPosition = m_pGameObject->GetTransform()->GetPosition();
+		data.originScale = m_pGameObject->GetTransform()->GetScale();
+		data.originAngle = m_pGameObject->GetTransform()->GetRotation();
+		data.frame = frame;
+		
+		ProtoRenderer.RenderSprite(*m_pTexture, data);
 	}
-
-	switch(m_VerAlignment)
-	{
-	case VAlignment::TOP:
-		data.position.y -= m_TexData.height;
-		break;
-	case VAlignment::CENTER:
-		data.position.y -= m_TexData.height / 2.f;
-		break;
-	case VAlignment::BOTTOM:
-		break;
-	default:
-		break;
-	}
-	
-	ProtoRenderer.RenderTexture(*m_pTexture, data);
 }
 
 void Sprite::DrawInspectorTitle()
@@ -101,46 +83,210 @@ void Sprite::DrawInspectorTitle()
 
 void Sprite::DrawInspector()
 {
-	/* Sprite */ {
-		ImGui::Text("Sprite");
-		ImGui::SameLine(100);
+	const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
+	const auto selection = ProtoGui::Presets::Path("Sprite", 100, m_TexRelPath, "Select a Sprite", fullPath, { "Sprite Files", "*.png *.jpg *.jpeg *.PNG" });;
 
-		ImGui::PushItemWidth(175);
-		ImGui::InputText("##RENDER_COMP_FILE_PATH", &m_TexRelPath[0], 300, ImGuiInputTextFlags_ReadOnly);
-		ImGui::PopItemWidth();
+	if (!selection.empty())
+	{
+		const std::string relPath{ selection[0].substr(fullPath.size()) };
 
-		ImGui::SameLine(285);
-		if (ImGui::Button("...##RENDER_COMP_FILE_PATH_BUTTON"))
+		if (m_pTexture)
 		{
-			const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
-			const auto selection = pfd::open_file("Select an Sprite", fullPath, { "Sprite Files", "*.png *.jpg *.jpeg *.PNG" }).result();
-			if (!selection.empty())
-			{
-				const std::string relPath{ selection[0].substr(fullPath.size()) };
-
-				if (m_pTexture)
-				{
-					if (relPath != m_pTexture->GetRelativePath())
-						SetTexture(relPath);
-				}
-
-				else
-					SetTexture(relPath);
-			}
+			if (relPath != m_pTexture->GetRelativePath())
+				SetTexture(relPath);
 		}
+
+		else
+			SetTexture(relPath);
 	}
 
 	if (!m_pTexture)
 		return;
+	
+	ImGui::Spacing();
+	ImGui::SameLine(25);
+	if (ImGui::Button("Open Sprite Editor", { 300, 25 }))
+		ImGui::OpenPopup("Sprite Editor");
 
-	ProtoGui::Presets::Position(m_TexData.x, m_TexData.y);
-	ProtoGui::Presets::Size(m_TexData.width, m_TexData.height);
+	bool opened = true;
+	ImGui::SetNextWindowSize({ 875, 820 });
+	ImGui::SetNextWindowPos({ 50, 50 }, ImGuiCond_Appearing);
+	if (ImGui::BeginPopupModal("Sprite Editor", &opened, ImGuiWindowFlags_NoResize))
+	{
+		ImGui::Columns(2, nullptr, false);
 
-	ImGui::PushID(this);
-	ProtoGui::Presets::Alignment(m_HorAlignment, m_VerAlignment);
-	ImGui::PopID();
+		ImGui::SetColumnWidth(0, 360);
+		ImGui::SetNextWindowPos({ 60, 60 }, ImGuiCond_Appearing);
+		if(ImGui::BeginChild("##EditFrames", { 350, 785 }, true))
+		{
+			if (ImGui::CollapsingHeader("Preview / Editor Settings"))
+			{
+				ProtoGui::Presets::InputXY({ "Scale", "X", "Y" }, m_SpritePreviewScale.x, m_SpritePreviewScale.y, { 0.01f, 0, 0, "%.2f" }, 0);
 
-	ProtoGui::Presets::Color("Color", m_TexData, m_TexData.color);
+				const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
+				const ProtoGui::DragData dragData{ 1.f, 0, 0, "%.0f" };
+				ProtoGui::Drag<float>("Rotation", pgData, "##SpritePreviewRotation", m_SpritePreviewRotation, dragData);
+
+				ImGui::Spacing();
+				ImGui::SameLine(5);
+				if (ImGui::Button("Add Frame", { 340, 25 }))
+				{
+					TextureFrame newFrame;
+					newFrame.dstPosition = { 0, 0 };
+					newFrame.dstSize = m_TextureSize;
+					newFrame.srcPosition = { 0, 0 };
+					newFrame.srcSize = m_TextureSize;
+
+					newFrame.scale = { 1, 1 };
+					newFrame.pivot = { 0, 0 };
+
+					newFrame.color = { 255, 255, 255, 255 };
+					m_Frames.push_back(newFrame);
+				}
+			}
+			
+			ImGui::Separator();
+
+			int toRemoveFrame{ -1 };
+			for (int j{}; j < int(m_Frames.size()); j++)
+			{
+				TextureFrame& frame = m_Frames[j];
+
+				ImGui::BeginGroup();
+				if (ImGui::CollapsingHeader(std::string("Frame " + std::to_string(j)).c_str()))
+				{
+					ImGui::PushID(&frame);
+
+					ImGui::Spacing();
+					ImGui::SameLine(5);
+					if (ImGui::Button("Delete", { 310, 25 }))
+						toRemoveFrame = j;
+
+					ProtoGui::Presets::InputXY({ "Dst. Position", "X", "Y" }, frame.dstPosition.x, frame.dstPosition.y, { 1.f, 0, 0, "%.0f" }, 0);
+					ProtoGui::Presets::InputXY({ "Dst. Size", "X", "Y" }, frame.dstSize.x, frame.dstSize.y, { 1.f, 0, 0, "%.0f" }, 1);
+					ProtoGui::Presets::InputXY({ "Dst. Pivot", "X", "Y" }, frame.pivot.x, frame.pivot.y, { 0.1f, 0, 1, "%.1f" }, 2);
+					ProtoGui::Presets::InputXY({ "Dst. Scale", "X", "Y" }, frame.scale.x, frame.scale.y, { 0.01f, 0, 0, "%.2f" }, 3);
+
+					ImGui::Separator();
+					ProtoGui::Presets::InputXY({ "Src. Position", "X", "Y" }, frame.srcPosition.x, frame.srcPosition.y, { 1.f, 0, 0, "%.0f" }, 4);
+					ProtoGui::Presets::InputXY({ "Src. Size", "X", "Y" }, frame.srcSize.x, frame.srcSize.y, { 1.f, 0, 0, "%.0f" }, 5);
+
+					ImGui::Text("Color");
+					ImGui::SameLine(100);
+					ProtoGui::Presets::Color(frame.color, frame.color, 6);
+
+					ImGui::PopID();
+				}
+				ImGui::EndGroup();
+			}
+
+			if (toRemoveFrame != -1)
+				m_Frames.erase(m_Frames.begin() + toRemoveFrame);
+
+		}
+		ImGui::EndChild();
+
+		ImGui::NextColumn();
+		
+		ImGui::SetNextWindowPos({ 60 + 360, 60 }, ImGuiCond_Appearing);
+		if (ImGui::BeginChild("##TexturePreview", { 490, 390 }, true))
+		{
+			const glm::vec2 maxPreviewSize{ 475, 375 };
+			glm::vec2 previewSize{ m_TextureSize };
+			
+			/* RenderTarget Draw */ {
+				ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pTexturePreview->GetSDLTexture());
+				SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+
+				RenderData data;
+				data.originPosition = { 0, 0 };
+				data.originScale = { 1, 1 };
+				data.originAngle = 0;
+
+				data.position = { 0, 0 };
+				data.scale = { 1, 1 };
+				data.pivot = { 0, 0 };
+
+				data.size = m_TextureSize;
+				data.color = { 255, 255, 255, 255 };
+				ProtoRenderer.RenderTexture(*m_pTexture, data);
+
+				for (auto& frame : m_Frames)
+				{
+					SDL_Rect src;
+					src.x = int(frame.srcPosition.x);
+					src.y = int(frame.srcPosition.y);
+					src.w = int(frame.srcSize.x);
+					src.h = int(frame.srcSize.y);
+					ProtoRenderer.RenderLineRect(src, { 255, 255, 255, 255 });
+				}
+
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+			}
+
+			if(previewSize.x > maxPreviewSize.x)
+			{
+				const float aspectRatio{ maxPreviewSize.x / m_TextureSize.x };
+				previewSize = m_TextureSize * aspectRatio;
+			}
+
+			if (previewSize.y > maxPreviewSize.y)
+			{
+				const float aspectRatio{ maxPreviewSize.y / m_TextureSize.y };
+				previewSize = m_TextureSize * aspectRatio;
+			}
+
+			ImVec2 cursorPos;
+			cursorPos = ProtoConvert::ToImGuiVec((maxPreviewSize - previewSize) * 0.5f);
+			cursorPos.x += 10;
+			cursorPos.y += 10;
+			ImGui::SetCursorPos(cursorPos);
+			
+			ImGui::Image(m_pTexturePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
+		}
+		ImGui::EndChild();
+
+		ImGui::SetNextWindowPos({ 60 + 360, 60 + 400 }, ImGuiCond_Appearing);
+		if (ImGui::BeginChild("##SpritePreview", { 490, 390 }, true))
+		{
+			const glm::vec2 previewSize{ 475, 375 };
+
+			/* RenderTarget Draw */ {
+				ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pSpritePreview->GetSDLTexture());
+				SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+
+				for (auto& frame : m_Frames)
+				{
+					FrameRenderData data;
+					data.originPosition = previewSize / 2.f;
+					data.originScale = m_SpritePreviewScale;
+					data.originAngle = m_SpritePreviewRotation;
+					data.frame = frame;
+					
+					ProtoRenderer.RenderSprite(*m_pTexture, data);
+				}
+
+				ProtoRenderer.RenderLine({ 0, previewSize.y / 2.f }, { previewSize.x, previewSize.y / 2.f }, { 255, 255, 255, 50 });
+				ProtoRenderer.RenderLine({ previewSize.x / 2.f, 0 }, { previewSize.x / 2.f, previewSize.y }, { 255, 255, 255, 50 });
+				
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+			}
+
+			ImVec2 cursorPos;
+			cursorPos.x += 5;
+			cursorPos.y += 5;
+			ImGui::SetCursorPos(cursorPos);
+
+			ImGui::Image(m_pSpritePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
+		}
+		ImGui::EndChild();
+
+		ImGui::Columns(1);
+		
+		ImGui::EndPopup();
+	}
 }
 
 void Sprite::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
@@ -150,42 +296,12 @@ void Sprite::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
 	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<Sprite>().c_str()));
 	SaveID(doc, pComp);
 	SaveActive(doc, pComp);
-	
-	// Sprite
+
 	ProtoSaver::XML::SaveString("SpriteLocation", m_TexRelPath, doc, pComp);
 
-	// Texture Data related
-	ProtoSaver::XML::Save<float>("TexDataX", m_TexData.x, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataY", m_TexData.y, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataW", m_TexData.width, doc, pComp);
-	ProtoSaver::XML::Save<float>("TexDataH", m_TexData.height, doc, pComp);
-
-	ProtoSaver::XML::Save<Uint8>("TexDataColorR", m_TexData.color.r, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorG", m_TexData.color.g, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorB", m_TexData.color.b, doc, pComp);
-	ProtoSaver::XML::Save<Uint8>("TexDataColorA", m_TexData.color.a, doc, pComp);
-
-	// Alignment related
-	std::string hAlignmentStr, vAlignmentStr;
-	switch (m_HorAlignment)
-	{
-	case HAlignment::LEFT:		hAlignmentStr = "Left"; break;
-	case HAlignment::CENTER:	hAlignmentStr = "Center"; break;
-	case HAlignment::RIGHT:		hAlignmentStr = "Right"; break;
-	default:;
-	}
-
-	switch (m_VerAlignment)
-	{
-	case VAlignment::TOP:		vAlignmentStr = "Top"; break;
-	case VAlignment::CENTER:	vAlignmentStr = "Center"; break;
-	case VAlignment::BOTTOM:	vAlignmentStr = "Bottom"; break;
-	default:;
-	}
-
-	ProtoSaver::XML::SaveString("HorizontalAlignment", hAlignmentStr, doc, pComp);
-	ProtoSaver::XML::SaveString("VerticalAlignment", vAlignmentStr, doc, pComp);
-
+	for (TextureFrame& frame : m_Frames)
+		frame.Save(doc, pComp);
+	
 	pParent->append_node(pComp);
 }
 
@@ -194,16 +310,12 @@ void Sprite::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
 	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
 	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
 
-	const std::string SpriteLocation{ ProtoParser::XML::ParseString(pComp, "SpriteLocation") };
-	TextureData texData;
-	ProtoParser::XML::Helper::LoadTexData(pComp, texData);
+	const std::string spriteLocation{ ProtoParser::XML::ParseString(pComp, "SpriteLocation") };
 
-	HAlignment horAlignment;
-	VAlignment verAlignment;
-	ProtoParser::XML::Helper::LoadAlignments(pComp, horAlignment, verAlignment);
-
-	auto pSpriteComp = new Sprite(id, isActive, ProtoContent.GetTexture(SpriteLocation), texData);
+	Proto::Texture2D* pTexture{ spriteLocation.empty() ? nullptr : ProtoContent.GetTexture(spriteLocation) };
+	const auto pSpriteComp = new Sprite(id, isActive, pTexture);
 	pCurr->AddComponent(pSpriteComp);
-	pSpriteComp->SetAlignment(horAlignment, verAlignment);
-	pSpriteComp->SetTextureData(texData);
+
+	for (rapidxml::xml_node<>* pFrameNode = pComp->first_node(ProtoConvert::ToString<TextureFrame>().c_str()); pFrameNode; pFrameNode = pFrameNode->next_sibling(ProtoConvert::ToString<TextureFrame>().c_str()))
+		pSpriteComp->AddFrame(TextureFrame::Load(pFrameNode));
 }

@@ -15,8 +15,8 @@ void LineCollider2D::DrawInspectorTitle()
 
 void LineCollider2D::DrawInspector()
 {
-	ProtoGui::Presets::Position(m_PosA.x, m_PosA.y, 0, " A");
-	ProtoGui::Presets::Position(m_PosB.x, m_PosB.y, 1, " B");
+	ProtoGui::Presets::InputXY({ "Position A", "X", "Y" }, m_PosA.x, m_PosA.y, { 1.f, 0, 0, "%.0f" }, 0);
+	ProtoGui::Presets::InputXY({ "Position B", "X", "Y" }, m_PosB.x, m_PosB.y, { 1.f, 0, 0, "%.0f" }, 1);
 	Collider2D::DrawInspector();
 }
 

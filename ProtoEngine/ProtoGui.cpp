@@ -1,173 +1,62 @@
 #include "ProtoEnginePCH.h"
 #include "ProtoGui.h"
 
-#include "ContentManager.h"
-#include "Font.h"
-#include "Texture2D.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 
-void ProtoGui::Presets::Position(float& x, float& y, int id, const std::string& extraText)
+void ProtoGui::Presets::InputXY(const std::vector<std::string>& texts, float& x, float& y, const DragData& data, int id)
 {
 	ImGui::PushID(id);
-	
+
 	ProtoGuiData pgData{ true, 0, -1, true, 70 };
-	const DragData dragData{ 0.1f, 0, 0, "%.1f" };
-	
-	ImGui::Text(std::string("Position" + extraText).c_str());
+
+	ImGui::Text(texts[0].c_str());
 	ImGui::SameLine(100);
 
 	pgData.sameLineOffset = 115;
-	ProtoGui::Drag<float>("X", pgData, "##PRESET_POS_X", x, dragData);
+	ProtoGui::Drag<float>(texts[1], pgData, "##PRESET_INPUT_X", x, data);
 	ImGui::SameLine(200);
 
 	pgData.sameLineOffset = 215;
-	ProtoGui::Drag<float>("Y", pgData, "##PRESET_POS_Y", y, dragData);
+	ProtoGui::Drag<float>(texts[2], pgData, "##PRESET_INPUT_Y", y, data);
 
 	ImGui::PopID();
 }
 
-void ProtoGui::Presets::Size(float& w, float& h, int id)
+void ProtoGui::Presets::Color(const SDL_Color& oldColor, SDL_Color& color, int id)
 {
 	ImGui::PushID(id);
-	
-	ProtoGuiData pgData{ true, 0, -1, true, 70 };
-	const DragData dragData{ 0.1f, 0, 0, "%.1f" };
 
-	ImGui::Text("Size");
-	ImGui::SameLine(100);
-
-	pgData.sameLineOffset = 115;
-	ProtoGui::Drag<float>("W", pgData, "##PRESET_SIZE_W", w, dragData);
-	ImGui::SameLine(200);
-
-	pgData.sameLineOffset = 215;
-	ProtoGui::Drag<float>("H", pgData, "##PRESET_SIZE_H", h, dragData);
-
-	ImGui::PopID();
-}
-
-void ProtoGui::Presets::Alignment(HAlignment& hAlignment, VAlignment& vAlignment, int id)
-{
-	ImGui::PushID(id);
-	
-	/* Alignment */ {
-		ImGui::Text("Alignment");
-
-		ImGui::SameLine(115);
-
-		const ImVec4 selectedCol{ 0.4f, 0.4f, 0.4f, 1.f };
-
-		/* Horizontal Alignment */ {
-			if (hAlignment == HAlignment::LEFT)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-left.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-left.png")->GetSDLTexture(), { 18, 18 }))
-					hAlignment = HAlignment::LEFT;
-			}
-
-			ImGui::SameLine();
-
-			if (hAlignment == HAlignment::CENTER)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-center.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-center.png")->GetSDLTexture(), { 18, 18 }))
-					hAlignment = HAlignment::CENTER;
-			}
-
-			ImGui::SameLine();
-
-			if (hAlignment == HAlignment::RIGHT)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-right.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-right.png")->GetSDLTexture(), { 18, 18 }))
-					hAlignment = HAlignment::RIGHT;
-			}
-		}
-
-		ImGui::SameLine(250);
-
-		/* Vertical Alignment */ {
-			if (vAlignment == VAlignment::BOTTOM)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(Proto::ContentManager::GetInstance().GetTexture("Engine/align-bottom.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-bottom.png")->GetSDLTexture(), { 18, 18 }))
-					vAlignment = VAlignment::BOTTOM;
-			}
-
-			ImGui::SameLine();
-
-			if (vAlignment == VAlignment::CENTER)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-middle.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-middle.png")->GetSDLTexture(), { 18, 18 }))
-					vAlignment = VAlignment::CENTER;
-			}
-
-			ImGui::SameLine();
-
-			if (vAlignment == VAlignment::TOP)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, selectedCol);
-				ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-top.png")->GetSDLTexture(), { 18, 18 });
-				ImGui::PopStyleColor();
-			}
-
-			else
-			{
-				if (ImGui::ImageButton(ProtoContent.GetTexture("Engine/align-top.png")->GetSDLTexture(), { 18, 18 }))
-					vAlignment = VAlignment::TOP;
-			}
-		}
-	}
-
-	ImGui::PopID();
-}
-
-void ProtoGui::Presets::Color(const std::string& text, const TextureData& texData, SDL_Color& color, int id)
-{
-	ImGui::PushID(id);
-	
-	ImGui::Text(text.c_str());
-	ImGui::SameLine(100);
-
-	float colors[4] = { float(texData.color.r) / 255.f, float(texData.color.g) / 255.f, float(texData.color.b) / 255.f, float(texData.color.a) / 255.f };
+	float colors[4] = { float(oldColor.r) / 255.f, float(oldColor.g) / 255.f, float(oldColor.b) / 255.f, float(oldColor.a) / 255.f };
 	ImGui::PushItemWidth(250);
-	ImGui::ColorEdit4("##PRESET_COLOR", &colors[0]);
+	ImGui::ColorEdit4("##PRESET_COLOR", &colors[0], ImGuiColorEditFlags_NoInputs);
 	color = { Uint8(colors[0] * 255), Uint8(colors[1] * 255), Uint8(colors[2] * 255), Uint8(colors[3] * 255) };
 	ImGui::PopItemWidth();
 
 	ImGui::PopID();
+}
+
+std::vector<std::string> ProtoGui::Presets::Path(const std::string& text, float sameLineOffset, std::string& relPath,
+	const std::string& openFileTitle, const std::string& fullPath, const std::vector<std::string>& filters, int id)
+{
+	std::vector<std::string> selection;
+	
+	ImGui::PushID(id);
+	
+	ImGui::Text(text.c_str());
+	ImGui::SameLine(sameLineOffset);
+
+	ImGui::PushItemWidth(175);
+	ImGui::InputText("##FilePathText", &relPath[0], 300, ImGuiInputTextFlags_ReadOnly);
+	ImGui::PopItemWidth();
+
+	ImGui::SameLine(sameLineOffset + 185);
+	if (ImGui::Button("...##FilePathButton"))
+		selection = pfd::open_file(openFileTitle, fullPath, filters).result();
+
+	ImGui::PopID();
+
+	return selection;
 }
 
 

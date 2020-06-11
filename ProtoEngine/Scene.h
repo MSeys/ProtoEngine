@@ -29,7 +29,8 @@ public:
 	
 protected:
 	void DrawHierarchy();
-
+	void DrawDebug();
+	
 	void Save();
 	void Reset();
 	void Load();

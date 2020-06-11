@@ -101,44 +101,44 @@ void Proto::InputManager::Process()
 	m_KBMHandler.Process();
 }
 
-bool Proto::InputManager::AddControllerButton(int index, int XInput, const std::string& stringifiedXInput)
+bool Proto::InputManager::AddInput(int index, XINPUT_Keycode keyCode)
 {
-	return m_ControllerHandler.AddInput(index, XInput, stringifiedXInput);
+	return m_ControllerHandler.AddInput(index, keyCode);
 }
 
-bool Proto::InputManager::AddKey(int SDLKey, const std::string& stringifiedSDLKey)
+bool Proto::InputManager::AddInput(SDL_Keycode keyCode)
 {
-	return m_KBMHandler.AddInput(SDLKey, stringifiedSDLKey);
+	return m_KBMHandler.AddInput(keyCode);
 }
 
-ControllerButton& Proto::InputManager::GetControllerButton(int index, int XInput)
+ControllerButton& Proto::InputManager::GetInput(int index, XINPUT_Keycode keyCode)
 {
-	return m_ControllerHandler.GetInput(index, XInput);
+	return m_ControllerHandler.GetInput(index, keyCode);
 }
 
-ControllerJoystick& Proto::InputManager::GetControllerJoystick(int index, const StickState& stickState) const noexcept
+ControllerJoystick& Proto::InputManager::GetInput(int index, const StickState& stickState) const noexcept
 {
 	return m_ControllerHandler.GetInput(index, stickState);
 }
 
-ControllerTrigger& Proto::InputManager::GetControllerTrigger(int index, const TriggerPosState& triggerPosState) const noexcept
+ControllerTrigger& Proto::InputManager::GetInput(int index, const TriggerPosState& triggerPosState) const noexcept
 {
 	return m_ControllerHandler.GetInput(index, triggerPosState);
 }
 
-Key& Proto::InputManager::GetKey(int SDLKey, bool doesCreate)
+Key& Proto::InputManager::GetInput(SDL_Keycode keyCode)
 {
-	return m_KBMHandler.GetInput(SDLKey, doesCreate);
+	return m_KBMHandler.GetInput(keyCode);
 }
 
-MouseButton& Proto::InputManager::GetMouseButton(const StickState& mouseState) const
+MouseButton& Proto::InputManager::GetMouseButton(const MouseState& mouseState) const
 {
-	return m_KBMHandler.GetInput(mouseState);
+	return m_KBMHandler.GetMouseButton(mouseState);
 }
 
 Mouse& Proto::InputManager::GetMouse() const
 {
-	return m_KBMHandler.GetInput();
+	return m_KBMHandler.GetMouse();
 }
 
 void Proto::InputManager::InitImGuiIO()

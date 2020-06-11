@@ -3,24 +3,32 @@
 	<GameObject Name="Background" ID="1" Active="true">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
-			<Sprite ID="4" OrderID="1" Active="true" SpriteLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="480.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+			<Image ID="4" OrderID="1" Active="true" ImageLocation="\background.jpg" PositionX="0.000000" PositionY="0.000000" ScaleX="1.000000" ScaleY="1.000000" PivotX="0.000000" PivotY="0.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Floor" ID="3" Active="true">
 		<Components>
-			<Transform ID="0" OrderID="0" PositionX="320.000000" PositionY="456.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="480.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<RigidBody2D ID="2" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
-			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="320.000000" CollisionSizeY="25.700001" CollisionRotation="0.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<Sprite ID="1" OrderID="3" Active="true" SpriteLocation="\background.jpg" TexDataX="0.000000" TexDataY="0.000000" TexDataW="640.000000" TexDataH="50.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-			<Text ID="4" OrderID="4" Active="true" FontLocation="\Lingua.otf" FontSize="25" TexDataX="0.000000" TexDataY="-7.500000" TexDataW="243.000000" TexDataH="26.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" Text="I am a floor herp derp" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="320.000000" CollisionPosY="-23.000000" CollisionSizeX="320.000000" CollisionSizeY="25.700001" CollisionRotation="0.000000" Density="0.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<Image ID="1" OrderID="3" Active="true" ImageLocation="\background.jpg" PositionX="0.000000" PositionY="0.000000" ScaleX="1.000000" ScaleY="0.100000" PivotX="0.000000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+			<Text ID="4" OrderID="4" Active="true" FontLocation="\Lingua.otf" FontSize="35" PositionX="320.000000" PositionY="0.000000" ScaleX="1.000000" ScaleY="1.000000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="254" ColorB="254" ColorA="255" Text="I am floor, herp derp"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Falling Object" ID="2" Active="true">
 		<Components>
-			<Transform ID="0" OrderID="0" PositionX="389.700012" PositionY="25.500000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<Transform ID="0" OrderID="0" PositionX="397.000000" PositionY="16.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<RigidBody2D ID="2" OrderID="1" BodyType="1" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
-			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="113.300003" CollisionSizeY="33.500000" CollisionRotation="0.000000" Density="1.000000" Friction="0.100000" Restitution="0.300000" IsTrigger="false"/>
-			<Sprite ID="1" OrderID="3" Active="true" SpriteLocation="\logo.png" TexDataX="0.000000" TexDataY="0.000000" TexDataW="208.000000" TexDataH="65.000000" TexDataColorR="255" TexDataColorG="255" TexDataColorB="255" TexDataColorA="255" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<BoxCollider2D ID="3" OrderID="2" Active="true" CollisionPosX="0.000000" CollisionPosY="0.000000" CollisionSizeX="105.000000" CollisionSizeY="33.500000" CollisionRotation="0.000000" Density="1.000000" Friction="0.100000" Restitution="0.300000" IsTrigger="false"/>
+			<Image ID="1" OrderID="3" Active="true" ImageLocation="\logo.png" PositionX="0.000000" PositionY="0.000000" ScaleX="1.000000" ScaleY="1.000000" PivotX="0.500000" PivotY="0.500000" ColorR="253" ColorG="114" ColorB="114" ColorA="255"/>
+			<AnimatedSprite ID="5" OrderID="4" Active="true" SpriteLocation="\BubbleBobble\heroGreen.png" StartingAnimation="0">
+				<Animation FrameTime="0.200000">
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.000000" ScaleY="2.000000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.000000" ScaleY="2.000000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.000000" ScaleY="2.000000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.000000" ScaleY="2.000000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+				</Animation>
+			</AnimatedSprite>
 		</Components>
 	</GameObject>
 	<GameObject Name="Trigger Object" ID="4" Active="true">

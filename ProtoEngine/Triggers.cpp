@@ -87,6 +87,6 @@ void ControllerTrigger::Process()
 
 void ControllerTrigger::SetInputData(Command& command)
 {
-	command.SetInputData(CommandOrigin::C_TRIGGER, "NONE", &m_Data);
+	command.SetInputData(CommandOrigin::C_TRIGGER, -1, XINPUT_Keycode(-1), &m_Data);
 }
 #pragma endregion Trigger

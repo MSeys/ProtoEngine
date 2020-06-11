@@ -18,9 +18,10 @@ void ProtoParser::XML::LoadComponents(xml_node<>* pComponents, GameObject* pCurr
 	Load<SphereCollider2D>(pComponents, pCurr, true);
 	Load<LineCollider2D>(pComponents, pCurr, true);
 
-	Load<Sprite>(pComponents, pCurr, true);
+	Load<Image>(pComponents, pCurr, true);
 	Load<Text>(pComponents, pCurr, true);
-	Load<FPSText>(pComponents, pCurr, true);
+	Load<Sprite>(pComponents, pCurr, true);
+	Load<AnimatedSprite>(pComponents, pCurr, true);
 	
 	if (ProtoSettings.GetRenderMode() == RenderMode::GAME)
 		ProtoSettings.GetGame()->LoadComponents(pComponents, pCurr);
@@ -40,39 +41,6 @@ std::string ProtoParser::XML::ParseString(xml_node<>* pComp, const std::string& 
 		return "";
 
 	return std::string(value);
-}
-
-void ProtoParser::XML::Helper::LoadTexData(xml_node<>* pComp, TextureData& texData)
-{
-	texData.x =			Parse<float>(pComp, "TexDataX");
-	texData.y =			Parse<float>(pComp, "TexDataY");
-	texData.width =		Parse<float>(pComp, "TexDataW");
-	texData.height =	Parse<float>(pComp, "TexDataH");
-	texData.color.r =	Parse<Uint8>(pComp, "TexDataColorR");
-	texData.color.g =	Parse<Uint8>(pComp, "TexDataColorG");
-	texData.color.b =	Parse<Uint8>(pComp, "TexDataColorB");
-	texData.color.a =	Parse<Uint8>(pComp, "TexDataColorA");
-}
-
-void ProtoParser::XML::Helper::LoadAlignments(xml_node<>* pComp, HAlignment& horAlignment, VAlignment& verAlignment)
-{
-	const std::string horAlignmentStr{ ParseString(pComp, "HorizontalAlignment") };
-
-	if (horAlignmentStr == "Left")
-		horAlignment = HAlignment::LEFT;
-	else if (horAlignmentStr == "Center")
-		horAlignment = HAlignment::CENTER;
-	else
-		horAlignment = HAlignment::RIGHT;
-
-	const std::string verAlignmentStr{ ParseString(pComp, "VerticalAlignment") };
-
-	if (verAlignmentStr == "Top")
-		verAlignment = VAlignment::TOP;
-	else if (verAlignmentStr == "Center")
-		verAlignment = VAlignment::CENTER;
-	else
-		verAlignment = VAlignment::BOTTOM;
 }
 
 float SecondsToMicroSeconds(float seconds)

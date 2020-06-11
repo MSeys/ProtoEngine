@@ -54,7 +54,7 @@ void Transform::DrawInspectorTitle()
 void Transform::DrawInspector()
 {
 	ProtoGui::ProtoGuiData pgData{ true, 0, -1, true, 70 };
-	ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.1f" };
+	ProtoGui::DragData dragData{ 1.f, 0, 0, "%.0f" };
 	
 	/* Position */ {
 		ImGui::Text("Position");

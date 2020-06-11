@@ -117,7 +117,7 @@ void ControllerJoystick::Update(const XINPUT_STATE& oldState, const XINPUT_STATE
 
 void ControllerJoystick::SetInputData(Command& command)
 {
-	command.SetInputData(CommandOrigin::C_JOYSTICK, "NONE", &m_Data);
+	command.SetInputData(CommandOrigin::C_JOYSTICK, -1, XINPUT_Keycode(-1), &m_Data);
 }
 #pragma endregion Variant (Joystick) | ControllerJoystick
 
@@ -148,6 +148,6 @@ void Mouse::UpdateOutPoll()
 
 void Mouse::SetInputData(Command& command)
 {
-	command.SetInputData(CommandOrigin::KBM_MOUSE, "NONE", &m_Data);
+	command.SetInputData(CommandOrigin::KBM_MOUSE, -1, XINPUT_Keycode(-1), &m_Data);
 }
 #pragma endregion Variant (Joystick) | Mouse

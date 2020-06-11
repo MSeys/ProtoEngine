@@ -431,11 +431,13 @@ void GameObject::DrawEditorDebug()
 {
 	// Components DrawEditorDebug
 	for (BaseBehaviour* pComp : m_pComponents)
-		pComp->DrawEditorDebug();
+		if(pComp->GetActive())
+			pComp->DrawEditorDebug();
 
 	// Children DrawEditorDebug
 	for (GameObject* pChild : m_pChildren)
-		pChild->DrawEditorDebug();
+		if(pChild->GetActive())
+			pChild->DrawEditorDebug();
 }
 
 void GameObject::Start()

@@ -53,7 +53,5 @@ void Proto::CommandManager::ForceExit()
 void Proto::CommandManager::ResetInputData()
 {
 	for (std::pair<std::string, Command*> pair : m_Commands)
-	{
-		pair.second->SetInputData(CommandOrigin::NONE, "NONE", nullptr);
-	}
+		pair.second->SetInputData(CommandOrigin::NONE, -1, XINPUT_Keycode(-1), nullptr);
 }

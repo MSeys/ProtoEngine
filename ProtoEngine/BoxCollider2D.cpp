@@ -15,11 +15,11 @@ void BoxCollider2D::DrawInspectorTitle()
 
 void BoxCollider2D::DrawInspector()
 {
-	ProtoGui::Presets::Position(m_CollisionPos.x, m_CollisionPos.y);
-	ProtoGui::Presets::Size(m_CollisionSize.x, m_CollisionSize.y);
+	ProtoGui::Presets::InputXY({ "Position", "X", "Y" }, m_CollisionPos.x, m_CollisionPos.y, { 1.f, 0, 0, "%.0f" }, 0);
+	ProtoGui::Presets::InputXY({ "Size", "X", "Y" }, m_CollisionSize.x, m_CollisionSize.y, { 0.1f, 0, 0, "%.1f" }, 1);
 
-	const ProtoGui::ProtoGuiData pgData{ true, 120, -1, true, 70 };
-	const ProtoGui::DragData dragData{ 0.1f, 0, 0, "%.2f" };
+	const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
+	const ProtoGui::DragData dragData{ 1.f, 0, 0, "%.0f" };
 	ProtoGui::Drag<float>("Rotation", pgData, "##BoxColliderRotation", m_Rotation, dragData);
 	Collider2D::DrawInspector();
 }
@@ -47,7 +47,7 @@ void BoxCollider2D::DrawEditorDebug()
 		b2PolygonShape boxShape;
 
 		const glm::vec2 collisionPos{ ProtoConvert::PixelsToBox2D(m_CollisionPos) };
-		const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize) };
+		const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize * GetTransform()->GetScale()) };
 		
 		boxShape.SetAsBox(collisionSize.x, collisionSize.y,  ProtoConvert::ToBox2DVec(collisionPos), ProtoConvert::ToRadians(m_Rotation));
 		
@@ -84,7 +84,7 @@ void BoxCollider2D::Start()
 	b2PolygonShape boxShape;
 
 	const glm::vec2 collisionPos{ ProtoConvert::PixelsToBox2D(m_CollisionPos) };
-	const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize) };
+	const glm::vec2 collisionSize{ ProtoConvert::PixelsToBox2D(m_CollisionSize * GetTransform()->GetScale()) };
 
 	boxShape.SetAsBox(collisionSize.x, collisionSize.y, ProtoConvert::ToBox2DVec(collisionPos), ProtoConvert::ToRadians(m_Rotation));
 	

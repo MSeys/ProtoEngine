@@ -8,7 +8,7 @@ public:
 	void Execute() override
 	{
 		auto& dataStr{ VoidCast<std::string>(EData) };
-		ProtoLogger.AddLog(LogLevel::Debug, "JumpCommand::Execute > " + IData.StringCode + " > " + dataStr);
+		ProtoLogger.AddLog(LogLevel::Debug, "JumpCommand::Execute > " + dataStr);
 		ProtoAudio::GetAudio().PlayAudio(L"jump.wav");
 		dataStr = "Boing V2.0";
 	}

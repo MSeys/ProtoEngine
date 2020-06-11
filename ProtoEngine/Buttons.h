@@ -2,7 +2,6 @@
 #include "ProtoEnginePCH.h"
 
 #include <array>
-#include <SDL.h>
 
 #include "windows.h"
 #include <Xinput.h>
@@ -35,26 +34,25 @@ class ControllerButton final : public Button
 {
 
 public:
-	ControllerButton(int XInput, std::string stringifiedXInput);
+	ControllerButton(const XINPUT_Keycode& keyCode);
 	void Update(const XINPUT_STATE& oldState, const XINPUT_STATE& currState);
 	void SetInputData(Command& command) override;
 	
 private:
-	int m_XInput;
-	std::string m_StringifiedXInput;
+	XINPUT_Keycode m_KeyCode;
 };
 
 class Key : public Button
 {
 public:
-	Key(std::string stringifiedSDLKey);
+	Key(const SDL_Keycode& keyCode);
 
 	virtual void UpdateInPoll(const SDL_Event& currState);
 	void UpdateOutPoll();
 	void SetInputData(Command& command) override;
 
 private:
-	std::string m_StringifiedSDLKey;
+	SDL_Keycode m_KeyCode;
 };
 
 class MouseButton final : public Key
