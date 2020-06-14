@@ -80,7 +80,7 @@ void GameObject::Load(rapidxml::xml_node<>* pNode)
 	SortComponentsByOrder();
 }
 
-void GameObject::AddChild(GameObject* obj)
+void GameObject::AddChild(GameObject* obj, bool runtime)
 {
 #if _DEBUG
 	if (obj->m_pParentObject)
@@ -101,11 +101,20 @@ void GameObject::AddChild(GameObject* obj)
 #endif
 
 	obj->m_pParentObject = this;
-	if (GetScene()->GetCurrentID() < obj->GetID())
-		GetScene()->SetCurrentID(obj->GetID());
+	if (!runtime)
+	{
+		if (GetCurrentID() < obj->GetID())
+			SetCurrentID(obj->GetID());
+	}
+
+	else
+	{
+		SetCurrentID(GetCurrentID() - 1);
+		obj->SetID(0);
+	}
 	m_pChildren.push_back(obj);
 
-	if (m_IsInitialized)
+	if (runtime)
 	{
 		const auto scene = GetScene();
 
@@ -132,14 +141,14 @@ void GameObject::RemoveChild(GameObject* obj, bool deleteObject)
 	m_pChildren.erase(it);
 
 	if(deleteObject)
-		SafeDelete(obj);
+		m_pToDestroy.push_back(obj);
 	else
 		obj->m_pParentObject = nullptr;
 }
 #pragma endregion Add / Remove Child
 
 #pragma region Add / Remove Component
-void GameObject::AddComponent(BaseBehaviour* pComp)
+void GameObject::AddComponent(BaseBehaviour* pComp, bool runtime)
 {
 #if _DEBUG
 	if (typeid(*pComp) == typeid(Transform) && HasComponent<Transform>())
@@ -163,7 +172,7 @@ void GameObject::AddComponent(BaseBehaviour* pComp)
 	m_pComponents.push_back(pComp);
 	pComp->m_pGameObject = this;
 
-	if (m_IsInitialized)
+	if (runtime)
 	{
 		pComp->Start();
 		pComp->Awake();
@@ -282,9 +291,9 @@ void GameObject::MakeParent()
 
 GameObject* GameObject::FindGameObjectWithIDinChildren(GameObjectID id)
 {
-	GameObject* pFoundHere = *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return pObject->GetID() == id; });
-	if (pFoundHere)
-		return pFoundHere;
+	const auto itFoundHere = std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return unsigned(pObject->GetID()) == unsigned(id); });
+	if (itFoundHere != m_pChildren.cend())
+		return *itFoundHere;
 	
 	for (GameObject* pGameObject : m_pChildren)
 	{
@@ -301,6 +310,15 @@ BaseBehaviour* GameObject::FindComponentWithID(ComponentID c_id) const
 	BaseBehaviour* pFoundComp = *std::find_if(m_pComponents.cbegin(), m_pComponents.cend(), [c_id](BaseBehaviour* pComp) { return pComp->GetID() == c_id; });
 	if (pFoundComp)
 		return pFoundComp;
+
+	return nullptr;
+}
+
+GameObject* GameObject::FindGameObjectWithName(const std::string& name) const
+{
+	const auto foundIt{ std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [name](GameObject* pObject) { return pObject->GetName().compare(name) == 0; }) };
+	if (foundIt != m_pChildren.cend())
+		return *foundIt;
 
 	return nullptr;
 }
@@ -487,6 +505,15 @@ void GameObject::Update()
 	// Children Update
 	for (GameObject* pChild : m_pChildren)
 		pChild->Update();
+
+	for (GameObject* pToDestroy : m_pToDestroy)
+	{
+		if (ProtoEditor.GetCurrentSelected() == pToDestroy)
+			ProtoEditor.SetCurrentSelected(nullptr);
+		SafeDelete(pToDestroy);
+	}
+
+	m_pToDestroy.clear();
 }
 
 void GameObject::UpdateUnscaled()
@@ -591,4 +618,12 @@ Scene* GameObject::GetScene() const
 		return m_pParentObject->GetScene();
 
 	return m_pParentScene;
+}
+
+void GameObject::Destroy()
+{
+	if (m_pParentObject)
+		m_pParentObject->RemoveChild(this, true);
+	else
+		GetScene()->RemoveChild(this, true);
 }

@@ -5,14 +5,6 @@
 #include "BB_PlayerController.h"
 #include "BB_ZenChanController.h"
 
-void BubbleBobbleGame::InitializeCommands()
-{
-}
-
-void BubbleBobbleGame::InitializeControls()
-{
-}
-
 void BubbleBobbleGame::InitializeScene()
 {
 	ProtoPhysics.SetPixelsPerMeter(100);
@@ -30,10 +22,10 @@ void BubbleBobbleGame::DrawAddComponent(GameObject* pCurrentSelected)
 		pCurrentSelected->AddComponent(new BB_MenuController(pCurrentSelected->RequestNewID(), true));
 
 	if (ImGui::Selectable("Player Controller"))
-		pCurrentSelected->AddComponent(new BB_PlayerController(pCurrentSelected->RequestNewID(), true, 0, 5.f, 5.f));
+		pCurrentSelected->AddComponent(new BB_PlayerController(pCurrentSelected->RequestNewID(), true, 0));
 
 	if (ImGui::Selectable("Zen-Chan Controller"))
-		pCurrentSelected->AddComponent(new BB_ZenChanController(pCurrentSelected->RequestNewID(), true, 5.f, 5.f));
+		pCurrentSelected->AddComponent(new BB_ZenChanController(pCurrentSelected->RequestNewID(), true));
 }
 
 void BubbleBobbleGame::LoadComponents(rapidxml::xml_node<>* pComponents, GameObject* pCurr)

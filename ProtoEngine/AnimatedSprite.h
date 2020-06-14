@@ -24,6 +24,7 @@ public:
 	void AddAnimation(const Animation& animation);
 	void PlayAnimation(unsigned int index, bool paused = false);
 	void SetPaused(bool isPaused) { m_IsPaused = isPaused; }
+	unsigned int GetPlayingAnimation() const { return m_PlayingAnimation; }
 	
 protected:
 	void Draw() override;
@@ -46,6 +47,7 @@ protected:
 	float m_CurrentTime{ 0 };
 
 	int m_StartingAnimation{ 0 };
+	int m_PlayingAnimation{ 0 };
 	bool m_IsPaused{ true };
 	
 	// Editor

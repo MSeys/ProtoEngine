@@ -113,17 +113,18 @@ namespace ProtoParser
 		template<typename T>
 		T Parse(rapidxml::xml_node<>* pComp, const std::string& name)
 		{
+			const std::string parsed{ ParseString(pComp, name) };
 			if (typeid(T) == typeid(int))
-				return T(stoi(ParseString(pComp, name)));
+				return T(parsed.empty() ? 0 : stoi(parsed));
 
 			if (typeid(T) == typeid(unsigned int))
-				return T(stoul(ParseString(pComp, name)));
+				return T(parsed.empty() ? 0 : stoul(parsed));
 
 			if (typeid(T) == typeid(Uint8))
-				return T(Uint8(stoi(ParseString(pComp, name))));
+				return T(Uint8(parsed.empty() ? 0 : stoi(parsed)));
 
 			if (typeid(T) == typeid(float))
-				return T(stof(ParseString(pComp, name)));
+				return T(parsed.empty() ? 0.f : stof(parsed));
 
 			if (typeid(T) == typeid(bool))
 				return T(ParseString(pComp, name) == "true");

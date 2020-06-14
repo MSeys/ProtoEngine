@@ -20,7 +20,7 @@ public:
 	Scene& operator=(const Scene& other) = delete;
 	Scene& operator=(Scene&& other) noexcept = delete;
 
-	void AddChild(GameObject* obj);
+	void AddChild(GameObject* obj, bool runtime = false);
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
 	bool HasActiveCamera() const { return m_pActiveCamera != nullptr; }
@@ -29,6 +29,10 @@ public:
 
 	GameObject* FindGameObjectWithID(GameObjectID id) const;
 	GameObject* FindGameObjectInRootWithName(const std::string& name) const;
+
+	GameObjectID RequestNewID() { return ++m_CurrentID; }
+	GameObjectID GetCurrentID() const { return m_CurrentID; }
+	void SetCurrentID(const GameObjectID& id) { m_CurrentID = id; }
 	
 protected:
 	void DrawHierarchy();
@@ -52,10 +56,6 @@ protected:
 	std::string GetFileFolderStructure() const { return m_FileFolderStructure; }
 	std::string GetFileName() const { return m_FileName; }
 	
-	GameObjectID RequestNewID() { return ++m_CurrentID; }
-	GameObjectID GetCurrentID() const { return m_CurrentID; }
-	void SetCurrentID(const GameObjectID& id) { m_CurrentID = id; }
-	
 private:
 	friend class Proto::SceneManager;
 	friend class Proto::Editor;
@@ -71,6 +71,8 @@ private:
 	void Draw();
 	
 	std::vector<GameObject*> m_pChildren;
+	std::vector<GameObject*> m_pToDestroy;
+	
 	bool m_IsInitialized;
 	std::wstring m_SceneName;
 

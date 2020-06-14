@@ -58,6 +58,21 @@ void Sprite::AddFrame(const TextureFrame& frame)
 	m_Frames.push_back(frame);
 }
 
+void Sprite::PopFrame()
+{
+	m_Frames.pop_back();
+}
+
+void Sprite::RemoveFrame(unsigned index)
+{
+	m_Frames.erase(m_Frames.begin() + index);
+}
+
+void Sprite::ResizeFrameList(unsigned size)
+{
+	m_Frames.resize(size);
+}
+
 void Sprite::Draw()
 {
 	if (!m_pTexture)

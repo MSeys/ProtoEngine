@@ -32,5 +32,3 @@ int main(int, char* [])
 	engine.Run();
 	return 0;
 }
-
-// TODO: fix AddChild | GameObject ID (resets??? Doesn't re-obtain highest ID???)

@@ -14,6 +14,9 @@ public:
 	
 	void SetTexture(const std::string& path);
 	void AddFrame(const TextureFrame& frame);
+	void PopFrame();
+	void RemoveFrame(unsigned int index);
+	void ResizeFrameList(unsigned int size);
 	
 protected:
 	void Draw() override;

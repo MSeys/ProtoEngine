@@ -30,10 +30,10 @@ public:
 	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent);
 	void Load(rapidxml::xml_node<>* pNode);
 	
-	void AddChild(GameObject* obj);
+	void AddChild(GameObject* obj, bool runtime = false);
 	void RemoveChild(GameObject* obj, bool deleteObject = true);
 
-	void AddComponent(BaseBehaviour* pComp);
+	void AddComponent(BaseBehaviour* pComp, bool runtime = false);
 	void RemoveComponent(BaseBehaviour* pComp, bool deleteComp = true);
 
 	void SwapUpChild(GameObject* obj);
@@ -51,12 +51,14 @@ public:
 
 	GameObject* FindGameObjectWithIDinChildren(GameObjectID id);
 	BaseBehaviour* FindComponentWithID(ComponentID c_id) const;
+	GameObject* FindGameObjectWithName(const std::string& name) const;
 	
 	Transform* GetTransform() const { return m_pTransform; }
 	Scene* GetScene() const;
 	GameObject* GetParent() const { return m_pParentObject; }
 	std::string& GetName() { return m_Name; }
 	GameObjectID GetID() const { return m_ID; }
+	void SetID(GameObjectID id) { m_ID = id; }
 
 	bool GetActive() const
 	{
@@ -66,6 +68,8 @@ public:
 		return m_IsActive;
 	}
 	void SetActive(bool active) { m_IsActive = active; }
+
+	void Destroy();
 
 #pragma region
 	template <class T>
@@ -181,7 +185,8 @@ private:
 	
 	std::vector<GameObject*> m_pChildren;
 	std::vector<BaseBehaviour*> m_pComponents;
-
+	std::vector<GameObject*> m_pToDestroy;
+	
 	std::string m_Name;
 	GameObjectID m_ID;
 	ComponentID m_CurrentID{}; // Component ID, used when adding components + saving + Find function

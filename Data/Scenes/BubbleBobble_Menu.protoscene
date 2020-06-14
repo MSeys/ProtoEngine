@@ -6,7 +6,7 @@
 			<Image ID="3" OrderID="1" Active="true" ImageLocation="\BubbleBobble\BubbleBobbleBackground.png" PositionX="320.000000" PositionY="320.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="0.500000" ColorR="176" ColorG="176" ColorB="176" ColorA="255"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="Floor" ID="2" Active="true">
+	<GameObject Name="Floors" ID="2" Active="true">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="320.000000" PositionY="640.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<Sprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\BubbleBobbleBackground.png">
@@ -16,7 +16,7 @@
 			<LineCollider2D ID="2" OrderID="3" Active="true" PointAX="-320.000000" PointAY="-75.000000" PointBX="320.000000" PointBY="-75.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="Wall" ID="7" Active="true">
+	<GameObject Name="Walls" ID="7" Active="true">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<RigidBody2D ID="1" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
@@ -47,7 +47,7 @@
 			<BB_MenuController ID="2" OrderID="2" Active="true"/>
 		</Components>
 	</GameObject>
-	<GameObject Name="Extra Floors" ID="8" Active="true">
+	<GameObject Name="Floors" ID="8" Active="true">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="100.000000" PositionY="500.000000" Rotation="0.000000" ScaleX="2.500000" ScaleY="2.500000"/>
 			<Sprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\BubbleBobbleBackground.png">
@@ -92,7 +92,7 @@
 			</AnimatedSprite>
 			<RigidBody2D ID="2" OrderID="2" BodyType="1" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
 			<BoxCollider2D ID="3" OrderID="3" Active="true" CollisionPosX="0.000000" CollisionPosY="-20.000000" CollisionSizeX="15.000000" CollisionSizeY="20.000000" CollisionRotation="0.000000" Density="5.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<BB_PlayerController ID="4" OrderID="4" Active="true" PlayerID="0" WalkSpeed="2.000000" JumpForce="-150.000000"/>
+			<BB_PlayerController ID="4" OrderID="4" Active="true" PlayerID="0" WalkSpeed="2.000000" JumpForce="-4.500000" JumpCooldown="0.500000" BubbleCooldown="0.000000"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Blue Player" ID="4" Active="true">
@@ -124,7 +124,7 @@
 			</AnimatedSprite>
 			<RigidBody2D ID="2" OrderID="2" BodyType="1" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
 			<BoxCollider2D ID="3" OrderID="3" Active="true" CollisionPosX="0.000000" CollisionPosY="-20.000000" CollisionSizeX="15.000000" CollisionSizeY="20.000000" CollisionRotation="0.000000" Density="5.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<BB_PlayerController ID="4" OrderID="4" Active="true" PlayerID="1" WalkSpeed="2.000000" JumpForce="-150.000000"/>
+			<BB_PlayerController ID="4" OrderID="4" Active="true" PlayerID="1" WalkSpeed="2.000000" JumpForce="-4.500000" JumpCooldown="0.500000" BubbleCooldown="0.000000"/>
 		</Components>
 	</GameObject>
 </Scene>

@@ -31,8 +31,6 @@ void Proto::Editor::Draw()
 
 	DrawMenu();
 	DrawEditorModeMenu();
-
-	ImGui::ShowDemoWindow();
 }
 
 void Proto::Editor::Destroy()

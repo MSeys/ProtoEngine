@@ -19,17 +19,10 @@ public:
 	}
 	
 protected:
-	// Now Unused
-	virtual void InitializeCommands() = 0;
-
-	// Now Unused
-	virtual void InitializeControls() = 0;
 	virtual void InitializeScene() = 0;
 };
 
 inline void BaseGame::Initialize()
 {
-	//InitializeCommands();
-	//InitializeControls();
 	InitializeScene();
 }

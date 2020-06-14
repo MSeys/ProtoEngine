@@ -10,6 +10,7 @@ class RigidBody2D final : public BaseBehaviour
 {
 public:
 	RigidBody2D(ComponentID ID, RigidBodyType bodyType, float gravityScale = 1.f, bool fixedRotation = false, bool isBullet = false);
+	~RigidBody2D();
 	
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;

@@ -4,8 +4,6 @@
 class BubbleBobbleGame : public BaseGame
 {
 public:
-	void InitializeCommands() override;
-	void InitializeControls() override;
 	void InitializeScene() override;
 
 	void DrawAddComponent(GameObject* pCurrentSelected) override;

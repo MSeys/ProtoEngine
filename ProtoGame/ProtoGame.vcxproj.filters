@@ -13,9 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SimpleGame.cpp">
-      <Filter>Games</Filter>
-    </ClCompile>
     <ClCompile Include="AchievementObserver.cpp">
       <Filter>Observers</Filter>
     </ClCompile>
@@ -31,12 +28,14 @@
     <ClCompile Include="BB_ZenChanController.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="BB_GameMode.cpp" />
+    <ClCompile Include="BB_GameMode.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="BB_BubbleController.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SimpleGame.h">
-      <Filter>Games</Filter>
-    </ClInclude>
     <ClInclude Include="Commands.h" />
     <ClInclude Include="AchievementObserver.h">
       <Filter>Observers</Filter>
@@ -56,6 +55,11 @@
     <ClInclude Include="BB_ZenChanController.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="BB_GameMode.h" />
+    <ClInclude Include="BB_GameMode.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="BB_BubbleController.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

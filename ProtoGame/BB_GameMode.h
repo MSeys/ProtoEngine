@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseBehaviour.h"
-#include "BB_PlayerController.h"
+
+class BB_PlayerController;
 
 class BB_GameMode final : public BaseBehaviour
 {
@@ -18,6 +19,8 @@ public:
 
 	bool HasPlayerOne() const { return m_pPlayerOneController != nullptr; }
 	bool HasPlayerTwo() const { return m_pPlayerTwoController != nullptr; }
+
+	void SetBackgroundFade(float fade) const;
 	
 protected:
 	void Start() override;
@@ -31,6 +34,13 @@ protected:
 private:
 	BB_PlayerController* m_pPlayerOneController{};
 	BB_PlayerController* m_pPlayerTwoController{};
+	GameObject* m_pPlayerOneUI{};
+	GameObject* m_pPlayerTwoUI{};
+
+	Sprite* m_pPlayerOneHealth{};
+	Sprite* m_pPlayerTwoHealth{};
+
+	Image* m_pFadeBackground{};
 
 	int m_PlayerOneID{ -1 }, m_PlayerTwoID{ -1 };
 

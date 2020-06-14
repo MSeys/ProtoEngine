@@ -32,7 +32,7 @@ Animation Animation::Load(rapidxml::xml_node<>* pComp)
 }
 
 AnimatedSprite::AnimatedSprite(ComponentID ID, bool isActive, int startingAnimation, Proto::Texture2D* pTexture)
-	: BaseBehaviour(ID, isActive), m_pTexture(pTexture), m_StartingAnimation(startingAnimation)
+	: BaseBehaviour(ID, isActive), m_pTexture(pTexture), m_StartingAnimation(startingAnimation), m_PlayingAnimation(startingAnimation)
 {
 	SDL_Texture* pSpritePreview{ SDL_CreateTexture(ProtoRenderer.GetSDLRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 										475, 375) };
@@ -86,6 +86,8 @@ void AnimatedSprite::PlayAnimation(unsigned int index, bool paused)
 {
 	if (index >= m_Animations.size())
 		return;
+
+	m_PlayingAnimation = index;
 	
 	m_CurrentFrame = 0;
 	m_pCurrentAnimation = &m_Animations[index];

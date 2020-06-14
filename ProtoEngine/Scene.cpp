@@ -132,7 +132,7 @@ void Scene::LoadAs(const std::string& filePath)
 }
 
 #pragma region Add / Remove Child
-void Scene::AddChild(GameObject* obj)
+void Scene::AddChild(GameObject* obj, bool runtime)
 {
 #if _DEBUG
 	if (obj->m_pParentScene)
@@ -153,10 +153,19 @@ void Scene::AddChild(GameObject* obj)
 #endif
 
 	obj->m_pParentScene = this;
-	if (GetCurrentID() < obj->GetID())
-		SetCurrentID(obj->GetID());
+	if (!runtime)
+	{
+		if (GetCurrentID() < obj->GetID())
+			SetCurrentID(obj->GetID());
+	}
+
+	else
+	{
+		SetCurrentID(GetCurrentID() - 1);
+		obj->SetID(0);
+	}
 	
-	if(m_IsInitialized)
+	if(runtime)
 		obj->Start();
 	m_pChildren.push_back(obj);
 }
@@ -175,7 +184,7 @@ void Scene::RemoveChild(GameObject* obj, bool deleteObject)
 
 	m_pChildren.erase(it);
 	if (deleteObject)
-		SafeDelete(obj);
+		m_pToDestroy.push_back(obj);
 	else
 		obj->m_pParentScene = nullptr;
 }
@@ -214,9 +223,9 @@ void Scene::DrawDebug()
 
 GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 {
-	GameObject* pFoundHere = *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return unsigned(pObject->GetID()) == unsigned(id); });
-	if (pFoundHere)
-		return pFoundHere;
+	const auto itFoundHere = std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [id](GameObject* pObject) { return unsigned(pObject->GetID()) == unsigned(id); });
+	if (itFoundHere != m_pChildren.cend())
+		return *itFoundHere;
 	
 	for (GameObject* pGameObject : m_pChildren)
 	{
@@ -230,7 +239,11 @@ GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 
 GameObject* Scene::FindGameObjectInRootWithName(const std::string& name) const
 {
-	return *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [name](GameObject* pObject) { return pObject->GetName().compare(name) == 0; });
+	const auto foundIt{ std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [name](GameObject* pObject) { return pObject->GetName().compare(name) == 0; }) };
+	if (foundIt != m_pChildren.cend())
+		return *foundIt;
+
+	return nullptr;
 }
 
 void Scene::SetActiveCamera(Camera* pCamera)
@@ -270,6 +283,15 @@ void Scene::Update()
 {
 	for (auto pChild : m_pChildren)
 		pChild->Update();
+
+	for (GameObject* pToDestroy : m_pToDestroy)
+	{
+		if (ProtoEditor.GetCurrentSelected() == pToDestroy)
+			ProtoEditor.SetCurrentSelected(nullptr);
+		SafeDelete(pToDestroy);
+	}
+
+	m_pToDestroy.clear();
 }
 
 void Scene::UpdateUnscaled()

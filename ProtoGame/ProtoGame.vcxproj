@@ -20,16 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AchievementObserver.cpp" />
+    <ClCompile Include="BB_BubbleController.cpp" />
     <ClCompile Include="BB_GameMode.cpp" />
     <ClCompile Include="BB_PlayerController.cpp" />
     <ClCompile Include="BB_ZenChanController.cpp" />
     <ClCompile Include="BubbleBobbleGame.cpp" />
     <ClCompile Include="BB_MenuController.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SimpleGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AchievementObserver.h" />
+    <ClInclude Include="BB_BubbleController.h" />
     <ClInclude Include="BB_GameMode.h" />
     <ClInclude Include="BB_PlayerController.h" />
     <ClInclude Include="BB_ZenChanController.h" />
@@ -37,7 +38,6 @@
     <ClInclude Include="BB_MenuController.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Events.h" />
-    <ClInclude Include="SimpleGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProtoEngine\ProtoEngine.vcxproj">

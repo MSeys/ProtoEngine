@@ -6,6 +6,12 @@ RigidBody2D::RigidBody2D(ComponentID ID, RigidBodyType bodyType, float gravitySc
 {
 }
 
+RigidBody2D::~RigidBody2D()
+{
+	if (ProtoPhysics.GetWorld().GetBodyCount() > 0 && m_pBody)
+		ProtoPhysics.GetWorld().DestroyBody(m_pBody);
+}
+
 void RigidBody2D::DrawInspectorTitle()
 {
 	ImGui::Text("Rigid Body 2D");

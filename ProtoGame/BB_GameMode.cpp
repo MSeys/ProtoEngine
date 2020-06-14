@@ -1,6 +1,8 @@
 #include "ProtoEnginePCH.h"
 #include "BB_GameMode.h"
 
+#include "BB_PlayerController.h"
+
 void BB_GameMode::DrawInspectorTitle()
 {
 	ImGui::Text("BB - GameMode");
@@ -8,10 +10,16 @@ void BB_GameMode::DrawInspectorTitle()
 
 void BB_GameMode::DrawInspector()
 {
-	const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
+	const ProtoGui::ProtoGuiData pgData{ true, 120, -1, true, 70 };
 	const ProtoGui::DragData dragData{ 1.f, -1, 0, "%.0f" };
 	ProtoGui::Drag<int>("Player One GOID", pgData, "##BB_GameMode_P1", m_PlayerOneID, dragData);
 	ProtoGui::Drag<int>("Player Two GOID", pgData, "##BB_GameMode_P2", m_PlayerTwoID, dragData);
+}
+
+void BB_GameMode::SetBackgroundFade(float fade) const
+{
+	if(m_pFadeBackground)
+		m_pFadeBackground->SetColor({ 0, 0, 0, Uint8(fade * 255) });
 }
 
 void BB_GameMode::Start()
@@ -20,21 +28,32 @@ void BB_GameMode::Start()
 
 void BB_GameMode::Awake()
 {
+	m_pFadeBackground = Gameobject.GetComponent<Image>(true);
 	if (m_PlayerOneID != -1)
 	{
 		GameObject* pPlayerOne{ Gameobject.GetScene()->FindGameObjectWithID(unsigned(m_PlayerOneID)) };
 		m_pPlayerOneController = pPlayerOne->GetComponent<BB_PlayerController>();
+		m_pPlayerOneUI = Gameobject.FindGameObjectWithName("P1_UI");
+		m_pPlayerOneHealth = dynamic_cast<Sprite*>(m_pPlayerOneUI->FindComponentWithID(6));
 	}
 
 	if (m_PlayerTwoID != -1)
 	{
 		GameObject* pPlayerTwo{ Gameobject.GetScene()->FindGameObjectWithID(unsigned(m_PlayerTwoID)) };
 		m_pPlayerTwoController = pPlayerTwo->GetComponent<BB_PlayerController>();
+		m_pPlayerTwoUI = Gameobject.FindGameObjectWithName("P2_UI");
+		m_pPlayerTwoUI->SetActive(true);
+
+		m_pPlayerTwoHealth = dynamic_cast<Sprite*>(m_pPlayerTwoUI->FindComponentWithID(6));
 	}
 }
 
 void BB_GameMode::Update()
 {
+	
+	m_pPlayerOneHealth->ResizeFrameList(m_pPlayerOneController->GetHealth());
+	if (m_pPlayerTwoHealth)
+		m_pPlayerTwoHealth->ResizeFrameList(m_pPlayerTwoController->GetHealth());
 }
 
 void BB_GameMode::FixedUpdate()
