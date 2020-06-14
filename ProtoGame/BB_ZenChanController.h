@@ -13,6 +13,8 @@ public:
 
 	void DrawInspector() override;
 	void DrawInspectorTitle() override;
+
+	bool IsStuckInBubble() const { return m_StuckInBubble; }
 	
 protected:
 	void Start() override;
@@ -53,6 +55,8 @@ private:
 	
 	void Move();
 	void Jump();
+
+	void SpawnPickup() const;
 	
 public:
 	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);

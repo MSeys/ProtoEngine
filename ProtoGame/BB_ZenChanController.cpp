@@ -1,6 +1,8 @@
 #include "ProtoEnginePCH.h"
 #include "BB_ZenChanController.h"
 
+
+#include "BB_PickupController.h"
 #include "BB_PlayerController.h"
 
 void BB_ZenChanController::DrawInspectorTitle()
@@ -57,7 +59,7 @@ void BB_ZenChanController::Update()
 
 			if(m_WasHit)
 			{
-				// TODO: Spawn Pickup
+				SpawnPickup();
 				Gameobject.Destroy();
 			}
 		}
@@ -67,9 +69,12 @@ void BB_ZenChanController::Update()
 void BB_ZenChanController::FixedUpdate()
 {
 	Move();
-	
-	if (GetTransform()->GetPosition().y > ProtoSettings.GetWindowSize().y + 50.f)
-		m_pRigidBody->GetBody()->SetTransform(ProtoConvert::ToBox2DVec(ProtoConvert::PixelsToBox2D({ GetTransform()->GetPosition().x, -10.f })), 0);
+
+	if (!m_pGameMode->IsTransitioning())
+	{
+		if (GetTransform()->GetPosition().y > ProtoSettings.GetWindowSize().y + 50.f)
+			m_pRigidBody->GetBody()->SetTransform(ProtoConvert::ToBox2DVec(ProtoConvert::PixelsToBox2D({ GetTransform()->GetPosition().x, -10.f })), 0);
+	}
 }
 
 void BB_ZenChanController::Draw()
@@ -100,11 +105,7 @@ void BB_ZenChanController::OnCollisionEnter(const Collision& collision)
 		{
 			m_pAnimatedSprite->PlayAnimation(3);
 			m_WasHit = true;
-		}
-		
-		else
-		{
-			m_pGameMode->GetPlayerOne()->Damage();
+			m_pGameMode->GetPlayerOne()->AddScore(25);
 		}
 		return;
 	}
@@ -117,11 +118,7 @@ void BB_ZenChanController::OnCollisionEnter(const Collision& collision)
 			{
 				m_pAnimatedSprite->PlayAnimation(3);
 				m_WasHit = true;
-			}
-
-			else
-			{
-				m_pGameMode->GetPlayerTwo()->Damage();
+				m_pGameMode->GetPlayerTwo()->AddScore(25);
 			}
 			return;
 		}
@@ -246,6 +243,19 @@ void BB_ZenChanController::Jump()
 		m_pRigidBody->GetBody()->ApplyLinearImpulse({ 0, m_pRigidBody->GetBody()->GetMass() * m_JumpForce }, m_pRigidBody->GetBody()->GetWorldCenter(), true);
 		m_CanJump = false;
 	}
+}
+
+void BB_ZenChanController::SpawnPickup() const
+{
+	GameObject* pPickup{ new GameObject(Gameobject.GetScene()->RequestNewID(), "Pickup", true) };
+	Gameobject.GetParent()->AddChild(pPickup, true);
+	pPickup->GetTransform()->SetPosition(GetTransform()->GetPosition().x, GetTransform()->GetPosition().y);
+
+	pPickup->AddComponent(new Image(pPickup->RequestNewID(), true, ProtoContent.GetTexture("\\BubbleBobble\\Bubble_Bobble_item_watermelon.png"), {}, { 0.5f, 0.5f }, { 0.5f, 1.f }), true);
+	pPickup->AddComponent(new RigidBody2D(pPickup->RequestNewID(), RigidBodyType::DYNAMIC, 1.f, true, false), true);
+	pPickup->AddComponent(new BoxCollider2D(pPickup->RequestNewID(), true, { 0, -20 }, { 15, 13 }, 0, 1.f, 0.f, 0.f, true), true);
+	pPickup->AddComponent(new BoxCollider2D(pPickup->RequestNewID(), true, { 0, -20 }, { 15, 13 }, 0, 1.f, 0.f, 0.f, false), true);
+	pPickup->AddComponent(new BB_PickupController(pPickup->RequestNewID(), true, 100), true);
 }
 
 void BB_ZenChanController::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)

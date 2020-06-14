@@ -10,6 +10,7 @@ void BubbleBobbleGame::InitializeScene()
 	ProtoPhysics.SetPixelsPerMeter(100);
 	ProtoScenes.Add(new Scene("\\Scenes\\BubbleBobble_Menu.protoscene"));
 	ProtoScenes.Add(new Scene("\\Scenes\\BubbleBobble_SP.protoscene"));
+	ProtoScenes.Add(new Scene("\\Scenes\\BubbleBobble_MP.protoscene"));
 	ProtoScenes.SetCurrentScene(L"BubbleBobble_Menu");
 }
 

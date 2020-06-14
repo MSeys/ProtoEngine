@@ -39,6 +39,7 @@ void BB_GameMode::Awake()
 		m_pPlayerOneController = pPlayerOne->GetComponent<BB_PlayerController>();
 		m_pPlayerOneUI = Gameobject.FindGameObjectWithName("P1_UI");
 		m_pPlayerOneHealth = dynamic_cast<Sprite*>(m_pPlayerOneUI->FindComponentWithID(6));
+		m_pPlayerOneScore = m_pPlayerOneUI->GetComponent<Text>();
 	}
 
 	if (m_PlayerTwoID != -1)
@@ -49,6 +50,7 @@ void BB_GameMode::Awake()
 		m_pPlayerTwoUI->SetActive(true);
 
 		m_pPlayerTwoHealth = dynamic_cast<Sprite*>(m_pPlayerTwoUI->FindComponentWithID(6));
+		m_pPlayerTwoScore = m_pPlayerTwoUI->GetComponent<Text>();
 	}
 }
 
@@ -57,6 +59,28 @@ void BB_GameMode::Update()
 	m_pPlayerOneHealth->ResizeFrameList(m_pPlayerOneController->GetHealth());
 	if (m_pPlayerTwoHealth)
 		m_pPlayerTwoHealth->ResizeFrameList(m_pPlayerTwoController->GetHealth());
+
+	if(m_pPlayerOneScore)
+	{
+		const int playerScore = m_pPlayerOneController->GetScore();
+		std::string playerScoreText{};
+		for(int i{}; i < int(6 - std::to_string(playerScore).size()); i++)
+			playerScoreText += "0";
+
+		playerScoreText += std::to_string(playerScore);
+		m_pPlayerOneScore->SetText(playerScoreText);
+	}
+
+	if (m_pPlayerTwoScore)
+	{
+		const int playerScore = m_pPlayerTwoController->GetScore();
+		std::string playerScoreText{};
+		for (int i{}; i < int(6 - std::to_string(playerScore).size()); i++)
+			playerScoreText += "0";
+
+		playerScoreText += std::to_string(playerScore);
+		m_pPlayerTwoScore->SetText(playerScoreText);
+	}
 }
 
 void BB_GameMode::FixedUpdate()

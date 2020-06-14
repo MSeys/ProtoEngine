@@ -80,6 +80,7 @@ public:
 			break;
 		case BB_MenuState::Coop:
 			ProtoLogger.AddLog(LogLevel::Info, "Going to Co-op");
+			ProtoScenes.Load(L"BubbleBobble_MP");
 			break;
 		case BB_MenuState::Versus:
 			ProtoLogger.AddLog(LogLevel::Info, "Going to Versus");

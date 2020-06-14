@@ -32,6 +32,8 @@ protected:
 
 	void OnCollisionEnter(const Collision& collision) override;
 	void OnCollisionExit(const Collision& collision) override;
+	void OnTriggerEnter(const Collision& collision) override;
+	
 	void PreSolveCollision(const Collision& collision) override;
 	void PreSolveTrigger(const Collision& collision) override;
 	

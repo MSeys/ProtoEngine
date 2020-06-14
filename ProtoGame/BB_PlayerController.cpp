@@ -3,6 +3,8 @@
 
 #include "BB_BubbleController.h"
 #include "BB_GameMode.h"
+#include "BB_PickupController.h"
+#include "BB_ZenChanController.h"
 
 void BB_PlayerController::DrawInspectorTitle()
 {
@@ -341,6 +343,13 @@ void BB_PlayerController::OnCollisionEnter(const Collision& collision)
 	if (collision.other->GetName() == "Walls")
 		return;
 
+	if(collision.other->GetName().find("Enemy") != std::string::npos)
+	{
+		BB_ZenChanController* pEnemyController = collision.other->GetComponent<BB_ZenChanController>();
+		if (!pEnemyController->IsStuckInBubble())
+			Damage();
+	}
+
 	m_FootContacts++;
 }
 
@@ -353,6 +362,16 @@ void BB_PlayerController::OnCollisionExit(const Collision& collision)
 		return;
 	
 	m_FootContacts--;
+}
+
+void BB_PlayerController::OnTriggerEnter(const Collision& collision)
+{
+	if(collision.other->GetName() == "Pickup")
+	{
+		BB_PickupController* pController{ collision.other->GetComponent<BB_PickupController>() };
+		if (pController)
+			AddScore(pController->GetScore());
+	}
 }
 
 void BB_PlayerController::PreSolveCollision(const Collision& collision)
@@ -407,10 +426,5 @@ void BB_PlayerController::PreSolveCollision(const Collision& collision)
 void BB_PlayerController::PreSolveTrigger(const Collision& collision)
 {
 	if (m_WasHit)
-	{
 		collision.contact->SetEnabled(false);
-		return;
-	}
-
-	// TODO: Pickup Trigger
 }

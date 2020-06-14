@@ -19,7 +19,7 @@ public:
 
 	bool HasPlayerOne() const { return m_pPlayerOneController != nullptr; }
 	bool HasPlayerTwo() const { return m_pPlayerTwoController != nullptr; }
-
+	bool IsTransitioning() const { return m_IsTransitioning; }
 	void SetBackgroundFade(float fade) const;
 	
 protected:
@@ -41,6 +41,9 @@ private:
 	Sprite* m_pPlayerTwoHealth{};
 
 	Image* m_pFadeBackground{};
+
+	Text* m_pPlayerOneScore{};
+	Text* m_pPlayerTwoScore{};
 
 	const float m_TransitionTimer{ 2.f };
 	float m_TransitionCurrTimer{ 0.f };

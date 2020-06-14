@@ -22,6 +22,7 @@
     <ClCompile Include="AchievementObserver.cpp" />
     <ClCompile Include="BB_BubbleController.cpp" />
     <ClCompile Include="BB_GameMode.cpp" />
+    <ClCompile Include="BB_PickupController.cpp" />
     <ClCompile Include="BB_PlayerController.cpp" />
     <ClCompile Include="BB_ZenChanController.cpp" />
     <ClCompile Include="BubbleBobbleGame.cpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="AchievementObserver.h" />
     <ClInclude Include="BB_BubbleController.h" />
     <ClInclude Include="BB_GameMode.h" />
+    <ClInclude Include="BB_PickupController.h" />
     <ClInclude Include="BB_PlayerController.h" />
     <ClInclude Include="BB_ZenChanController.h" />
     <ClInclude Include="BubbleBobbleGame.h" />
