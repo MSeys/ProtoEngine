@@ -28,6 +28,10 @@ void BB_GameMode::Start()
 
 void BB_GameMode::Awake()
 {
+	m_pLevels[0] = Gameobject.GetScene()->FindGameObjectInRootWithName("Level1");
+	m_pLevels[1] = Gameobject.GetScene()->FindGameObjectInRootWithName("Level2");
+	m_pLevels[2] = Gameobject.GetScene()->FindGameObjectInRootWithName("Level3");
+	
 	m_pFadeBackground = Gameobject.GetComponent<Image>(true);
 	if (m_PlayerOneID != -1)
 	{
@@ -50,7 +54,6 @@ void BB_GameMode::Awake()
 
 void BB_GameMode::Update()
 {
-	
 	m_pPlayerOneHealth->ResizeFrameList(m_pPlayerOneController->GetHealth());
 	if (m_pPlayerTwoHealth)
 		m_pPlayerTwoHealth->ResizeFrameList(m_pPlayerTwoController->GetHealth());
@@ -58,6 +61,42 @@ void BB_GameMode::Update()
 
 void BB_GameMode::FixedUpdate()
 {
+	if (!m_IsTransitioning)
+	{
+		if (m_pLevels[m_CurrentLevel]->GetChildren().size() == 2)
+			m_IsTransitioning = true;
+	}
+
+	if (m_IsTransitioning)
+	{
+		SetBackgroundFade((m_TransitionCurrTimer <= m_TransitionTimer / 2.f) ? m_TransitionCurrTimer : m_TransitionTimer - m_TransitionCurrTimer);
+		m_TransitionCurrTimer += ProtoTime.DeltaTime;
+		if(m_TransitionCurrTimer >= m_TransitionTimer / 2.f && !m_IsTransitioningHalfway)
+		{
+			if (m_CurrentLevel + 1 == int(m_pLevels.size()))
+			{
+				ProtoScenes.Load(L"BubbleBobble_Menu");
+				return;
+			}
+			
+			m_pLevels[m_CurrentLevel]->SetActive(false);
+			m_CurrentLevel += 1;
+			m_pLevels[m_CurrentLevel]->SetActive(true);
+
+			m_pPlayerOneController->ResetPosition();
+
+			if (HasPlayerTwo())
+				m_pPlayerTwoController->ResetPosition();
+			
+			m_IsTransitioningHalfway = true;
+		}
+		if (m_TransitionCurrTimer > m_TransitionTimer)
+		{
+			m_TransitionCurrTimer = 0.f;
+			m_IsTransitioning = false;
+			m_IsTransitioningHalfway = false;
+		}
+	}
 }
 
 void BB_GameMode::Draw()

@@ -24,6 +24,11 @@ void BB_PlayerController::DrawInspector()
 	ProtoGui::Drag<float>("Bubble Cooldown", pgData, "##BB_PlayerController_BubbleCooldown", m_SpawnBubbleCooldown, dragData);
 }
 
+void BB_PlayerController::ResetPosition() const
+{
+	m_pRigidBody->GetBody()->SetTransform(ProtoConvert::ToBox2DVec(ProtoConvert::PixelsToBox2D(m_StartingPosition)), 0);
+}
+
 void BB_PlayerController::Start()
 {
 }

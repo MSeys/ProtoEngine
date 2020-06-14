@@ -42,7 +42,16 @@ private:
 
 	Image* m_pFadeBackground{};
 
+	const float m_TransitionTimer{ 2.f };
+	float m_TransitionCurrTimer{ 0.f };
+
 	int m_PlayerOneID{ -1 }, m_PlayerTwoID{ -1 };
+
+	std::array<GameObject*, 3> m_pLevels;
+	int m_CurrentLevel{ 0 };
+
+	bool m_IsTransitioning{ false };
+	bool m_IsTransitioningHalfway{ false };
 
 public:
 	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);

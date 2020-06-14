@@ -20,10 +20,8 @@
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<RigidBody2D ID="1" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
-			<LineCollider2D ID="2" OrderID="2" Active="false" PointAX="0.000000" PointAY="0.000000" PointBX="0.000000" PointBY="640.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<LineCollider2D ID="3" OrderID="3" Active="false" PointAX="640.000000" PointAY="0.000000" PointBX="640.000000" PointBY="640.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<BoxCollider2D ID="4" OrderID="4" Active="true" CollisionPosX="-2.000000" CollisionPosY="320.000000" CollisionSizeX="4.000000" CollisionSizeY="320.000000" CollisionRotation="0.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
-			<BoxCollider2D ID="5" OrderID="5" Active="true" CollisionPosX="642.000000" CollisionPosY="320.000000" CollisionSizeX="4.000000" CollisionSizeY="320.000000" CollisionRotation="0.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<BoxCollider2D ID="4" OrderID="2" Active="true" CollisionPosX="-2.000000" CollisionPosY="320.000000" CollisionSizeX="4.000000" CollisionSizeY="320.000000" CollisionRotation="0.000000" Density="50.000000" Friction="0.000000" Restitution="0.000000" IsTrigger="false"/>
+			<BoxCollider2D ID="5" OrderID="3" Active="true" CollisionPosX="642.000000" CollisionPosY="320.000000" CollisionSizeX="4.000000" CollisionSizeY="320.000000" CollisionRotation="0.000000" Density="50.000000" Friction="0.000000" Restitution="0.000000" IsTrigger="false"/>
 		</Components>
 	</GameObject>
 	<GameObject Name="Menu" ID="5" Active="true">

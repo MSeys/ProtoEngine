@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Scene version="1.0" Name="BubbleBobble_SP" type="protoscene">
-	<GameObject Name="Level1" ID="8" Active="false">
+	<GameObject Name="Level1" ID="8" Active="true">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<Sprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\BubbleBobble_R1T20.png">
@@ -98,7 +98,7 @@
 			</Components>
 		</GameObject>
 	</GameObject>
-	<GameObject Name="Level3" ID="18" Active="true">
+	<GameObject Name="Level3" ID="18" Active="false">
 		<Components>
 			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
 			<Sprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\BubbleBobble_R1T20.png">

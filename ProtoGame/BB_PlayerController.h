@@ -22,6 +22,7 @@ public:
 	int GetScore() const { return m_Score; }
 
 	bool IsDead() const { return m_IsDead; }
+	void ResetPosition() const;
 	
 protected:
 	void Start() override;
