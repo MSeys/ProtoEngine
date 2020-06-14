@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <iostream>
 
+#include "Editor.h"
+
 enum class CommandOrigin
 {
 	C_BUTTON, C_JOYSTICK, C_TRIGGER, KBM_KEY, KBM_MOUSE, KBM_MOUSE_KEY, NONE
@@ -66,6 +68,19 @@ class ExitCommand : public Command
 {
 	void Execute() override
 	{
-		*static_cast<bool*>(EData) = true;
+		if(ProtoSettings.GetRenderMode() == RenderMode::GAME)
+			*static_cast<bool*>(EData) = true;
+
+		else
+		{
+			if(ProtoSettings.GetEditorMode() == EditorMode::EDIT)
+				*static_cast<bool*>(EData) = true;
+
+			else
+			{
+				Proto::Editor::GetInstance().ReturnToEditMode();
+				ProtoSettings.SetEditorMode(EditorMode::EDIT);
+			}
+		}
 	}
 };

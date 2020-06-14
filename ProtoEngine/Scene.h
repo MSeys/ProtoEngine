@@ -26,6 +26,9 @@ public:
 	bool HasActiveCamera() const { return m_pActiveCamera != nullptr; }
 	glm::vec2 GetActiveCamera() const;
 	void SetActiveCamera(Camera* pCamera);
+
+	GameObject* FindGameObjectWithID(GameObjectID id) const;
+	GameObject* FindGameObjectInRootWithName(const std::string& name) const;
 	
 protected:
 	void DrawHierarchy();
@@ -52,8 +55,6 @@ protected:
 	GameObjectID RequestNewID() { return ++m_CurrentID; }
 	GameObjectID GetCurrentID() const { return m_CurrentID; }
 	void SetCurrentID(const GameObjectID& id) { m_CurrentID = id; }
-
-	GameObject* FindGameObjectWithID(GameObjectID id) const;
 	
 private:
 	friend class Proto::SceneManager;
@@ -65,6 +66,7 @@ private:
 	void Start();
 	void Awake();
 	void Update();
+	void UpdateUnscaled();
 	void FixedUpdate();
 	void Draw();
 	

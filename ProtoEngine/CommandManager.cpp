@@ -6,13 +6,24 @@
 void Proto::CommandManager::Init()
 {
 	m_Commands[COMMAND_DEFAULT] = new DefaultCommand(); // Add default command | Useful for Debugging
-	m_Commands[COMMAND_EXIT] = new ExitCommand(); // Add Exit command | Basic bool exit handling | Used in Force Exit for SDL_QUIT Event
+	m_pExitCommand = new ExitCommand(); // Add Exit command | Basic bool exit handling | Used in Force Exit for SDL_QUIT Event
 }
 
 void Proto::CommandManager::Destroy()
 {
+	SafeDelete(m_pExitCommand);
 	for (std::pair<std::string, Command*> pair : m_Commands)
 		SafeDelete(pair.second);
+}
+
+void Proto::CommandManager::Reset()
+{
+	for (std::pair<std::string, Command*> pair : m_Commands)
+		SafeDelete(pair.second);
+
+	m_Commands.clear();
+	
+	m_Commands[COMMAND_DEFAULT] = new DefaultCommand(); // Add default command | Useful for Debugging
 }
 
 bool Proto::CommandManager::AddCommand(Command* command, const std::string& commandID)
@@ -45,9 +56,9 @@ Command& Proto::CommandManager::GetCommand(const std::string& commandID) const
 	}
 }
 
-void Proto::CommandManager::ForceExit()
+void Proto::CommandManager::ForceExit() const
 {
-	m_Commands.at(COMMAND_EXIT)->Execute();
+	m_pExitCommand->Execute();
 }
 
 void Proto::CommandManager::ResetInputData()

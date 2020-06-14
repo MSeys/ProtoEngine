@@ -5,24 +5,23 @@
 #include <vld.h>
 #endif
 
+#include "BubbleBobbleGame.h"
 #include "Engine.h"
 #include "SDL.h"
-
-#include "SimpleGame.h"
 
 int main(int, char* [])
 {
 	BaseGame* pGame{};
-	BaseGame* pRefGame{ new SimpleGame() };
+	BaseGame* pRefGame{ new BubbleBobbleGame() };
 	EditorSettings editorSettings;
 	WindowSettings windowSettings;
 
 #ifdef _WIN64
 	pGame = pRefGame;
-	windowSettings.Title = "SimpleGame";
+	windowSettings.Title = "Bubble Bobble";
 #endif
 
-	windowSettings.GameWindowSize = { 640, 480 };
+	windowSettings.GameWindowSize = { 640, 640 };
 	windowSettings.FPSState = FPSState::PROTO_CAPPED;
 	windowSettings.FPSRate = FPSRate::PROTO_FPS_VERY_HIGH;
 
@@ -34,5 +33,4 @@ int main(int, char* [])
 	return 0;
 }
 
-// TODO: List of features to make
-// SpriteSheet Component + Animations (A day work)
+// TODO: fix AddChild | GameObject ID (resets??? Doesn't re-obtain highest ID???)

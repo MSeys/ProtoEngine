@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Scene version="1.0" Name="BubbleBobble_SP" type="protoscene">
+	<GameObject Name="GameMode" ID="7" Active="true">
+		<Components>
+			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<BB_GameMode ID="1" OrderID="1" Active="true" PlayerOneID="5" PlayerTwoID="-1"/>
+		</Components>
+	</GameObject>
+	<GameObject Name="Level1" ID="8" Active="true">
+		<Components>
+			<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<Sprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\BubbleBobble_R1T20.png">
+				<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="256.000000" DstSizeY="256.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="256.000000" SrcSizeY="256.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.000000" PivotY="0.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+			</Sprite>
+		</Components>
+		<GameObject Name="Wall" ID="3" Active="true">
+			<Components>
+				<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+				<LineCollider2D ID="1" OrderID="1" Active="true" PointAX="40.000000" PointAY="100.000000" PointBX="40.000000" PointBY="580.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="2" OrderID="2" Active="true" PointAX="600.000000" PointAY="100.000000" PointBX="600.000000" PointBY="580.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<RigidBody2D ID="3" OrderID="3" BodyType="0" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
+			</Components>
+		</GameObject>
+		<GameObject Name="Floors" ID="4" Active="true">
+			<Components>
+				<Transform ID="0" OrderID="0" PositionX="0.000000" PositionY="0.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+				<RigidBody2D ID="1" OrderID="1" BodyType="0" GravityScale="1.000000" FixedRotation="false" IsBullet="false"/>
+				<LineCollider2D ID="3" OrderID="2" Active="true" PointAX="40.000000" PointAY="280.000000" PointBX="80.000000" PointBY="280.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="4" OrderID="3" Active="true" PointAX="40.000000" PointAY="380.000000" PointBX="80.000000" PointBY="380.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="5" OrderID="4" Active="true" PointAX="40.000000" PointAY="480.000000" PointBX="80.000000" PointBY="480.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="6" OrderID="5" Active="true" PointAX="40.000000" PointAY="580.000000" PointBX="600.000000" PointBY="580.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="7" OrderID="6" Active="true" PointAX="140.000000" PointAY="280.000000" PointBX="500.000000" PointBY="280.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="8" OrderID="7" Active="true" PointAX="140.000000" PointAY="380.000000" PointBX="500.000000" PointBY="380.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="9" OrderID="8" Active="true" PointAX="140.000000" PointAY="480.000000" PointBX="500.000000" PointBY="480.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="10" OrderID="9" Active="true" PointAX="560.000000" PointAY="280.000000" PointBX="600.000000" PointBY="280.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="11" OrderID="10" Active="true" PointAX="560.000000" PointAY="380.000000" PointBX="600.000000" PointBY="380.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<LineCollider2D ID="12" OrderID="11" Active="true" PointAX="560.000000" PointAY="480.000000" PointBX="600.000000" PointBY="480.000000" Density="1.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			</Components>
+		</GameObject>
+		<GameObject Name="EnemyZenChan" ID="1" Active="true">
+			<Components>
+				<Transform ID="0" OrderID="0" PositionX="175.000000" PositionY="274.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+				<AnimatedSprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\enemyZenChan.png" StartingAnimation="0">
+					<Animation FrameTime="0.200000">
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					</Animation>
+					<Animation FrameTime="0.200000">
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					</Animation>
+					<Animation FrameTime="0.200000">
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="16.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="16.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="16.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="16.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					</Animation>
+					<Animation FrameTime="0.200000">
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="32.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="32.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="32.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+						<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="32.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					</Animation>
+				</AnimatedSprite>
+				<RigidBody2D ID="2" OrderID="2" BodyType="1" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
+				<BoxCollider2D ID="3" OrderID="3" Active="true" CollisionPosX="0.000000" CollisionPosY="-20.000000" CollisionSizeX="15.000000" CollisionSizeY="20.000000" CollisionRotation="0.000000" Density="5.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+				<BB_ZenChanController ID="4" OrderID="4" Active="true" WalkSpeed="0.750000" JumpForce="-150.000000"/>
+			</Components>
+		</GameObject>
+	</GameObject>
+	<GameObject Name="PlayerGreen" ID="5" Active="true">
+		<Components>
+			<Transform ID="0" OrderID="0" PositionX="100.000000" PositionY="580.000000" Rotation="0.000000" ScaleX="1.000000" ScaleY="1.000000"/>
+			<AnimatedSprite ID="1" OrderID="1" Active="true" SpriteLocation="\BubbleBobble\heroGreen.png" StartingAnimation="0">
+				<Animation FrameTime="0.300000">
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+				</Animation>
+				<Animation FrameTime="0.300000">
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="0.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="16.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="32.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+					<TextureFrame DstPositionX="0.000000" DstPositionY="0.000000" DstSizeX="16.000000" DstSizeY="16.000000" SrcPositionX="48.000000" SrcPositionY="0.000000" SrcSizeX="16.000000" SrcSizeY="16.000000" ScaleX="-2.500000" ScaleY="2.500000" PivotX="0.500000" PivotY="1.000000" ColorR="255" ColorG="255" ColorB="255" ColorA="255"/>
+				</Animation>
+			</AnimatedSprite>
+			<RigidBody2D ID="3" OrderID="2" BodyType="1" GravityScale="1.000000" FixedRotation="true" IsBullet="false"/>
+			<BoxCollider2D ID="4" OrderID="3" Active="true" CollisionPosX="0.000000" CollisionPosY="-20.000000" CollisionSizeX="15.000000" CollisionSizeY="20.000000" CollisionRotation="0.000000" Density="5.000000" Friction="0.300000" Restitution="0.000000" IsTrigger="false"/>
+			<BB_PlayerController ID="2" OrderID="4" Active="true" PlayerID="0" WalkSpeed="2.000000" JumpForce="-150.000000"/>
+		</Components>
+	</GameObject>
+</Scene>
+

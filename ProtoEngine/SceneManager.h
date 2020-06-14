@@ -16,7 +16,8 @@ namespace Proto
 
 		void Add(Scene* pScene);
 		void Load(const std::wstring& sceneName);
-
+		void Quit() { CommandManager::GetInstance().ForceExit(); }
+		
 		// Does not reload the Scene - Use with caution
 		void SetCurrentScene(const std::wstring& sceneName);
 		
@@ -25,6 +26,7 @@ namespace Proto
 		
 		void Begin();
 		void Update() const;
+		void UpdateUnscaled() const;
 		void FixedUpdate() const;
 		void Draw() const;
 

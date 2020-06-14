@@ -17,6 +17,8 @@ namespace Proto
 		void Update();
 		void Process();
 
+		void Reset();
+
 		bool AddInput(int index, XINPUT_Keycode keyCode);
 		ControllerButton& GetInput(int index, XINPUT_Keycode keyCode);
 		ControllerJoystick& GetInput(int index, const StickState& stickState) const;

@@ -1,0 +1,39 @@
+#pragma once
+#include "BaseBehaviour.h"
+#include "BB_PlayerController.h"
+
+class BB_GameMode final : public BaseBehaviour
+{
+public:
+	BB_GameMode(const ComponentID ID, const bool isActive, int playerOneID, int playerTwoID)
+		: BaseBehaviour(ID, isActive), m_PlayerOneID(playerOneID), m_PlayerTwoID(playerTwoID)
+	{
+	}
+
+	void DrawInspectorTitle() override;
+	void DrawInspector() override;
+
+	BB_PlayerController* GetPlayerOne() const { return m_pPlayerOneController; }
+	BB_PlayerController* GetPlayerTwo() const { return m_pPlayerTwoController; }
+
+	bool HasPlayerOne() const { return m_pPlayerOneController != nullptr; }
+	bool HasPlayerTwo() const { return m_pPlayerTwoController != nullptr; }
+	
+protected:
+	void Start() override;
+	void Awake() override;
+	void Update() override;
+	void FixedUpdate() override;
+	void Draw() override;
+
+	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) override;
+	
+private:
+	BB_PlayerController* m_pPlayerOneController{};
+	BB_PlayerController* m_pPlayerTwoController{};
+
+	int m_PlayerOneID{ -1 }, m_PlayerTwoID{ -1 };
+
+public:
+	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
+};

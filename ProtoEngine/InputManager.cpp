@@ -99,6 +99,15 @@ void Proto::InputManager::Process()
 {
 	m_ControllerHandler.Process();
 	m_KBMHandler.Process();
+
+	m_WasReset = false;
+}
+
+void Proto::InputManager::Reset()
+{
+	m_WasReset = true;
+	m_ControllerHandler.Reset();
+	m_KBMHandler.Reset();
 }
 
 bool Proto::InputManager::AddInput(int index, XINPUT_Keycode keyCode)

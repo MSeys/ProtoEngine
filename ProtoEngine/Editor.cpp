@@ -41,6 +41,20 @@ void Proto::Editor::Destroy()
 	SafeDelete(m_pGameWindow);
 }
 
+void Proto::Editor::ReturnToEditMode()
+{
+	ProtoInput.Reset();
+	ProtoCommands.Reset();
+	
+	ProtoScenes.GetCurrentScene()->Reset();
+	ProtoScenes.GetCurrentScene()->Load();
+
+	if (m_CurrentSelectedID != 0)
+		m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(m_CurrentSelectedID);
+
+	ProtoTime.TimeScale = 0;
+}
+
 void Proto::Editor::DrawDocks()
 {
 	const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
@@ -175,6 +189,7 @@ void Proto::Editor::DrawMenu()
 						{
 							ProtoScenes.SetCurrentScene(pScene->GetSceneName());
 							ProtoScenes.GetCurrentScene()->Reset();
+
 							ProtoScenes.GetCurrentScene()->Load();
 							
 							m_SceneName = ProtoConvert::ToString(pScene->GetSceneName());
@@ -383,6 +398,10 @@ void Proto::Editor::DrawEditorModeMenu()
 				m_CurrentSelectedID = m_pCurrentSelected->GetID();
 
 			ProtoScenes.GetCurrentScene()->Save();
+
+			ProtoCommands.Reset();
+			ProtoInput.Reset();
+			
 			ProtoScenes.GetCurrentScene()->Reset();
 			ProtoScenes.GetCurrentScene()->Load();
 
@@ -413,13 +432,7 @@ void Proto::Editor::DrawEditorModeMenu()
 		{
 			newMode = EditorMode::EDIT;
 
-			ProtoScenes.GetCurrentScene()->Reset();
-			ProtoScenes.GetCurrentScene()->Load();
-
-			if (m_CurrentSelectedID != 0)
-				m_pCurrentSelected = ProtoScenes.GetCurrentScene()->FindGameObjectWithID(m_CurrentSelectedID);
-
-			ProtoTime.TimeScale = 0;
+			ReturnToEditMode();
 		}
 
 		if (ProtoSettings.GetEditorMode() == EditorMode::EDIT)

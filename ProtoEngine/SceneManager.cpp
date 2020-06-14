@@ -22,6 +22,12 @@ void Proto::SceneManager::Update() const
 		m_pCurrentScene->Update();
 }
 
+void Proto::SceneManager::UpdateUnscaled() const
+{
+	if (m_pCurrentScene != nullptr)
+		m_pCurrentScene->UpdateUnscaled();
+}
+
 void Proto::SceneManager::FixedUpdate() const
 {
 	if (m_pCurrentScene != nullptr)
@@ -57,8 +63,15 @@ void Proto::SceneManager::Load(const std::wstring& sceneName)
 
 	if (it != m_pScenes.end())
 	{
+		// Reset editor selected to avoid crashes
+		ProtoEditor.SetCurrentSelected(nullptr);
+		
 		m_pCurrentScene = *it;
 		m_pCurrentScene->Reset(); // Reset scene
+
+		ProtoCommands.Reset();
+		ProtoInput.Reset();
+		
 		m_pCurrentScene->Load(); // Reload it from file
 		
 		m_pCurrentScene->Start(); // Call Start
@@ -74,7 +87,9 @@ void Proto::SceneManager::SetCurrentScene(const std::wstring& sceneName)
 		});
 
 	if (it != m_pScenes.end())
+	{
 		m_pCurrentScene = *it;
+	}
 }
 
 void Proto::SceneManager::Begin()

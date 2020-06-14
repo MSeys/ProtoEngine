@@ -1,0 +1,172 @@
+#include "ProtoEnginePCH.h"
+#include "BB_PlayerController.h"
+
+void BB_PlayerController::DrawInspectorTitle()
+{
+	ImGui::Text("BB - Player Controller");
+}
+
+void BB_PlayerController::DrawInspector()
+{
+	const ProtoGui::ProtoGuiData pgData{ true, 100, -1, true, 70 };
+	ProtoGui::DragData dragData{ 1.f, 0, 1, "%.0f" };
+	ProtoGui::Drag<int>("Player ID", pgData, "##BB_PlayerController_PlayerID", m_PlayerID, dragData);
+
+	dragData.v_min = dragData.v_max = 0;
+	dragData.v_speed = 0.1f;
+	dragData.format = "%0.1f";
+	ProtoGui::Drag<float>("Walk Speed", pgData, "##BB_PlayerController_WalkSpeed", m_WalkSpeed, dragData);
+	ProtoGui::Drag<float>("Jump Force", pgData, "##BB_PlayerController_JumpForce", m_JumpForce, dragData);
+}
+
+void BB_PlayerController::Start()
+{
+}
+
+void BB_PlayerController::Awake()
+{
+	const std::string moveID{ "BubbleBobble_Player_Move_" + std::to_string(m_PlayerID) },
+					  moveStopID{ "BubbleBobble_Player_MoveStop_" + std::to_string(m_PlayerID) },
+					  jumpID{ "BubbleBobble_Player_Jump_" + std::to_string(m_PlayerID) };
+	
+	m_pRigidBody = Gameobject.GetComponent<RigidBody2D>();
+	m_pAnimatedSprite = Gameobject.GetComponent<AnimatedSprite>();
+	m_pBoxCollider = Gameobject.GetComponent<BoxCollider2D>();
+	
+	ProtoCommands.AddCommand(new PlayerMovingCommand(), moveID);
+	ProtoCommands.AddCommand(new PlayerMoveStopCommand(), moveStopID);
+	ProtoCommands.AddCommand(new PlayerJumpCommand(), jumpID);
+
+	ProtoCommands.GetCommand(moveID).SetExecuteData(this);
+	ProtoCommands.GetCommand(moveStopID).SetExecuteData(this);
+	ProtoCommands.GetCommand(jumpID).SetExecuteData(this);
+	
+	if (m_PlayerID == 0)
+	{
+		ProtoInput.AddInput(SDLK_a);
+		ProtoInput.GetInput(SDLK_a).SetCommand(ButtonState::Held, moveID);
+		ProtoInput.GetInput(SDLK_a).SetCommand(ButtonState::Released, moveStopID);
+
+		ProtoInput.AddInput(SDLK_d);
+		ProtoInput.GetInput(SDLK_d).SetCommand(ButtonState::Held, moveID);
+		ProtoInput.GetInput(SDLK_d).SetCommand(ButtonState::Released, moveStopID);
+	}
+
+	else
+	{
+		ProtoInput.AddInput(SDLK_LEFT);
+		ProtoInput.GetInput(SDLK_LEFT).SetCommand(ButtonState::Held, moveID);
+		ProtoInput.GetInput(SDLK_LEFT).SetCommand(ButtonState::Released, moveStopID);
+
+		ProtoInput.AddInput(SDLK_RIGHT);
+		ProtoInput.GetInput(SDLK_RIGHT).SetCommand(ButtonState::Held, moveID);
+		ProtoInput.GetInput(SDLK_RIGHT).SetCommand(ButtonState::Released, moveStopID);
+	}
+
+	ProtoInput.GetInput(m_PlayerID, StickState::Left).SetCommand(JoystickState::Moving, moveID);
+	ProtoInput.GetInput(m_PlayerID, StickState::Left).SetCommand(JoystickState::Released, moveStopID);
+
+	ProtoInput.AddInput(m_PlayerID, XINPUT_GAMEPAD_LEFT_SHOULDER);
+	ProtoInput.GetInput(m_PlayerID, XINPUT_GAMEPAD_LEFT_SHOULDER).SetCommand(ButtonState::Pressed, jumpID);
+}
+
+void BB_PlayerController::FixedUpdate()
+{
+	m_pRigidBody->GetBody()->SetLinearVelocity({ m_Velocity.x * m_WalkSpeed, m_pRigidBody->GetBody()->GetLinearVelocity().y });
+}
+
+void BB_PlayerController::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
+{
+	using namespace rapidxml;
+
+	xml_node<>* pComp = doc.allocate_node(node_element, doc.allocate_string(ProtoConvert::ToString<BB_PlayerController>().c_str()));
+	SaveID(doc, pComp);
+	SaveActive(doc, pComp);
+
+	ProtoSaver::XML::Save<int>("PlayerID", m_PlayerID, doc, pComp);
+	ProtoSaver::XML::Save<float>("WalkSpeed", m_WalkSpeed, doc, pComp);
+	ProtoSaver::XML::Save<float>("JumpForce", m_JumpForce, doc, pComp);
+
+	pParent->append_node(pComp);
+}
+
+void BB_PlayerController::Move(float xVelocity)
+{
+	if (m_Velocity.x != -1 && xVelocity == -1)
+		m_pAnimatedSprite->PlayAnimation(1);
+
+	else if (m_Velocity.x != 1 && xVelocity == 1)
+		m_pAnimatedSprite->PlayAnimation(0);
+
+	m_Velocity.x = xVelocity;
+}
+
+void BB_PlayerController::Jump() const
+{
+	if (m_FootContacts > 0)
+	{
+		ProtoLogger.AddLog(LogLevel::Info, "Player Jumped");
+		m_pRigidBody->GetBody()->ApplyForce({ 0, m_JumpForce }, m_pRigidBody->GetBody()->GetWorldCenter(), true);
+	}
+}
+
+void BB_PlayerController::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
+{
+	const auto id{ ProtoParser::XML::Parse<unsigned int>(pComp, "ID") };
+	const auto isActive{ ProtoParser::XML::Parse<bool>(pComp, "Active") };
+
+	const auto playerID{ ProtoParser::XML::Parse<int>(pComp, "PlayerID") };
+	const auto walkSpeed{ ProtoParser::XML::Parse<float>(pComp, "WalkSpeed") };
+	const auto jumpForce{ ProtoParser::XML::Parse<float>(pComp, "JumpForce") };
+	
+	pCurr->AddComponent(new BB_PlayerController(id, isActive, playerID, walkSpeed, jumpForce));
+}
+
+void BB_PlayerController::OnCollisionEnter(const Collision& collision)
+{
+	if (collision.other->GetName() == "Wall")
+		return;
+
+	m_FootContacts++;
+}
+
+void BB_PlayerController::OnCollisionExit(const Collision& collision)
+{
+	if (collision.other->GetName() == "Wall")
+		return;
+	
+	m_FootContacts--;
+}
+
+void BB_PlayerController::PreSolveCollision(const Collision& collision)
+{
+	// Derived from https://www.iforce2d.net/b2dtut/one-way-walls
+	
+	b2Fixture* fixtureA{ collision.contact->GetFixtureA() }, *fixtureB{ collision.contact->GetFixtureB() };
+	
+	b2Fixture* playerFixture{ static_cast<GameObject*>(fixtureA->GetBody()->GetUserData()) == GetGameObject() ? fixtureA : fixtureB };
+	b2Fixture* otherFixture{ playerFixture == fixtureA ? fixtureB : fixtureA };
+	
+	if (static_cast<GameObject*>(otherFixture->GetBody()->GetUserData())->GetName() == "Wall")
+	{
+		collision.contact->SetEnabled(true);
+		return;
+	}
+	
+	b2Body* playerBody = playerFixture->GetBody();
+	
+	const int numPoints = collision.contact->GetManifold()->pointCount;
+	b2WorldManifold worldManifold;
+	collision.contact->GetWorldManifold(&worldManifold);
+	
+	//check if contact points are moving downward
+	for (int i = 0; i < numPoints; i++) 
+	{
+		const b2Vec2 pointVel = playerBody->GetLinearVelocityFromWorldPoint(worldManifold.points[i]);
+		if (pointVel.y >= 0)
+			return;//point is moving down, leave contact solid and exit
+	}
+	
+	//no points are moving downward, contact should not be solid
+	collision.contact->SetEnabled(false);
+}

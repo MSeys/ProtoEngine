@@ -89,6 +89,7 @@ void AnimatedSprite::PlayAnimation(unsigned int index, bool paused)
 	
 	m_CurrentFrame = 0;
 	m_pCurrentAnimation = &m_Animations[index];
+	m_pCurrentPreviewAnimation = &m_Animations[index];
 	m_IsPaused = paused;
 }
 
@@ -101,6 +102,9 @@ void AnimatedSprite::Draw()
 		return;
 
 	if (m_CurrentFrame >= m_pCurrentAnimation->frames.size())
+		return;
+
+	if (m_pCurrentAnimation->frames.empty())
 		return;
 
 	FrameRenderData data;
@@ -131,14 +135,20 @@ void AnimatedSprite::Update()
 				m_CurrentFrame = 0;
 		}
 	}
+}
 
+void AnimatedSprite::UpdateUnscaled()
+{
+	if (m_IsPaused)
+		return;
+	
 	if (m_pCurrentPreviewAnimation)
 	{
 		m_CurrentPreviewTime += ProtoTime.DeltaTime_Unscaled;
 		if (m_CurrentPreviewTime >= m_pCurrentPreviewAnimation->frameTime)
 		{
 			m_CurrentPreviewTime = 0;
-			
+
 			if (m_CurrentPreviewFrame + 1 < m_pCurrentPreviewAnimation->frames.size())
 				m_CurrentPreviewFrame++;
 			else
@@ -156,7 +166,7 @@ void AnimatedSprite::DrawInspectorTitle()
 void AnimatedSprite::DrawInspector()
 {
 	const std::string fullPath = fs::canonical(ProtoContent.GetDataPath()).string();
-	const auto selection = ProtoGui::Presets::Path("Animated Sprite", 100, m_TexRelPath, "Select a Sprite", fullPath, { "Sprite Files", "*.png *.jpg *.jpeg *.PNG" });;
+	const auto selection = ProtoGui::Presets::Path("Anim. Sprite", 100, m_TexRelPath, "Select a Sprite", fullPath, { "Sprite Files", "*.png *.jpg *.jpeg *.PNG" });;
 
 	if (!selection.empty())
 	{
@@ -180,6 +190,8 @@ void AnimatedSprite::DrawInspector()
 	if (ImGui::Button("Open Animated Sprite Editor", { 300, 25 }))
 		ImGui::OpenPopup("Animated Sprite Editor");
 
+
+#pragma region Animated Sprite Editor
 	bool opened = true;
 	ImGui::SetNextWindowSize({ 875, 820 });
 	ImGui::SetNextWindowPos({ 50, 50 }, ImGuiCond_Appearing);
@@ -205,13 +217,87 @@ void AnimatedSprite::DrawInspector()
 
 				ImGui::Spacing();
 				ImGui::SameLine(5);
+				if (ImGui::Button("(Un)Pause Animation", { 340, 25 }))
+					m_IsPaused = !m_IsPaused;
+				
+				ImGui::Spacing();
+				ImGui::SameLine(5);
 				if (ImGui::Button("Add Animation", { 340, 25 }))
 					AddAnimation({ 0.2f, {} });
 
 				ImGui::Spacing();
 				ImGui::SameLine(5);
-				if (ImGui::Button("(Un)Pause Preview", { 340, 25 }))
-					m_IsPaused = !m_IsPaused;
+				if (ImGui::Button("Load Animations", { 340, 25 }))
+				{
+					const auto loadAnimSelection = pfd::open_file("Select an Animation File", fullPath, { "ProtoAnimations", "*.protoanimations" }).result();
+					if (!loadAnimSelection.empty())
+					{
+						const std::string filePath{ loadAnimSelection[0].substr(fullPath.size()) };
+
+						LoadAnimations(filePath);
+					}
+				}
+
+				ImGui::Spacing();
+				ImGui::SameLine(5);
+				if (ImGui::Button("Save Animations", { 340, 25 }))
+					ImGui::OpenPopup("Save Animations");
+
+				if (ImGui::BeginPopupModal("Save Animations", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Please fill in a name and select a folder to save these animations.");
+					ImGui::Separator();
+
+					m_SaveFileName.resize(100);
+					ImGui::Text("File Name: ");
+					ImGui::SameLine();
+					ImGui::InputText("##SAVE_FILE_NAME", &m_SaveFileName[0], 100);
+
+					ImGui::SameLine();
+					ImGui::Text(".protoanimations");
+
+					m_SaveFileFolderStructure.resize(300);
+					ImGui::Text("File Location: ");
+					ImGui::SameLine();
+					ImGui::InputText("##SAVE_FILE_PATH", &m_SaveFileFolderStructure[0], 300, ImGuiInputTextFlags_ReadOnly);
+					ImGui::SameLine();
+
+					if (ImGui::Button("...##SAVE_FILE_BUTTON"))
+					{
+						const auto saveFolderSelection = pfd::select_folder("Select a Folder", fullPath).result();
+						if (!saveFolderSelection.empty())
+						{
+							m_SaveFileFolderStructure = saveFolderSelection.substr(fullPath.size());
+						}
+					}
+
+					if (m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
+					{
+						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+					}
+
+					if (ImGui::Button("OK", ImVec2(150, 0)))
+					{
+						SaveAnimations();
+
+						ImGui::CloseCurrentPopup();
+					}
+
+					if (m_SaveFileFolderStructure[0] == '\0' || m_SaveFileName[0] == '\0')
+					{
+						ImGui::PopItemFlag();
+						ImGui::PopStyleVar();
+					}
+
+					ImGui::SetItemDefaultFocus();
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel", ImVec2(150, 0)))
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
+				}
 			}
 
 			ImGui::Separator();
@@ -223,6 +309,8 @@ void AnimatedSprite::DrawInspector()
 				if (ImGui::CollapsingHeader(std::string("Animation " + std::to_string(i)).c_str()))
 				{
 					Animation& animation = m_Animations[i];
+					ImGui::PushID(&animation);
+					
 					ImGui::Text(std::string("Animation " + std::to_string(i)).c_str());
 					ImGui::Separator();
 
@@ -259,6 +347,8 @@ void AnimatedSprite::DrawInspector()
 					ImGui::SameLine(5);
 					if (ImGui::Button("Preview Animation", { 340, 25 }))
 					{
+						m_CurrentFrame = 0;
+						m_CurrentPreviewFrame = 0;
 						m_pCurrentPreviewAnimation = &animation;
 						m_pCurrentAnimation = &animation;
 					}
@@ -307,11 +397,18 @@ void AnimatedSprite::DrawInspector()
 
 					if (toRemoveFrame != -1)
 						animation.frames.erase(animation.frames.begin() + toRemoveFrame);
+
+					ImGui::PopID();
 				}
 			}
 
 			if (toRemoveAnimation != -1)
+			{
+				if (m_pCurrentPreviewAnimation == &m_Animations[toRemoveAnimation] || m_pCurrentAnimation == &m_Animations[toRemoveAnimation])
+					m_pCurrentPreviewAnimation = m_pCurrentAnimation = nullptr;
+				
 				m_Animations.erase(m_Animations.begin() + toRemoveAnimation);
+			}
 		}
 #pragma endregion Animation List
 
@@ -319,109 +416,113 @@ void AnimatedSprite::DrawInspector()
 
 		ImGui::NextColumn();
 
-		/* Texture Preview */ {
-			ImGui::SetNextWindowPos({ 60 + 360, 60 }, ImGuiCond_Appearing);
-			if (ImGui::BeginChild("##TexturePreview", { 490, 390 }, true))
-			{
-				const glm::vec2 maxPreviewSize{ 475, 375 };
-				glm::vec2 previewSize{ m_TextureSize };
+#pragma region Texture Preview
+		ImGui::SetNextWindowPos({ 60 + 360, 60 }, ImGuiCond_Appearing);
+		if (ImGui::BeginChild("##TexturePreview", { 490, 390 }, true))
+		{
+			const glm::vec2 maxPreviewSize{ 475, 375 };
+			glm::vec2 previewSize{ m_TextureSize };
 
-				/* RenderTarget Draw */ {
-					ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
-					SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pTexturePreview->GetSDLTexture());
-					SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+			/* RenderTarget Draw */ {
+				ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pTexturePreview->GetSDLTexture());
+				SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
-					RenderData data;
-					data.originPosition = { 0, 0 };
-					data.originScale = { 1, 1 };
-					data.originAngle = 0;
+				RenderData data;
+				data.originPosition = { 0, 0 };
+				data.originScale = { 1, 1 };
+				data.originAngle = 0;
 
-					data.position = { 0, 0 };
-					data.scale = { 1, 1 };
-					data.pivot = { 0, 0 };
+				data.position = { 0, 0 };
+				data.scale = { 1, 1 };
+				data.pivot = { 0, 0 };
 
-					data.size = m_TextureSize;
-					data.color = { 255, 255, 255, 255 };
-					ProtoRenderer.RenderTexture(*m_pTexture, data);
+				data.size = m_TextureSize;
+				data.color = { 255, 255, 255, 255 };
+				ProtoRenderer.RenderTexture(*m_pTexture, data);
 
-					if (m_pCurrentPreviewAnimation)
-						for (auto& frame : m_pCurrentPreviewAnimation->frames)
-						{
-							SDL_Rect src;
-							src.x = int(frame.srcPosition.x);
-							src.y = int(frame.srcPosition.y);
-							src.w = int(frame.srcSize.x);
-							src.h = int(frame.srcSize.y);
-							ProtoRenderer.RenderLineRect(src, { 255, 255, 255, 255 });
-						}
-
-					SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
-				}
-
-				if (previewSize.x > maxPreviewSize.x)
+				if (m_pCurrentPreviewAnimation)
 				{
-					const float aspectRatio{ maxPreviewSize.x / m_TextureSize.x };
-					previewSize = m_TextureSize * aspectRatio;
-				}
-
-				if (previewSize.y > maxPreviewSize.y)
-				{
-					const float aspectRatio{ maxPreviewSize.y / m_TextureSize.y };
-					previewSize = m_TextureSize * aspectRatio;
-				}
-
-				ImVec2 cursorPos;
-				cursorPos = ProtoConvert::ToImGuiVec((maxPreviewSize - previewSize) * 0.5f);
-				cursorPos.x += 10;
-				cursorPos.y += 10;
-				ImGui::SetCursorPos(cursorPos);
-
-				ImGui::Image(m_pTexturePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
-			}
-			ImGui::EndChild();
-		}
-
-		/* Sprite Preview */ {
-			ImGui::SetNextWindowPos({ 60 + 360, 60 + 400 }, ImGuiCond_Appearing);
-			if (ImGui::BeginChild("##SpritePreview", { 490, 390 }, true))
-			{
-				const glm::vec2 previewSize{ 475, 375 };
-
-				/* RenderTarget Draw */ {
-					ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
-					SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pSpritePreview->GetSDLTexture());
-					SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
-
-					if(m_pCurrentPreviewAnimation && !m_pCurrentPreviewAnimation->frames.empty())
+					for (auto& frame : m_pCurrentPreviewAnimation->frames)
 					{
-						FrameRenderData data;
-						data.originPosition = previewSize / 2.f;
-						data.originScale = m_SpritePreviewScale;
-						data.originAngle = m_SpritePreviewRotation;
-						data.frame = m_pCurrentPreviewAnimation->frames[m_CurrentPreviewFrame];
-						
-						ProtoRenderer.RenderSprite(*m_pTexture, data);
+						SDL_Rect src;
+						src.x = int(frame.srcPosition.x);
+						src.y = int(frame.srcPosition.y);
+						src.w = int(frame.srcSize.x);
+						src.h = int(frame.srcSize.y);
+						ProtoRenderer.RenderLineRect(src, { 255, 255, 255, 255 });
 					}
-					
-					ProtoRenderer.RenderLine({ 0, previewSize.y / 2.f }, { previewSize.x, previewSize.y / 2.f }, { 255, 255, 255, 50 });
-					ProtoRenderer.RenderLine({ previewSize.x / 2.f, 0 }, { previewSize.x / 2.f, previewSize.y }, { 255, 255, 255, 50 });
-
-					SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
 				}
-
-				ImVec2 cursorPos;
-				cursorPos.x += 5;
-				cursorPos.y += 5;
-				ImGui::SetCursorPos(cursorPos);
-
-				ImGui::Image(m_pSpritePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
+				
+				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
 			}
-			ImGui::EndChild();
+
+			if (previewSize.x > maxPreviewSize.x)
+			{
+				const float aspectRatio{ maxPreviewSize.x / m_TextureSize.x };
+				previewSize = m_TextureSize * aspectRatio;
+			}
+
+			if (previewSize.y > maxPreviewSize.y)
+			{
+				const float aspectRatio{ maxPreviewSize.y / m_TextureSize.y };
+				previewSize = m_TextureSize * aspectRatio;
+			}
+
+			ImVec2 cursorPos;
+			cursorPos = ProtoConvert::ToImGuiVec((maxPreviewSize - previewSize) * 0.5f);
+			cursorPos.x += 10;
+			cursorPos.y += 10;
+			ImGui::SetCursorPos(cursorPos);
+
+			ImGui::Image(m_pTexturePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
 		}
+		ImGui::EndChild();
+#pragma endregion Texture Preview
+
+#pragma region Sprite Preview
+		ImGui::SetNextWindowPos({ 60 + 360, 60 + 400 }, ImGuiCond_Appearing);
+		if (ImGui::BeginChild("##SpritePreview", { 490, 390 }, true))
+		{
+			const glm::vec2 previewSize{ 475, 375 };
+
+		#pragma region Render Target Draw
+			ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pSpritePreview->GetSDLTexture());
+			SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+
+			if(m_pCurrentPreviewAnimation && !m_pCurrentPreviewAnimation->frames.empty())
+			{
+				FrameRenderData data;
+				data.originPosition = previewSize / 2.f;
+				data.originScale = m_SpritePreviewScale;
+				data.originAngle = m_SpritePreviewRotation;
+				data.frame = m_pCurrentPreviewAnimation->frames[m_CurrentPreviewFrame];
+				
+				ProtoRenderer.RenderSprite(*m_pTexture, data);
+			}
+			
+			ProtoRenderer.RenderLine({ 0, previewSize.y / 2.f }, { previewSize.x, previewSize.y / 2.f }, { 255, 255, 255, 50 });
+			ProtoRenderer.RenderLine({ previewSize.x / 2.f, 0 }, { previewSize.x / 2.f, previewSize.y }, { 255, 255, 255, 50 });
+
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+		#pragma endregion Render Target Draw
+
+			ImVec2 cursorPos;
+			cursorPos.x += 5;
+			cursorPos.y += 5;
+			ImGui::SetCursorPos(cursorPos);
+
+			ImGui::Image(m_pSpritePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
+		}
+		ImGui::EndChild();
+#pragma endregion Sprite Preview
 		
 		ImGui::Columns(1);
 		ImGui::EndPopup();
 	}
+
+#pragma endregion Animated Sprite Editor
 }
 
 void AnimatedSprite::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)
@@ -457,4 +558,56 @@ void AnimatedSprite::Load(rapidxml::xml_node<>* pComp, GameObject* pCurr)
 		pSpriteComp->AddAnimation(Animation::Load(pAnimNode));
 
 	pSpriteComp->PlayAnimation(startingAnim, false);
+}
+
+
+
+void AnimatedSprite::LoadAnimations(const std::string& filePath)
+{	
+	using namespace rapidxml;
+	
+	xml_document<> doc;
+	const std::string path{ ProtoContent.GetDataPath() + filePath };
+	std::ifstream file(path);
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	std::string content(buffer.str());
+
+	doc.parse<0>(&content[0]);
+
+	xml_node<>* scene = doc.first_node("Animations");
+
+	for (xml_node<>* animNode = scene->first_node(ProtoConvert::ToString<Animation>().c_str()); animNode; animNode = animNode->next_sibling(ProtoConvert::ToString<Animation>().c_str()))
+		m_Animations.push_back(Animation::Load(animNode));
+}
+
+void AnimatedSprite::SaveAnimations()
+{
+	using namespace rapidxml;
+
+	xml_document<> doc;
+	/* Basic Node Declaration - Version + Encoding */ {
+		xml_node<>* decl = doc.allocate_node(node_declaration);
+		decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+		decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+		doc.append_node(decl);
+	}
+
+	xml_node<>* animations = doc.allocate_node(node_element, "Animations");
+	animations->append_attribute(doc.allocate_attribute("version", "1.0"));
+	animations->append_attribute(doc.allocate_attribute("type", "protoanimations"));
+
+	for (auto anim : m_Animations)
+		anim.Save(doc, animations);
+
+	doc.append_node(animations);
+
+	const std::string path{ ProtoContent.GetDataPath() + m_SaveFileFolderStructure.c_str() + "\\" + m_SaveFileName.c_str() + ".protoanimations" };  // NOLINT(readability-redundant-string-cstr)
+																														// c_str() is necessary as strings have reserved space (filled with '\0')
+	fs::create_directory(ProtoContent.GetDataPath() + m_SaveFileFolderStructure.c_str());  // NOLINT(readability-redundant-string-cstr)
+	std::ofstream fileStored(path);
+	fileStored << doc;
+	fileStored.close();
+	doc.clear();
 }

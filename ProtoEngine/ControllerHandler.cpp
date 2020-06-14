@@ -30,6 +30,8 @@ void Proto::ControllerHandler::Destroy()
 
 	for (auto& pTrigger : m_pRightTriggers)
 		SafeDelete(pTrigger);
+
+	m_ControllerButtons.clear();
 }
 
 void Proto::ControllerHandler::Update()
@@ -38,7 +40,7 @@ void Proto::ControllerHandler::Update()
 	{
 		m_OldStates[i] = m_CurrentStates[i];
 		ZeroMemory(&m_CurrentStates[i], sizeof(XINPUT_STATE));
-		XInputGetState(0, &m_CurrentStates[i]);
+		XInputGetState(i, &m_CurrentStates[i]);
 	}
 
 	for (auto& upperPair : m_ControllerButtons)
@@ -66,7 +68,10 @@ void Proto::ControllerHandler::Process()
 	for (auto& upperPair : m_ControllerButtons)
 	{
 		for (auto& innerPair : upperPair.second)
-		{
+		{			
+			if (ProtoInput.WasReset())
+				return;
+			
 			ControllerButton* pControllerButton{ innerPair.second };
 			pControllerButton->Process();
 		}
@@ -74,23 +79,41 @@ void Proto::ControllerHandler::Process()
 
 	for (auto& pJoystick : m_pLeftJoysticks)
 	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		pJoystick->Process();
 	}
 
 	for (auto& pJoystick : m_pRightJoysticks)
 	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		pJoystick->Process();
 	}
 
 	for (auto& pTrigger : m_pLeftTriggers)
 	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		pTrigger->Process();
 	}
 
 	for (auto& pTrigger : m_pRightTriggers)
 	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		pTrigger->Process();
 	}
+}
+
+void Proto::ControllerHandler::Reset()
+{
+	Destroy();
+	Init();
 }
 
 bool Proto::ControllerHandler::AddInput(int index, XINPUT_Keycode keyCode)

@@ -22,13 +22,27 @@ namespace Proto
 		void Draw();
 		void Destroy();
 		
-		void SetCurrentSelected(GameObject* pGameObject) { m_pCurrentSelected = pGameObject; }
+		void SetCurrentSelected(GameObject* pGameObject)
+		{
+			if(!pGameObject)
+			{
+				m_CurrentSelectedID = 0;
+				m_pCurrentSelected = nullptr;
+			}
+			else
+			{
+				m_pCurrentSelected = pGameObject;
+				m_CurrentSelectedID = pGameObject->GetID();
+			}
+		}
 		GameObject* GetCurrentSelected() const { return m_pCurrentSelected; }
 
 		void SetSceneName(const std::string& sceneName) { m_SceneName = sceneName; }
 		void SetSaveFileFolderStructure(const std::string& saveFileFolderStructure) { m_SaveFileFolderStructure = saveFileFolderStructure; }
 		void SetSaveFileName(const std::string& saveFileName) { m_SaveFileName = saveFileName; }
 
+		void ReturnToEditMode();
+		
 	private:		
 		void DrawDocks();
 		void DrawMenu();

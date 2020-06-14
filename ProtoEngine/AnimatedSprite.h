@@ -9,7 +9,7 @@ namespace Proto {
 struct Animation
 {
 	float frameTime{ 0.2f };
-	std::vector<TextureFrame> frames{};
+	std::vector<TextureFrame> frames{ 0 };
 
 	void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent);
 	static Animation Load(rapidxml::xml_node<>* pComp);
@@ -28,6 +28,7 @@ public:
 protected:
 	void Draw() override;
 	void Update() override;
+	void UpdateUnscaled() override;
 	
 	void DrawInspectorTitle() override;
 	void DrawInspector() override;
@@ -58,6 +59,12 @@ protected:
 	unsigned int m_CurrentPreviewFrame{ 0 };
 	float m_CurrentPreviewTime{ 0 };
 
+	std::string m_SaveFileFolderStructure{};
+	std::string m_SaveFileName{};
+
+	void LoadAnimations(const std::string& filePath);
+	void SaveAnimations();
+	
 public:
 	static void Load(rapidxml::xml_node<>* pComp, GameObject* pCurr);
 };

@@ -9,6 +9,8 @@ public:
 	void UpdateInPoll(const SDL_Event& e);
 	void Process();
 
+	void Reset();
+
 	bool AddInput(SDL_Keycode keyCode);
 
 	Key& GetInput(SDL_Keycode keyCode);

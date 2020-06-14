@@ -165,6 +165,7 @@ private:
 	void Start();
 	void Awake();
 	void Update();
+	void UpdateUnscaled();
 	void FixedUpdate();
 	void Draw();
 
@@ -172,7 +173,10 @@ private:
 	void OnTriggerExit(const Collision& collision);
 	void OnCollisionEnter(const Collision& collision);
 	void OnCollisionExit(const Collision& collision);
-
+	
+	void PreSolveTrigger(const Collision& collision);
+	void PreSolveCollision(const Collision& collision);
+	
 	void SortComponentsByOrder();
 	
 	std::vector<GameObject*> m_pChildren;

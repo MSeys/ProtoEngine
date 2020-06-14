@@ -7,13 +7,13 @@ void Proto::PhysicsListener::BeginContact(b2Contact* contact)
 {
 	const auto fixtureA = contact->GetFixtureA(), fixtureB = contact->GetFixtureB();
 	auto gameObjectA = static_cast<GameObject*>(fixtureA->GetBody()->GetUserData()), gameObjectB = static_cast<GameObject*>(fixtureB->GetBody()->GetUserData());
-	
-	if(fixtureA->IsSensor())
-		gameObjectA->OnTriggerEnter({ gameObjectB, contact });
-	
-	else if(fixtureB->IsSensor())
-		gameObjectB->OnTriggerEnter({ gameObjectA, contact });
 
+	if (fixtureA->IsSensor() || fixtureB->IsSensor())
+	{
+		gameObjectA->OnTriggerEnter({ gameObjectB, contact });
+		gameObjectB->OnTriggerEnter({ gameObjectA, contact });
+	}
+	
 	else
 	{
 		gameObjectA->OnCollisionEnter({ gameObjectB, contact });
@@ -27,12 +27,12 @@ void Proto::PhysicsListener::EndContact(b2Contact* contact)
 
 	auto gameObjectA = static_cast<GameObject*>(fixtureA->GetBody()->GetUserData()), gameObjectB = static_cast<GameObject*>(fixtureB->GetBody()->GetUserData());
 
-	if (fixtureA->IsSensor())
+	if (fixtureA->IsSensor() || fixtureB->IsSensor())
+	{
 		gameObjectA->OnTriggerExit({ gameObjectB, contact });
-
-	else if (fixtureB->IsSensor())
 		gameObjectB->OnTriggerExit({ gameObjectA, contact });
-
+	}
+	
 	else
 	{
 		gameObjectA->OnCollisionExit({ gameObjectB, contact });
@@ -40,20 +40,34 @@ void Proto::PhysicsListener::EndContact(b2Contact* contact)
 	}
 }
 
-void Proto::PhysicsListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+void Proto::PhysicsListener::PreSolve(b2Contact* contact, const b2Manifold*)
 {
-	UNREFERENCED_PARAMETER(oldManifold);
-	
 	const auto fixtureA = contact->GetFixtureA(), fixtureB = contact->GetFixtureB();
 	const auto colliderA = static_cast<Collider2D*>(fixtureA->GetUserData()), colliderB = static_cast<Collider2D*>(fixtureB->GetUserData());
+	
 	if (!colliderA->GetActive() || !colliderB->GetActive())
+	{
 		contact->SetEnabled(false);
+		return;
+	}
+
+	auto gameObjectA = static_cast<GameObject*>(fixtureA->GetBody()->GetUserData()), gameObjectB = static_cast<GameObject*>(fixtureB->GetBody()->GetUserData());
+	if (fixtureA->IsSensor() || fixtureB->IsSensor())
+	{
+		gameObjectA->PreSolveTrigger({ gameObjectB, contact });
+		gameObjectB->PreSolveTrigger({ gameObjectA, contact });
+	}
+
+	
+	else
+	{
+		gameObjectA->PreSolveCollision({ gameObjectB, contact });
+		gameObjectB->PreSolveCollision({ gameObjectA, contact });
+	}
 }
 
-void Proto::PhysicsListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+void Proto::PhysicsListener::PostSolve(b2Contact*, const b2ContactImpulse*)
 {
-	UNREFERENCED_PARAMETER(contact);
-	UNREFERENCED_PARAMETER(impulse);
 }
 
 Proto::PhysicsManager::PhysicsManager()

@@ -21,6 +21,8 @@ void KBMHandler::Destroy()
 	SafeDelete(m_pMouse);
 
 	SafeDelete(m_pDefaultKey);
+
+	m_Keys.clear();
 }
 
 void KBMHandler::UpdateOutPoll()
@@ -63,14 +65,28 @@ void KBMHandler::Process()
 {
 	for (auto& pair : m_Keys)
 	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		Key* pKey{ pair.second };
 		pKey->Process();
 	}
 
 	for (auto& pMouseButton : m_pMouseButtons)
+	{
+		if (ProtoInput.WasReset())
+			return;
+		
 		pMouseButton->Process();
-
+	}
+	
 	GetMouse().Process();
+}
+
+void KBMHandler::Reset()
+{
+	Destroy();
+	Init();
 }
 
 bool KBMHandler::AddInput(SDL_Keycode keyCode)

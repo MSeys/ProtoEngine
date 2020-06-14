@@ -32,6 +32,8 @@ namespace Proto
 		void Update();
 		void Process();
 
+		void Reset();
+
 		bool AddInput(int index, XINPUT_Keycode keyCode);
 		bool AddInput(SDL_Keycode keyCode);
 
@@ -43,9 +45,12 @@ namespace Proto
 		MouseButton& GetMouseButton(const MouseState& mouseState) const;
 		Mouse& GetMouse() const;
 
+		bool WasReset() const { return m_WasReset; }
+
 	private:
 		ControllerHandler m_ControllerHandler;
 		KBMHandler m_KBMHandler;
+		bool m_WasReset{ false };
 
 		void InitImGuiIO();
 	};

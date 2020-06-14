@@ -108,6 +108,7 @@ void Sprite::DrawInspector()
 	if (ImGui::Button("Open Sprite Editor", { 300, 25 }))
 		ImGui::OpenPopup("Sprite Editor");
 
+#pragma region Sprite Editor
 	bool opened = true;
 	ImGui::SetNextWindowSize({ 875, 820 });
 	ImGui::SetNextWindowPos({ 50, 50 }, ImGuiCond_Appearing);
@@ -187,43 +188,44 @@ void Sprite::DrawInspector()
 		ImGui::EndChild();
 
 		ImGui::NextColumn();
-		
+
+#pragma region Texture Preview
 		ImGui::SetNextWindowPos({ 60 + 360, 60 }, ImGuiCond_Appearing);
 		if (ImGui::BeginChild("##TexturePreview", { 490, 390 }, true))
 		{
 			const glm::vec2 maxPreviewSize{ 475, 375 };
 			glm::vec2 previewSize{ m_TextureSize };
 			
-			/* RenderTarget Draw */ {
-				ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
-				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pTexturePreview->GetSDLTexture());
-				SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+		#pragma region Render Target Draw
+			ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pTexturePreview->GetSDLTexture());
+			SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
-				RenderData data;
-				data.originPosition = { 0, 0 };
-				data.originScale = { 1, 1 };
-				data.originAngle = 0;
+			RenderData data;
+			data.originPosition = { 0, 0 };
+			data.originScale = { 1, 1 };
+			data.originAngle = 0;
 
-				data.position = { 0, 0 };
-				data.scale = { 1, 1 };
-				data.pivot = { 0, 0 };
+			data.position = { 0, 0 };
+			data.scale = { 1, 1 };
+			data.pivot = { 0, 0 };
 
-				data.size = m_TextureSize;
-				data.color = { 255, 255, 255, 255 };
-				ProtoRenderer.RenderTexture(*m_pTexture, data);
+			data.size = m_TextureSize;
+			data.color = { 255, 255, 255, 255 };
+			ProtoRenderer.RenderTexture(*m_pTexture, data);
 
-				for (auto& frame : m_Frames)
-				{
-					SDL_Rect src;
-					src.x = int(frame.srcPosition.x);
-					src.y = int(frame.srcPosition.y);
-					src.w = int(frame.srcSize.x);
-					src.h = int(frame.srcSize.y);
-					ProtoRenderer.RenderLineRect(src, { 255, 255, 255, 255 });
-				}
-
-				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+			for (auto& frame : m_Frames)
+			{
+				SDL_Rect src;
+				src.x = int(frame.srcPosition.x);
+				src.y = int(frame.srcPosition.y);
+				src.w = int(frame.srcSize.x);
+				src.h = int(frame.srcSize.y);
+				ProtoRenderer.RenderLineRect(src, { 255, 255, 255, 255 });
 			}
+
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+		#pragma endregion Render Target Draw
 
 			if(previewSize.x > maxPreviewSize.x)
 			{
@@ -246,33 +248,35 @@ void Sprite::DrawInspector()
 			ImGui::Image(m_pTexturePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
 		}
 		ImGui::EndChild();
-
+#pragma endregion Texture Preview
+		
+#pragma region Sprite Preview
 		ImGui::SetNextWindowPos({ 60 + 360, 60 + 400 }, ImGuiCond_Appearing);
 		if (ImGui::BeginChild("##SpritePreview", { 490, 390 }, true))
 		{
 			const glm::vec2 previewSize{ 475, 375 };
 
-			/* RenderTarget Draw */ {
-				ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
-				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pSpritePreview->GetSDLTexture());
-				SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
+			#pragma region Render Target Draw
+			ProtoSettings.SetEditorRenderMode(RenderMode::GAME);
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), m_pSpritePreview->GetSDLTexture());
+			SDL_RenderClear(ProtoRenderer.GetSDLRenderer());
 
-				for (auto& frame : m_Frames)
-				{
-					FrameRenderData data;
-					data.originPosition = previewSize / 2.f;
-					data.originScale = m_SpritePreviewScale;
-					data.originAngle = m_SpritePreviewRotation;
-					data.frame = frame;
-					
-					ProtoRenderer.RenderSprite(*m_pTexture, data);
-				}
-
-				ProtoRenderer.RenderLine({ 0, previewSize.y / 2.f }, { previewSize.x, previewSize.y / 2.f }, { 255, 255, 255, 50 });
-				ProtoRenderer.RenderLine({ previewSize.x / 2.f, 0 }, { previewSize.x / 2.f, previewSize.y }, { 255, 255, 255, 50 });
+			for (auto& frame : m_Frames)
+			{
+				FrameRenderData data;
+				data.originPosition = previewSize / 2.f;
+				data.originScale = m_SpritePreviewScale;
+				data.originAngle = m_SpritePreviewRotation;
+				data.frame = frame;
 				
-				SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+				ProtoRenderer.RenderSprite(*m_pTexture, data);
 			}
+
+			ProtoRenderer.RenderLine({ 0, previewSize.y / 2.f }, { previewSize.x, previewSize.y / 2.f }, { 255, 255, 255, 50 });
+			ProtoRenderer.RenderLine({ previewSize.x / 2.f, 0 }, { previewSize.x / 2.f, previewSize.y }, { 255, 255, 255, 50 });
+			
+			SDL_SetRenderTarget(ProtoRenderer.GetSDLRenderer(), nullptr);
+			#pragma endregion Render Target Draw
 
 			ImVec2 cursorPos;
 			cursorPos.x += 5;
@@ -282,11 +286,14 @@ void Sprite::DrawInspector()
 			ImGui::Image(m_pSpritePreview->GetSDLTexture(), ProtoConvert::ToImGuiVec(previewSize));
 		}
 		ImGui::EndChild();
-
+#pragma endregion Sprite Preview
+		
 		ImGui::Columns(1);
 		
 		ImGui::EndPopup();
 	}
+
+#pragma endregion Sprite Preview
 }
 
 void Sprite::Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent)

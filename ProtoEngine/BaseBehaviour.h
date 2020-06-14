@@ -52,6 +52,7 @@ protected:
 	virtual void Start() {}
 	virtual void Awake() {}
 	virtual void Update() {}
+	virtual void UpdateUnscaled() {}
 	virtual void FixedUpdate() {}
 	virtual void Draw() {}
 
@@ -59,6 +60,8 @@ protected:
 	virtual void OnTriggerExit(const Collision& collision) { UNREFERENCED_PARAMETER(collision); }
 	virtual void OnCollisionEnter(const Collision& collision) { UNREFERENCED_PARAMETER(collision); }
 	virtual void OnCollisionExit(const Collision& collision) { UNREFERENCED_PARAMETER(collision); }
+	virtual void PreSolveTrigger(const Collision& collision) { UNREFERENCED_PARAMETER(collision); }
+	virtual void PreSolveCollision(const Collision& collision) { UNREFERENCED_PARAMETER(collision); }
 	
 	virtual void Save(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* pParent) = 0;
 	

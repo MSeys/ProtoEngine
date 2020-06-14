@@ -153,6 +153,9 @@ void Scene::AddChild(GameObject* obj)
 #endif
 
 	obj->m_pParentScene = this;
+	if (GetCurrentID() < obj->GetID())
+		SetCurrentID(obj->GetID());
+	
 	if(m_IsInitialized)
 		obj->Start();
 	m_pChildren.push_back(obj);
@@ -225,6 +228,11 @@ GameObject* Scene::FindGameObjectWithID(GameObjectID id) const
 	return nullptr;
 }
 
+GameObject* Scene::FindGameObjectInRootWithName(const std::string& name) const
+{
+	return *std::find_if(m_pChildren.cbegin(), m_pChildren.cend(), [name](GameObject* pObject) { return pObject->GetName().compare(name) == 0; });
+}
+
 void Scene::SetActiveCamera(Camera* pCamera)
 {
 	if (m_pActiveCamera)
@@ -262,6 +270,12 @@ void Scene::Update()
 {
 	for (auto pChild : m_pChildren)
 		pChild->Update();
+}
+
+void Scene::UpdateUnscaled()
+{
+	for (auto pChild : m_pChildren)
+		pChild->UpdateUnscaled();
 }
 
 void Scene::FixedUpdate()

@@ -101,6 +101,8 @@ void GameObject::AddChild(GameObject* obj)
 #endif
 
 	obj->m_pParentObject = this;
+	if (GetScene()->GetCurrentID() < obj->GetID())
+		GetScene()->SetCurrentID(obj->GetID());
 	m_pChildren.push_back(obj);
 
 	if (m_IsInitialized)
@@ -487,6 +489,23 @@ void GameObject::Update()
 		pChild->Update();
 }
 
+void GameObject::UpdateUnscaled()
+{
+	if (!m_IsActive)
+		return;
+
+	// Components Update
+	for (BaseBehaviour* pComp : m_pComponents)
+	{
+		if (pComp->GetActive())
+			pComp->UpdateUnscaled();
+	}
+
+	// Children Update
+	for (GameObject* pChild : m_pChildren)
+		pChild->UpdateUnscaled();
+}
+
 void GameObject::FixedUpdate()
 {
 	if (!m_IsActive)
@@ -543,6 +562,18 @@ void GameObject::OnCollisionExit(const Collision& collision)
 {
 	for (BaseBehaviour* pComp : m_pComponents)
 		pComp->OnCollisionExit(collision);
+}
+
+void GameObject::PreSolveTrigger(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->PreSolveTrigger(collision);
+}
+
+void GameObject::PreSolveCollision(const Collision& collision)
+{
+	for (BaseBehaviour* pComp : m_pComponents)
+		pComp->PreSolveCollision(collision);
 }
 #pragma endregion Root Functions
 

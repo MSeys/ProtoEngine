@@ -40,9 +40,12 @@ void Proto::Engine::Run() const
 
 		ProtoInput.Update();
 		ProtoInput.Process();
-		
-		ProtoScenes.Update();
 
+		if(ProtoTime.TimeScale > 0)
+			ProtoScenes.Update();
+
+		ProtoScenes.UpdateUnscaled();
+		
 		fixedTimer += ProtoTime.DeltaTime;
 		while(fixedTimer >= ProtoTime.FixedDeltaTime)
 		{
@@ -121,7 +124,7 @@ void Proto::Engine::InitializeEngineParts()
 	
 	// ProtoCommands
 	ProtoCommands.Init();
-	ProtoCommands.GetCommand(COMMAND_EXIT).SetExecuteData(&m_Exit);
+	ProtoCommands.GetExitCommand().SetExecuteData(&m_Exit);
 	
 	// ProtoInput
 	ProtoInput.Init();

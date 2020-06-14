@@ -20,11 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AchievementObserver.cpp" />
+    <ClCompile Include="BB_GameMode.cpp" />
+    <ClCompile Include="BB_PlayerController.cpp" />
+    <ClCompile Include="BB_ZenChanController.cpp" />
+    <ClCompile Include="BubbleBobbleGame.cpp" />
+    <ClCompile Include="BB_MenuController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SimpleGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AchievementObserver.h" />
+    <ClInclude Include="BB_GameMode.h" />
+    <ClInclude Include="BB_PlayerController.h" />
+    <ClInclude Include="BB_ZenChanController.h" />
+    <ClInclude Include="BubbleBobbleGame.h" />
+    <ClInclude Include="BB_MenuController.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="SimpleGame.h" />
@@ -106,6 +116,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ProtoEngine;$(SolutionDir)3rdParty\SDL2_ttf\include;$(SolutionDir)3rdParty\SDL2_image\include;$(SolutionDir)3rdParty\glm;$(SolutionDir)3rdParty\SDL2\include;$(SolutionDir)3rdParty\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,6 +132,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ProtoEngine;$(SolutionDir)3rdParty\SDL2_ttf\include;$(SolutionDir)3rdParty\SDL2_image\include;$(SolutionDir)3rdParty\glm;$(SolutionDir)3rdParty\SDL2\include;$(SolutionDir)3rdParty\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,6 +150,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ProtoEngine;$(SolutionDir)3rdParty\SDL2_ttf\include;$(SolutionDir)3rdParty\SDL2_image\include;$(SolutionDir)3rdParty\glm;$(SolutionDir)3rdParty\SDL2\include;$(SolutionDir)3rdParty\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +170,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ProtoEngine;$(SolutionDir)3rdParty\SDL2_ttf\include;$(SolutionDir)3rdParty\SDL2_image\include;$(SolutionDir)3rdParty\glm;$(SolutionDir)3rdParty\SDL2\include;$(SolutionDir)3rdParty\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
